@@ -7,9 +7,10 @@
   "scripts": {
     "build": "tsc -p src",
     "test": "npm run build && tape test/*.js | faucet",
-    "prepublish": "npm run build",
+    "prepublish": "npm run build && npm run build-docs",
     "test-travis": "npm run build && istanbul cover tape test/*.js",
-    "coverage": "npm run build && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls"
+    "coverage": "npm run build && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
+    "build-docs": "documentation readme lib/mobx-utils.js --github --section API"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
   ],
   "devDependencies": {
     "coveralls": "^2.11.4",
+    "documentation": "^4.0.0-beta9",
     "faucet": "0.0.1",
     "istanbul": "^0.3.21",
     "mobx": "^2.4.2",
