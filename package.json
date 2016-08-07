@@ -5,13 +5,11 @@
   "main": "lib/mobx-utils.js",
   "typings": "lib/mobx-utils.d.ts",
   "scripts": {
-    "test": "npm run build && npm run build-test && npm run tape",
-    "tape": "tape lib/test.js | faucet",
-    "prepublish": "npm run build",
     "build": "tsc -p src",
-    "test-travis": "npm run build && npm run build-test && tsc && istanbul cover tape lib/test.js",
-    "coverage": "npm run small-build && npm run build-tests && istanbul cover tape test/*.js test/perf/index.js && cat ./coverage/lcov.info|coveralls",
-    "build-tests": "tsc-p test"
+    "test": "npm run build && tape test/*.js | faucet",
+    "prepublish": "npm run build",
+    "test-travis": "npm run build && istanbul cover tape test/*.js",
+    "coverage": "npm run build && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls"
   },
   "repository": {
     "type": "git",

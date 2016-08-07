@@ -8,10 +8,9 @@
         "removeComments": false,
         "outDir": "../lib/",
         "noImplicitAny": true,
-        "moduleResolution": "node",
-        "outFile": "lib/mobx-utils.js"
+        "moduleResolution": "node"
     },
-    "files": [
-        "index.ts"
+    "exclude": [
+        "node_modules"
     ]
 }
