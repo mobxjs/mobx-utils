@@ -1,0 +1,17 @@
+{
+    "version": "1.8.10",
+    "compilerOptions": {
+        "target": "es5",
+        "sourceMap": false,
+        "declaration": true,
+        "module": "commonjs",
+        "removeComments": false,
+        "outDir": "../lib/",
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "outFile": "lib/mobx-utils.js"
+    },
+    "files": [
+        "index.ts"
+    ]
+}

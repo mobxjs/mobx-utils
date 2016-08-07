@@ -1,0 +1,49 @@
+{
+  "name": "mobx-utils",
+  "version": "0.1.0",
+  "description": "Utility functions for MobX",
+  "main": "lib/mobx-utils.js",
+  "typings": "lib/mobx-utils.d.ts",
+  "scripts": {
+    "test": "npm run build && npm run build-test && npm run tape",
+    "tape": "tape lib/test.js | faucet",
+    "prepublish": "npm run build",
+    "build": "tsc -p src",
+    "test-travis": "npm run build && npm run build-test && tsc && istanbul cover tape lib/test.js",
+    "coverage": "npm run small-build && npm run build-tests && istanbul cover tape test/*.js test/perf/index.js && cat ./coverage/lcov.info|coveralls",
+    "build-tests": "tsc-p test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobxjs/mobx-utils.git"
+  },
+  "author": "Michel Weststrate",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mobxjs/mobx-utils/issues"
+  },
+  "files": [
+    "lib/"
+  ],
+  "devDependencies": {
+    "coveralls": "^2.11.4",
+    "faucet": "0.0.1",
+    "istanbul": "^0.3.21",
+    "mobx": "^2.4.2",
+    "tape": "^4.2.2",
+    "typescript": "^1.8.10"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "mobx": "^2.4.2"
+  },
+  "keywords": [
+    "mobx",
+    "mobx-utils",
+    "promise",
+    "reactive",
+    "frp",
+    "functional-reactive-programming",
+    "state management"
+  ]
+}
