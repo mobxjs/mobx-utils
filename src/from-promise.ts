@@ -37,6 +37,14 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
     }
 }
 
+/**
+ *
+ *
+ * @param {IThenable<T>} promise
+ * @param {T} [initialValue=undefined]
+ * @param {any} [modifier=IDENTITY]
+ * @returns {IPromiseBasedObservable<T>}
+ */
 export function fromPromise<T>(promise: IThenable<T>, initialValue: T = undefined, modifier =  IDENTITY): IPromiseBasedObservable<T> {
     return new PromiseBasedObservable(promise, initialValue, modifier);
 }
