@@ -1,6 +1,6 @@
 {
   "name": "mobx-utils",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Utility functions for MobX",
   "main": "lib/mobx-utils.js",
   "typings": "lib/mobx-utils.d.ts",
