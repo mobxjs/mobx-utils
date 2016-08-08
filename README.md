@@ -40,7 +40,7 @@ Like normal `when`, except that this `when` will automatically dispose if the co
 **Examples**
 
 ```javascript
-test("expect store to load, t => {
+test("expect store to load", t => {
   const store = {
     items: [],
     loaded: false
