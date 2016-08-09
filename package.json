@@ -1,11 +1,12 @@
 {
   "name": "mobx-utils",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Utility functions for MobX",
   "main": "lib/mobx-utils.js",
   "typings": "lib/mobx-utils.d.ts",
   "scripts": {
-    "build": "tsc -p src",
+    "build": "tsc -p src && npm run browserify",
+    "browserify": "browserify --entry lib/mobx-utils.js --external mobx --standalone mobxUtils --outfile mobx-utils.umd.js",
     "test": "npm run build && tape test/*.js | faucet",
     "prepublish": "npm run build && npm run build-docs",
     "test-travis": "npm run build && istanbul cover tape test/*.js",
@@ -22,9 +23,11 @@
     "url": "https://github.com/mobxjs/mobx-utils/issues"
   },
   "files": [
-    "lib/"
+    "lib/",
+    "mobx-utils.umd.js"
   ],
   "devDependencies": {
+    "browserify": "^13.1.0",
     "coveralls": "^2.11.4",
     "documentation": "^4.0.0-beta9",
     "faucet": "0.0.1",

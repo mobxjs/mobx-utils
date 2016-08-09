@@ -8,13 +8,15 @@ Work in progress
 
 # Installation
 
-`npm install mobx-utils --save`
+NPM: `npm install mobx-utils --save`
+
+CDN: https://npmcdn.com/mobx-utils/mobx-utils.umd.js
 
 # API
 
 ## fromPromise
 
-[lib/from-promise.js:53-57](https://github.com/mobxjs/mobx-utils/blob/4e7763abd4eac3ba574e195840ff2628c4c52e1d/lib/from-promise.js#L53-L57 "Source code on GitHub")
+[lib/from-promise.js:53-57](https://github.com/mobxjs/mobx-utils/blob/e1df0926a2e499f95a26e3230f4e67ec46fb503b/lib/from-promise.js#L53-L57 "Source code on GitHub")
 
 **Parameters**
 
@@ -26,7 +28,7 @@ Returns **IPromiseBasedObservable&lt;T>**
 
 ## whenWithTimeout
 
-[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/4e7763abd4eac3ba574e195840ff2628c4c52e1d/lib/guarded-when.js#L32-L51 "Source code on GitHub")
+[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/e1df0926a2e499f95a26e3230f4e67ec46fb503b/lib/guarded-when.js#L32-L51 "Source code on GitHub")
 
 Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
 
@@ -62,7 +64,7 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/4e7763abd4eac3ba574e195840ff2628c4c52e1d/lib/keep-alive.js#L35-L40 "Source code on GitHub")
+[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/e1df0926a2e499f95a26e3230f4e67ec46fb503b/lib/keep-alive.js#L35-L40 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -89,7 +91,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## keepAlive
 
-[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/4e7763abd4eac3ba574e195840ff2628c4c52e1d/lib/keep-alive.js#L35-L40 "Source code on GitHub")
+[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/e1df0926a2e499f95a26e3230f4e67ec46fb503b/lib/keep-alive.js#L35-L40 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -116,7 +118,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## fromResource
 
-[lib/from-resource.js:60-92](https://github.com/mobxjs/mobx-utils/blob/4e7763abd4eac3ba574e195840ff2628c4c52e1d/lib/from-resource.js#L60-L92 "Source code on GitHub")
+[lib/from-resource.js:60-92](https://github.com/mobxjs/mobx-utils/blob/e1df0926a2e499f95a26e3230f4e67ec46fb503b/lib/from-resource.js#L60-L92 "Source code on GitHub")
 
 fromResource creates an observable which current state can be inspected using `.get()`,
 and which can be kept in sync with some external datasource that can be subscribed to.
@@ -156,7 +158,7 @@ function createObservableUser(dbUserRecord) {
       // the user observable is not in use at the moment, unsubscribe (for now)
       dbUserRecord.unsubscribe(currentSubscription)
     },
-    dbUserRecord.fields // optional, provide initial data
+    dbUserRecord.fields // optionally, provide initial data
   )
 }
 
