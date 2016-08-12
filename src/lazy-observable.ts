@@ -6,13 +6,13 @@ export function lazyObservable<T>(
     initialValue: T = undefined,
     modifier = IDENTITY
 ): {
-    get(): T
+    current(): T
 } {
     let started = false;
     const value = observable(modifier(initialValue));
 
     return {
-        get: () => {
+        current: () => {
             if (!started) {
                 started = true;
                 fetch(action("lazyObservable-fetched", (newValue: T) => {

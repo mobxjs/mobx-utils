@@ -48,7 +48,7 @@ test("test from-resource", t => {
         var calcs = 0;
         var disposer = mobx.autorun(() => {
             calcs++;
-            currentName = me$.get().name
+            currentName = me$.current().name
         })
 
         t.equal(me.subscriptions.length, 1)
@@ -68,13 +68,13 @@ test("test from-resource", t => {
         t.equal(calcs, 3)
 
         // test warning
-        t.equal(me$.get().name, "noa") // happens to be visible through the data reference, but no autorun tragger
+        t.equal(me$.current().name, "noa") // happens to be visible through the data reference, but no autorun tragger
         t.deepEqual(warn, ['Called `get` of an subscribingObservable outside a reaction. Current value will be returned but no new subscription has started'])
 
         // resubscribe
         disposer = mobx.autorun(() => {
             calcs++;
-            currentName = me$.get().name
+            currentName = me$.current().name
         })
 
         t.equal(currentName, "noa")
@@ -87,7 +87,7 @@ test("test from-resource", t => {
 
             me$.dispose()
             t.equal(me.subscriptions.length, 0)
-            t.throws(() => me$.get())
+            t.throws(() => me$.current())
 
             me.updateName("john")
             t.equal(calcs, 5)
