@@ -73,6 +73,13 @@ export function fromResource<T>(
     let isDisposed = false;
     let value = initialValue;
 
+    const suspender = () => {
+        if (isActive) {
+            isActive = false;
+            unsubscriber();
+        }
+    };
+
     const atom = new Atom(
         "ResourceBasedObservable",
         () => {
@@ -83,11 +90,7 @@ export function fromResource<T>(
                 atom.reportChanged();
             }));
         },
-        () => {
-            invariant(isActive);
-            unsubscriber();
-            isActive = false;
-        }
+        suspender
     );
 
     return {
@@ -100,10 +103,7 @@ export function fromResource<T>(
         },
         dispose: () => {
             isDisposed = true;
-            if (isActive) {
-                isActive = false;
-                unsubscriber();
-            }
+            suspender();
         },
         isAlive: () => isActive
     };
