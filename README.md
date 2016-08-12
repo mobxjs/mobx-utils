@@ -10,39 +10,39 @@ Work in progress
 
 NPM: `npm install mobx-utils --save`
 
-CDN: https://npmcdn.com/mobx-utils/mobx-utils.umd.js
+CDN: <https://npmcdn.com/mobx-utils/mobx-utils.umd.js>
 
 # API
 
 ## fromPromise
 
-[lib/from-promise.js:53-57](https://github.com/mobxjs/mobx-utils/blob/e1df0926a2e499f95a26e3230f4e67ec46fb503b/lib/from-promise.js#L53-L57 "Source code on GitHub")
+[lib/from-promise.js:53-57](https://github.com/mobxjs/mobx-utils/blob/7cf95e0302a17be8b373378094750c8492a6331f/lib/from-promise.js#L53-L57 "Source code on GitHub")
 
 **Parameters**
 
--   `promise` **IThenable&lt;T>**
+-   `promise` **IThenable&lt;T>** 
 -   `initialValue` **\[T]**  (optional, default `undefined`)
 -   `modifier` **\[any]**  (optional, default `IDENTITY`)
 
-Returns **IPromiseBasedObservable&lt;T>**
+Returns **IPromiseBasedObservable&lt;T>** 
 
 ## whenWithTimeout
 
-[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/e1df0926a2e499f95a26e3230f4e67ec46fb503b/lib/guarded-when.js#L32-L51 "Source code on GitHub")
+[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/7cf95e0302a17be8b373378094750c8492a6331f/lib/guarded-when.js#L32-L51 "Source code on GitHub")
 
 Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
 
 **Parameters**
 
--   `expr`
--   `action`
+-   `expr`  
+-   `action`  
 -   `timeout` **\[[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** maximum amount when spends waiting before giving up (optional, default `10000`)
 -   `onTimeout` **\[any]** the ontimeout handler will be called if the condition wasn't met withing the given time (optional, default `()`)
 
 **Examples**
 
 ```javascript
-test("expect store to load, t => {
+test("expect store to load", t => {
   const store = {
     items: [],
     loaded: false
@@ -64,7 +64,7 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/e1df0926a2e499f95a26e3230f4e67ec46fb503b/lib/keep-alive.js#L35-L40 "Source code on GitHub")
+[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/7cf95e0302a17be8b373378094750c8492a6331f/lib/keep-alive.js#L35-L40 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -73,8 +73,8 @@ and lazily re-evaluates the expression if needed outside a reaction while not in
 **Parameters**
 
 -   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
--   `_1`
--   `_2`
+-   `_1`  
+-   `_2`  
 
 **Examples**
 
@@ -91,7 +91,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## keepAlive
 
-[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/e1df0926a2e499f95a26e3230f4e67ec46fb503b/lib/keep-alive.js#L35-L40 "Source code on GitHub")
+[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/7cf95e0302a17be8b373378094750c8492a6331f/lib/keep-alive.js#L35-L40 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -101,8 +101,8 @@ and lazily re-evaluates the expression if needed outside a reaction while not in
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** an object that has a computed property, created by `@computed` or `extendObservable`
 -   `property` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the property to keep alive
--   `_1`
--   `_2`
+-   `_1`  
+-   `_2`  
 
 **Examples**
 
@@ -118,12 +118,12 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## fromResource
 
-[lib/from-resource.js:60-92](https://github.com/mobxjs/mobx-utils/blob/e1df0926a2e499f95a26e3230f4e67ec46fb503b/lib/from-resource.js#L60-L92 "Source code on GitHub")
+[lib/from-resource.js:60-92](https://github.com/mobxjs/mobx-utils/blob/7cf95e0302a17be8b373378094750c8492a6331f/lib/from-resource.js#L60-L92 "Source code on GitHub")
 
-fromResource creates an observable which current state can be inspected using `.get()`,
+`fromResource` creates an observable which current state can be inspected using `.get()`,
 and which can be kept in sync with some external datasource that can be subscribed to.
 
-the created observable will only subscribe to the datasource if it is in use somewhere,
+The created observable will only subscribe to the datasource if it is in use somewhere,
 (un)subscribing when needed. To enable `fromResource` to do that two callbacks need to be provided,
 one to subscribe, and one to unsubscribe. The subscribe callback itself will receive a `sink` callback, which can be used
 to update the current state of the observable, allowing observes to react.
@@ -136,7 +136,7 @@ which comes from an imaginary database and notifies when it has changed.
 
 **Parameters**
 
--   `subscriber`
+-   `subscriber`  
 -   `unsubscriber` **\[IDisposer]**  (optional, default `NOOP`)
 -   `initialValue` **\[T]** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
 
