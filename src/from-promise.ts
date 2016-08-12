@@ -13,7 +13,7 @@ export interface IPromiseBasedObservable<T> {
 class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
     private _observable: IObservableValue<T>;
     private _state: IObservableValue<PromiseState> = observable("pending" as PromiseState);
-    private _reason: IObservableValue<any> = undefined;
+    private _reason: IObservableValue<any> = observable(undefined as any);
 
     constructor(public promise: IThenable<T>, initialValue: T = undefined, private modifier = IDENTITY) {
         this._observable = observable(modifier(initialValue));
