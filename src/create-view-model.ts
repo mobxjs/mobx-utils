@@ -87,9 +87,8 @@ class ViewModel<T> implements IViewModel<T> {
  * N.B. doesn't support observable arrays and maps yet
  *
  * @example
- * ```javascript
  * class Todo {
- *   @observable title = "Test"
+ *   \@observable title = "Test"
  * }
  *
  * const model = new Todo()
