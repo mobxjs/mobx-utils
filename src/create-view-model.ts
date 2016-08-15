@@ -82,8 +82,30 @@ class ViewModel<T> implements IViewModel<T> {
  * - `reset()`: resets the state of the view model, abandoning all local modificatoins
  * - `isDirty`: observable property indicating if the viewModel contains any modifications
  * - `isPropertyDirty(propName)`: returns true if the specified property is dirty
+ * - `model`: The original model object for which this viewModel was created
  *
  * N.B. doesn't support observable arrays and maps yet
+ *
+ * @example
+ * class Todo {
+ *   @observable title = "Test"
+ * }
+ *
+ * const model = new Todo()
+ * const viewModel = createViewModel(model);
+ *
+ * autorun(() => console.log(viewModel.model.title, ",", viewModel.title))
+ * // prints "Test, Test"
+ * model.title = "Get coffee"
+ * // prints "Get coffee, Get coffee", viewModel just proxies to model
+ * viewModel.title = "Get tea"
+ * // prints "Get coffee, Get tea", viewModel's title is now dirty, and the local value will be printed
+ * viewModel.submit()
+ * // prints "Get tea, Get tea", changes submitted from the viewModel to the model, viewModel is proxying again
+ * viewModel.title = "Get cookie"
+ * // prints "Get tea, Get cookie" // viewModel has diverged again
+ * viewModel.reset()
+ * // prints "Get tea, Get tea", changes of the viewModel have been abandoned
  *
  * @param {T} model
  * @returns {(T & IViewModel<T>)}

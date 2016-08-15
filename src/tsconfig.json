@@ -8,7 +8,8 @@
         "removeComments": false,
         "outDir": "../lib/",
         "noImplicitAny": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "experimentalDecorators": true
     },
     "exclude": [
         "node_modules"
