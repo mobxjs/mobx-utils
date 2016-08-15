@@ -1,9 +1,19 @@
-import {isAction, autorun, autorunAsync, action, isObservableArray} from "mobx";
+import {isAction, autorun, autorunAsync, action, isObservableArray, runInAction} from "mobx";
 import {IDisposer} from "./utils";
 
 /**
  * `queueProcessor` takes an observable array, observes it and calls `processor`
  * for each new item added to the observable array, optionally deboucing the action
+ *
+ * @example
+ * const pendingNotifications = observable([])
+ * const stop = queueProcessor(pendingNotifications, msg => {
+ *   // show Desktop notification
+ *   new Notification(msg);
+ * })
+ *
+ * // usage:
+ * pendingNotifications.push("test!")
  *
  * @param {T[]} observableArray observable array instance to track
  * @param {(item: T) => void} processor action to call per item
@@ -20,7 +30,7 @@ export function queueProcessor<T>(observableArray: T[], processor: (item: T) => 
         // construct a final set
         const items = observableArray.slice(0);
         // clear the queue for next iteration
-        observableArray.splice(0);
+        runInAction(() => observableArray.splice(0));
         // fire processor
         items.forEach(processor);
     };
