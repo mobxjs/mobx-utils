@@ -3,7 +3,7 @@ import {IDisposer} from "./utils";
 
 /**
  * `queueProcessor` takes an observable array, observes it and calls `processor`
- * for each new item added to the observable array, optionally deboucing the action
+ * once for each item added to the observable array, optionally deboucing the action
  *
  * @example
  * const pendingNotifications = observable([])

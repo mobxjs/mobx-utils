@@ -16,19 +16,49 @@ CDN: <https://npmcdn.com/mobx-utils/mobx-utils.umd.js>
 
 ## fromPromise
 
-[lib/from-promise.js:53-57](https://github.com/mobxjs/mobx-utils/blob/7cf95e0302a17be8b373378094750c8492a6331f/lib/from-promise.js#L53-L57 "Source code on GitHub")
+[lib/from-promise.js:78-82](https://github.com/mobxjs/mobx-utils/blob/91db1eb342f8af042320841b6c409a0f2d36fce5/lib/from-promise.js#L78-L82 "Source code on GitHub")
+
+`fromPromise` takes a Promise and returns an object with 3 observable properties that track
+the status of the promise. The returned object has the following observable properties:
+`value`: either the initial value, or the value the Promise resolved to
+`state`: one of `"pending"`, `"fulfilled"` or `"rejected"`
+`reason`: the reject reason if the state is `"rejected"`
+`promise`: (not observable) the original promise object
 
 **Parameters**
 
--   `promise` **IThenable&lt;T>** 
--   `initialValue` **\[T]**  (optional, default `undefined`)
--   `modifier` **\[any]**  (optional, default `IDENTITY`)
+-   `promise` **IThenable&lt;T>** The promise which will be observed
+-   `initialValue` **\[T]** Optional predefined initial value (optional, default `undefined`)
+-   `modifier` **\[any]** MobX modifier, e.g. `asFlat`, to be applied to the resolved value (optional, default `IDENTITY`)
+
+**Examples**
+
+```javascript
+const fetchResult = fromPromise(fetch("http://someurl"))
+
+// combine with when..
+when(
+  () => fetchResult.state !== "pending"
+  () => {
+    console.log("Got ", fetchResult.reason || fetchResult.value)
+  }
+)
+
+// or a mobx-react component..
+const myComponent = observer(({ fetchResult }) => {
+  switch(fetchResult.state) {
+     case "pending": return <div>Loading...</div>
+     case "rejected": return <div>Ooops... {fetchResult.reason}</div>
+     case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
+  }
+})
+```
 
 Returns **IPromiseBasedObservable&lt;T>** 
 
 ## whenWithTimeout
 
-[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/7cf95e0302a17be8b373378094750c8492a6331f/lib/guarded-when.js#L32-L51 "Source code on GitHub")
+[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/91db1eb342f8af042320841b6c409a0f2d36fce5/lib/guarded-when.js#L32-L51 "Source code on GitHub")
 
 Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
 
@@ -64,7 +94,7 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/7cf95e0302a17be8b373378094750c8492a6331f/lib/keep-alive.js#L35-L40 "Source code on GitHub")
+[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/91db1eb342f8af042320841b6c409a0f2d36fce5/lib/keep-alive.js#L35-L40 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -91,7 +121,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## keepAlive
 
-[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/7cf95e0302a17be8b373378094750c8492a6331f/lib/keep-alive.js#L35-L40 "Source code on GitHub")
+[lib/keep-alive.js:35-40](https://github.com/mobxjs/mobx-utils/blob/91db1eb342f8af042320841b6c409a0f2d36fce5/lib/keep-alive.js#L35-L40 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -116,11 +146,70 @@ const stop = keepAlive(obj, "doubler")
 
 Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
 
+## queueProcessor
+
+[lib/queue-processor.js:22-40](https://github.com/mobxjs/mobx-utils/blob/91db1eb342f8af042320841b6c409a0f2d36fce5/lib/queue-processor.js#L22-L40 "Source code on GitHub")
+
+`queueProcessor` takes an observable array, observes it and calls `processor`
+for each new item added to the observable array, optionally deboucing the action
+
+**Parameters**
+
+-   `observableArray` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
+-   `processor`  
+-   `debounce` **\[[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
+
+**Examples**
+
+```javascript
+const pendingNotifications = observable([])
+const stop = queueProcessor(pendingNotifications, msg => {
+  // show Desktop notification
+  new Notification(msg);
+})
+
+// usage:
+pendingNotifications.push("test!")
+```
+
+Returns **IDisposer** stops the processor
+
+## lazyObservable
+
+[lib/lazy-observable.js:30-46](https://github.com/mobxjs/mobx-utils/blob/91db1eb342f8af042320841b6c409a0f2d36fce5/lib/lazy-observable.js#L30-L46 "Source code on GitHub")
+
+creates an observable around a fetch method that will not be invoked
+util the observable is needed the first time.
+The fetch method receives a sink callback which can be used to replace the
+current value of the lazyObservable. It is allowed to call sink multiple times
+to keep the lazyObservable up to date with some external resource.
+
+**Parameters**
+
+-   `fetch`  
+-   `initialValue` **\[T]** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
+-   `modifier` **\[any]** optional mobx modifier that determines the the comparison and recursion strategy of the observable, for example `asFlat` or `asStructure` (optional, default `IDENTITY`)
+
+**Examples**
+
+```javascript
+const userProfile = lazyObservable(
+  sink => fetch("/myprofile").then(profile => sink(profile))
+)
+
+// use the userProfile in a React component:
+const Profile = observer(({ userProfile }) =>
+  userProfile.current() === undefined
+  ? <div>Loading user profile...</div>
+  : <div>{userProfile.current().displayName}</div>
+)
+```
+
 ## fromResource
 
-[lib/from-resource.js:60-92](https://github.com/mobxjs/mobx-utils/blob/7cf95e0302a17be8b373378094750c8492a6331f/lib/from-resource.js#L60-L92 "Source code on GitHub")
+[lib/from-resource.js:63-97](https://github.com/mobxjs/mobx-utils/blob/91db1eb342f8af042320841b6c409a0f2d36fce5/lib/from-resource.js#L63-L97 "Source code on GitHub")
 
-`fromResource` creates an observable which current state can be inspected using `.get()`,
+`fromResource` creates an observable which current state can be inspected using `.current()`,
 and which can be kept in sync with some external datasource that can be subscribed to.
 
 The created observable will only subscribe to the datasource if it is in use somewhere,
@@ -128,7 +217,9 @@ The created observable will only subscribe to the datasource if it is in use som
 one to subscribe, and one to unsubscribe. The subscribe callback itself will receive a `sink` callback, which can be used
 to update the current state of the observable, allowing observes to react.
 
-Whatever is passed to `sink` will be returned by `get()`. It is the `get()` call itself which is being tracked,
+Whatever is passed to `sink` will be returned by `current()`. The values passed to the sink will not be converted to
+observables automatically, but feel free to do so.
+It is the `current()` call itself which is being tracked,
 so make sure that you don't dereference to early.
 
 The following example code creates an observable that connects to a `dbUserRecord`,
@@ -166,10 +257,40 @@ function createObservableUser(dbUserRecord) {
 const myUserObservable = createObservableUser(myDatabaseConnector.query("name = 'Michel'"))
 autorun(() => {
   // printed everytime the database updates its records
-  console.log(myUserObservable.get().displayName)
+  console.log(myUserObservable.current().displayName)
 })
 
 const userComponent = observer(({ user }) =>
   <div>{user.get().displayName}</div>
 )
+```
+
+## createViewModel
+
+[lib/create-view-model.js:121-123](https://github.com/mobxjs/mobx-utils/blob/91db1eb342f8af042320841b6c409a0f2d36fce5/lib/create-view-model.js#L121-L123 "Source code on GitHub")
+
+`createViewModel` takes an object with observable properties (model)
+and wraps a view model around it. The view model proxies all enumerable property of the original model with the following behavior:
+
+-   as long as no new value has been assigned to the viewmodel property, the original property will be returned, and any future change in the model will be visible in the view model as well
+-   once a new value has been assigned to a property of the viewmodel, that value will be returned during a read of that property in the future
+
+The viewmodel exposes the following additional methods, besides all the enumerable properties of the model:
+
+-   `submit()`: copies all the values of the viewmodel to the model and resets the state
+-   `reset()`: resets the state of the view model, abandoning all local modificatoins
+-   `isDirty`: observable property indicating if the viewModel contains any modifications
+-   `isPropertyDirty(propName)`: returns true if the specified property is dirty
+-   `model`: The original model object for which this viewModel was created
+
+N.B. doesn't support observable arrays and maps yet
+
+**Parameters**
+
+-   `model` **T** 
+
+**Examples**
+
+```javascript
+class Todo {
 ```

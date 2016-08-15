@@ -33,20 +33,22 @@ import {NOOP, IDENTITY, IDisposer, invariant} from "./utils";
  *     () => {
  *       // the user observable is not in use at the moment, unsubscribe (for now)
  *       dbUserRecord.unsubscribe(currentSubscription)
- *     },
- *     dbUserRecord.fields // optionally, provide initial data
+ *     }
  *   )
  * }
  *
  * // usage:
  * const myUserObservable = createObservableUser(myDatabaseConnector.query("name = 'Michel'"))
+ *
+ * // use the observable in autorun
  * autorun(() => {
  *   // printed everytime the database updates its records
  *   console.log(myUserObservable.current().displayName)
  * })
  *
+ * // ... or a component
  * const userComponent = observer(({ user }) =>
- *   <div>{user.get().displayName}</div>
+ *   <div>{user.current().displayName}</div>
  * )
  *
  * @export

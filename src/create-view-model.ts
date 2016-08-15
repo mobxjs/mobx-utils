@@ -75,7 +75,7 @@ class ViewModel<T> implements IViewModel<T> {
  * `createViewModel` takes an object with observable properties (model)
  * and wraps a view model around it. The view model proxies all enumerable property of the original model with the following behavior:
  *  - as long as no new value has been assigned to the viewmodel property, the original property will be returned, and any future change in the model will be visible in the view model as well
- *  - once a new value has been assigned to a property of the viewmodel, that value will be returned during a read of that property in the future
+ *  - once a new value has been assigned to a property of the viewmodel, that value will be returned during a read of that property in the future. However, the original model remain untouched until `submit()` is called.
  *
  * The viewmodel exposes the following additional methods, besides all the enumerable properties of the model:
  * - `submit()`: copies all the values of the viewmodel to the model and resets the state
@@ -87,6 +87,7 @@ class ViewModel<T> implements IViewModel<T> {
  * N.B. doesn't support observable arrays and maps yet
  *
  * @example
+ * ```javascript
  * class Todo {
  *   @observable title = "Test"
  * }
@@ -109,6 +110,7 @@ class ViewModel<T> implements IViewModel<T> {
  *
  * @param {T} model
  * @returns {(T & IViewModel<T>)}
+ * ```
  */
 export function createViewModel<T>(model: T): T & IViewModel<T> {
     return new ViewModel(model) as any;
