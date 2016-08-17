@@ -4,6 +4,8 @@ const utils = require("../");
 const mobx = require("mobx");
 const test = require("tape");
 
+mobx.useStrict(true);
+
 test("whenWithTimeout should operate normally", t => {
     var a = mobx.observable(1);
 
@@ -14,7 +16,7 @@ test("whenWithTimeout should operate normally", t => {
         () => t.fail()
     )
 
-    setTimeout(() => a.set(2), 200)
+    setTimeout(mobx.action(() => a.set(2)), 200)
 })
 
 test("whenWithTimeout should timeout", t => {
@@ -29,7 +31,7 @@ test("whenWithTimeout should timeout", t => {
         }
     )
 
-    setTimeout(() => a.set(2), 1000)
+    setTimeout(mobx.action(() => a.set(2)), 1000)
 })
 
 test("whenWithTimeout should dispose", t => {
@@ -52,9 +54,9 @@ test("whenWithTimeout should dispose", t => {
     d1()
     d2()
 
-    setTimeout(() => {
+    setTimeout(mobx.action(() => {
         a.set(2)
         t.end()
-    }, 150)
+    }), 150)
 
 })

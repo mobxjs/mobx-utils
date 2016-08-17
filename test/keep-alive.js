@@ -4,6 +4,8 @@ const utils = require("../");
 const mobx = require("mobx");
 const test = require("tape");
 
+mobx.useStrict(true);
+
 test("keep alive should work for computeds", t => {
     const a = mobx.observable(1);
     let calcs = 0;
@@ -16,7 +18,7 @@ test("keep alive should work for computeds", t => {
     doubler.get();
     t.equal(calcs, 2);
 
-    a.set(2);
+    mobx.runInAction(() => a.set(2))
     t.equal(calcs, 2);
 
     const disposer = utils.keepAlive(doubler);
@@ -24,7 +26,7 @@ test("keep alive should work for computeds", t => {
     doubler.get();
     t.equal(calcs, 3);
 
-    a.set(4);
+    mobx.runInAction(() => a.set(4))
     t.equal(calcs, 4);
 
     t.equal(doubler.get(), 8);
@@ -57,7 +59,7 @@ test("keep alive should work for properties", t => {
     x.doubler;
     t.equal(calcs, 2);
 
-    x.a = 2;
+    mobx.runInAction(() => x.a = 2)
     t.equal(calcs, 2);
 
     const disposer = utils.keepAlive(x, "doubler");
@@ -65,7 +67,7 @@ test("keep alive should work for properties", t => {
     t.equal(x.doubler, 4);
     t.equal(calcs, 3);
 
-    x.a = 4;
+    mobx.runInAction(() => x.a = 4)
     t.equal(calcs, 4);
 
     t.equal(x.doubler, 8);

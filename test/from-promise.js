@@ -4,6 +4,8 @@ const utils = require("../");
 const mobx = require("mobx");
 const test = require("tape");
 
+mobx.useStrict(true);
+
 test("test from-promise", t => {
     test("resolves", t => {
         const p = new Promise((resolve, reject) => {

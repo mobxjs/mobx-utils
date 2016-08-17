@@ -4,6 +4,8 @@ const utils = require("../");
 const mobx = require("mobx");
 const test = require("tape");
 
+mobx.useStrict(true);
+
 test("create view model", t => {
     function Todo(title, done) {
         mobx.extendObservable(this, {
@@ -28,12 +30,12 @@ test("create view model", t => {
     t.equal(tr, "coffee:false")
     t.equal(vr, "coffee:false")
 
-    model.title = "tea"
+    mobx.runInAction(() =>  model.title = "tea")
     t.equal(tr, "tea:false")
     t.equal(vr, "tea:false") // change reflected in view model
     t.equal(viewModel.isDirty, false)
 
-    viewModel.done = true;
+    mobx.runInAction(() =>  viewModel.done = true)
     t.equal(tr, "tea:false")
     t.equal(vr, "tea:true")
     t.equal(viewModel.isDirty, true)
@@ -41,14 +43,14 @@ test("create view model", t => {
     t.equal(viewModel.isPropertyDirty("done"), true)
 
     // should reset
-    viewModel.reset()
+    viewModel.reset();
     t.equal(tr, "tea:false")
     t.equal(vr, "tea:false")
     t.equal(viewModel.isDirty, false)
     t.equal(viewModel.isPropertyDirty("title"), false)
     t.equal(viewModel.isPropertyDirty("done"), false)
 
-    viewModel.title = "cola";
+    mobx.runInAction(() =>  viewModel.title = "cola")
     t.equal(tr, "tea:false")
     t.equal(vr, "cola:false")
     t.equal(viewModel.isDirty, true)
@@ -56,11 +58,11 @@ test("create view model", t => {
     t.equal(viewModel.isPropertyDirty("title"), true)
 
     // model changes should not update view model which is dirty
-    model.title = "coffee";
+    mobx.runInAction(() =>  model.title = "coffee")
     t.equal(tr, "coffee:false")
     t.equal(vr, "cola:false")
 
-    viewModel.submit()
+    viewModel.submit();
     t.equal(tr, "cola:false")
     t.equal(vr, "cola:false")
     t.equal(viewModel.isDirty, false)

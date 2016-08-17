@@ -4,6 +4,8 @@ const utils = require("../");
 const mobx = require("mobx");
 const test = require("tape");
 
+mobx.useStrict(true);
+
 test("lazy observable should work", t => {
     let started = false;
     const lo = utils.lazyObservable(
