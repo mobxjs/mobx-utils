@@ -72,6 +72,29 @@ test("test from-promise", t => {
         )
     })
 
+    test("rejects when throwing", t => {
+        const p = new Promise((resolve, reject) => {
+            throw 7
+        })
+
+        const obs = utils.fromPromise(p, 3);
+        t.equal(obs.value, 3)
+        t.equal(obs.state, "pending")
+        t.equal(obs.reason, undefined)
+        t.ok(obs.promise === p)
+
+        mobx.when(
+            () => obs.state !== "pending",
+            () => {
+                t.equal(obs.state, "rejected")
+                t.equal(obs.value, 3)
+                t.equal(obs.reason, 7)
+                t.end()
+            }
+        )
+    })
+
+
     t.end()
 })
 
