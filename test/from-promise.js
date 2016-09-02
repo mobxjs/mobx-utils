@@ -44,7 +44,7 @@ test("test from-promise", t => {
         mobx.when(
             () => obs.value === 7,
             () => {
-                t.equal(obs.state, "fulfilled")
+                t.equal(obs.state, utils.FULFILLED)
                 t.end()
             }
         )
@@ -62,9 +62,9 @@ test("test from-promise", t => {
         t.ok(obs.promise === p)
 
         mobx.when(
-            () => obs.state !== "pending",
+            () => obs.state !== utils.PENDING,
             () => {
-                t.equal(obs.state, "rejected")
+                t.equal(obs.state, utils.REJECTED)
                 t.equal(obs.value, 7)
                 t.equal(obs.reason, 7)
                 t.end()

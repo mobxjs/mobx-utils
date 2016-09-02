@@ -3,6 +3,10 @@ import {IDENTITY, deprecated} from "./utils";
 
 export type PromiseState = "pending" | "fulfilled" | "rejected";
 
+export const PENDING = "pending";
+export const FULFILLED = "fulfilled";
+export const REJECTED = "rejected";
+
 export interface IPromiseBasedObservable<T> {
     value: T;
     state: PromiseState;
@@ -68,6 +72,9 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
  *      case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
  *   }
  * })
+ *
+ * Note that the status strings are available as constants:
+ * `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
  *
  * @param {IThenable<T>} promise The promise which will be observed
  * @param {T} [initialValue=undefined] Optional predefined initial value
