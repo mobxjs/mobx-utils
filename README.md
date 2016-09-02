@@ -20,14 +20,13 @@ CDN: <https://npmcdn.com/mobx-utils/mobx-utils.umd.js>
 
 ## fromPromise
 
-[lib/from-promise.js:78-82](https://github.com/mobxjs/mobx-utils/blob/b1321aea8c7aa934073a9973a73d867ce697bd04/lib/from-promise.js#L78-L82 "Source code on GitHub")
+[lib/from-promise.js:85-89](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/from-promise.js#L85-L89 "Source code on GitHub")
 
 `fromPromise` takes a Promise and returns an object with 3 observable properties that track
 the status of the promise. The returned object has the following observable properties:
 
--   `value`: either the initial value, or the value the Promise resolved to
+-   `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference
 -   `state`: one of `"pending"`, `"fulfilled"` or `"rejected"`
--   `reason`: the reject reason if the state is `"rejected"`
 -   `promise`: (not observable) the original promise object
 
 **Parameters**
@@ -45,7 +44,7 @@ const fetchResult = fromPromise(fetch("http://someurl"))
 when(
   () => fetchResult.state !== "pending"
   () => {
-    console.log("Got ", fetchResult.reason || fetchResult.value)
+    console.log("Got ", fetchResult.value)
   }
 )
 
@@ -53,17 +52,20 @@ when(
 const myComponent = observer(({ fetchResult }) => {
   switch(fetchResult.state) {
      case "pending": return <div>Loading...</div>
-     case "rejected": return <div>Ooops... {fetchResult.reason}</div>
+     case "rejected": return <div>Ooops... {fetchResult.value}</div>
      case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
   }
 })
+
+Note that the status strings are available as constants:
+`mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
 ```
 
-Returns **IPromiseBasedObservable&lt;T>**
+Returns **IPromiseBasedObservable&lt;T>** 
 
 ## lazyObservable
 
-[lib/lazy-observable.js:33-49](https://github.com/mobxjs/mobx-utils/blob/b1321aea8c7aa934073a9973a73d867ce697bd04/lib/lazy-observable.js#L33-L49 "Source code on GitHub")
+[lib/lazy-observable.js:33-49](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/lazy-observable.js#L33-L49 "Source code on GitHub")
 
 `lazyObservable` creates an observable around a `fetch` method that will not be invoked
 util the observable is needed the first time.
@@ -76,7 +78,7 @@ so make sure that you don't dereference to early.
 
 **Parameters**
 
--   `fetch`
+-   `fetch`  
 -   `initialValue` **\[T]** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
 -   `modifier` **\[any]** optional mobx modifier that determines the the comparison and recursion strategy of the observable, for example `asFlat` or `asStructure` (optional, default `IDENTITY`)
 
@@ -97,7 +99,7 @@ const Profile = observer(({ userProfile }) =>
 
 ## fromResource
 
-[lib/from-resource.js:65-99](https://github.com/mobxjs/mobx-utils/blob/b1321aea8c7aa934073a9973a73d867ce697bd04/lib/from-resource.js#L65-L99 "Source code on GitHub")
+[lib/from-resource.js:65-99](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/from-resource.js#L65-L99 "Source code on GitHub")
 
 `fromResource` creates an observable which current state can be inspected using `.current()`,
 and which can be kept in sync with some external datasource that can be subscribed to.
@@ -117,7 +119,7 @@ which comes from an imaginary database and notifies when it has changed.
 
 **Parameters**
 
--   `subscriber`
+-   `subscriber`  
 -   `unsubscriber` **\[IDisposer]**  (optional, default `NOOP`)
 -   `initialValue` **\[T]** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
 
@@ -159,7 +161,7 @@ const userComponent = observer(({ user }) =>
 
 ## createViewModel
 
-[lib/create-view-model.js:122-124](https://github.com/mobxjs/mobx-utils/blob/b1321aea8c7aa934073a9973a73d867ce697bd04/lib/create-view-model.js#L122-L124 "Source code on GitHub")
+[lib/create-view-model.js:122-124](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/create-view-model.js#L122-L124 "Source code on GitHub")
 
 `createViewModel` takes an object with observable properties (model)
 and wraps a view model around it. The view model proxies all enumerable property of the original model with the following behavior:
@@ -179,7 +181,7 @@ N.B. doesn't support observable arrays and maps yet
 
 **Parameters**
 
--   `model` **T**
+-   `model` **T** 
 
 **Examples**
 
@@ -207,14 +209,14 @@ viewModel.reset()
 
 ## whenWithTimeout
 
-[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/b1321aea8c7aa934073a9973a73d867ce697bd04/lib/guarded-when.js#L32-L51 "Source code on GitHub")
+[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/guarded-when.js#L32-L51 "Source code on GitHub")
 
 Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
 
 **Parameters**
 
--   `expr`
--   `action`
+-   `expr`  
+-   `action`  
 -   `timeout` **\[[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** maximum amount when spends waiting before giving up (optional, default `10000`)
 -   `onTimeout` **\[any]** the ontimeout handler will be called if the condition wasn't met within the given time (optional, default `()`)
 
@@ -243,7 +245,7 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/b1321aea8c7aa934073a9973a73d867ce697bd04/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/keep-alive.js#L31-L36 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -253,8 +255,8 @@ and lazily re-evaluates the expression if needed outside a reaction while not in
 
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** an object that has a computed property, created by `@computed` or `extendObservable`
 -   `property` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the property to keep alive
--   `_1`
--   `_2`
+-   `_1`  
+-   `_2`  
 
 **Examples**
 
@@ -270,13 +272,13 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## keepAlive
 
-[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/b1321aea8c7aa934073a9973a73d867ce697bd04/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/keep-alive.js#L31-L36 "Source code on GitHub")
 
 **Parameters**
 
 -   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
--   `_1`
--   `_2`
+-   `_1`  
+-   `_2`  
 
 **Examples**
 
@@ -293,7 +295,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## queueProcessor
 
-[lib/queue-processor.js:22-40](https://github.com/mobxjs/mobx-utils/blob/b1321aea8c7aa934073a9973a73d867ce697bd04/lib/queue-processor.js#L22-L40 "Source code on GitHub")
+[lib/queue-processor.js:22-40](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/queue-processor.js#L22-L40 "Source code on GitHub")
 
 `queueProcessor` takes an observable array, observes it and calls `processor`
 once for each item added to the observable array, optionally deboucing the action
@@ -301,7 +303,7 @@ once for each item added to the observable array, optionally deboucing the actio
 **Parameters**
 
 -   `observableArray` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
--   `processor`
+-   `processor`  
 -   `debounce` **\[[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
 
 **Examples**
