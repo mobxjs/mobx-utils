@@ -1,5 +1,5 @@
 import {IObservableValue, observable, action} from "mobx";
-import {IDENTITY, IThenable} from "./utils";
+import {IDENTITY} from "./utils";
 
 export type PromiseState = "pending" | "fulfilled" | "rejected";
 
@@ -7,7 +7,7 @@ export interface IPromiseBasedObservable<T> {
     value: T;
     state: PromiseState;
     reason: any;
-    promise: IThenable<T>;
+    promise: PromiseLike<T>;
 }
 
 class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
@@ -15,15 +15,18 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
     private _state: IObservableValue<PromiseState> = observable("pending" as PromiseState);
     private _reason: IObservableValue<any> = observable(undefined as any);
 
-    constructor(public promise: IThenable<T>, initialValue: T = undefined, private modifier = IDENTITY) {
+    constructor(public promise: PromiseLike<T>, initialValue: T = undefined, private modifier = IDENTITY) {
         this._observable = observable(modifier(initialValue));
-        promise.then(action("observableFromPromise-resolve", (value: T) => {
-            this._observable.set(this.modifier(value));
-            this._state.set("fulfilled");
-        })).catch(action("observableFromPromise-reject", (reason: any) => {
-            this._reason.set(reason);
-            this._state.set("rejected");
-        }));
+        promise.then(
+            action("observableFromPromise-resolve", (value: T) => {
+                this._observable.set(this.modifier(value));
+                this._state.set("fulfilled");
+            }),
+            action("observableFromPromise-reject", (reason: any) => {
+                this._reason.set(reason);
+                this._state.set("rejected");
+            })
+        );
     }
 
     get value(): T {
@@ -70,7 +73,7 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
  * @param {any} [modifier=IDENTITY] MobX modifier, e.g. `asFlat`, to be applied to the resolved value
  * @returns {IPromiseBasedObservable<T>}
  */
-export function fromPromise<T>(promise: IThenable<T>, initialValue: T = undefined, modifier =  IDENTITY): IPromiseBasedObservable<T> {
+export function fromPromise<T>(promise: PromiseLike<T>, initialValue: T = undefined, modifier =  IDENTITY): IPromiseBasedObservable<T> {
     return new PromiseBasedObservable(promise, initialValue, modifier);
 }
 
