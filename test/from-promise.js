@@ -65,7 +65,7 @@ test("test from-promise", t => {
             () => obs.state !== "pending",
             () => {
                 t.equal(obs.state, "rejected")
-                t.equal(obs.value, 3)
+                t.equal(obs.value, 7)
                 t.equal(obs.reason, 7)
                 t.end()
             }
@@ -87,7 +87,7 @@ test("test from-promise", t => {
             () => obs.state !== "pending",
             () => {
                 t.equal(obs.state, "rejected")
-                t.equal(obs.value, 3)
+                t.equal(obs.value, 7)
                 t.equal(obs.reason, 7)
                 t.end()
             }
