@@ -1,4 +1,4 @@
-import {observable, action, ObservableMap, asMap, isObservableObject} from "mobx";
+import {observable, action, ObservableMap, asMap, isObservableObject, isObservableArray, isObservableMap} from "mobx";
 import {invariant} from "./utils";
 
 export interface IViewModel<T> {
@@ -50,7 +50,16 @@ class ViewModel<T> implements IViewModel<T> {
             this.isDirty = false;
             this.dirtyMap.entries().forEach(([key, dirty]) => {
                 if (dirty === true) {
-                    (this.model as any)[key] = this.localValues.get(key);
+                    const source = this.localValues.get(key);
+                    const destination = (this.model as any)[key];
+                    if (isObservableArray(destination)) {
+                        destination.replace(source);
+                    } else if (isObservableMap(destination)) {
+                        destination.clear();
+                        destination.merge(source);
+                    } else {
+                        (this.model as any)[key] = source;
+                    }
                     this.dirtyMap.set(key, false);
                     this.localValues.delete(key);
                 }
