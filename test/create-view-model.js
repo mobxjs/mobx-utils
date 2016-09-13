@@ -87,22 +87,22 @@ test("create view model", t => {
     t.equal(viewModel.isPropertyDirty("done"), false)
     t.equal(viewModel.isPropertyDirty("usersInterested"), false)
 
-    mobx.runInAction(() =>  viewModel.title = "cola")
+    mobx.runInAction(() =>  {viewModel.title = "cola"; viewModel.usersInterested = newUsers;})
     t.equal(tr, "tea:false,interested:Vader,Madonna")
-    t.equal(vr, "cola:false,interested:Vader,Madonna")
+    t.equal(vr, "cola:false,interested:Putin,Madonna,Tarzan")
     t.equal(viewModel.isDirty, true)
     t.equal(viewModel.isPropertyDirty("done"), false)
     t.equal(viewModel.isPropertyDirty("title"), true)
-    t.equal(viewModel.isPropertyDirty("usersInterested"), false)
+    t.equal(viewModel.isPropertyDirty("usersInterested"), true)
 
     // model changes should not update view model which is dirty
     mobx.runInAction(() =>  model.title = "coffee")
     t.equal(tr, "coffee:false,interested:Vader,Madonna")
-    t.equal(vr, "cola:false,interested:Vader,Madonna")
+    t.equal(vr, "cola:false,interested:Putin,Madonna,Tarzan")
 
     viewModel.submit();
-    t.equal(tr, "cola:false,interested:Vader,Madonna")
-    t.equal(vr, "cola:false,interested:Vader,Madonna")
+    t.equal(tr, "cola:false,interested:Putin,Madonna,Tarzan")
+    t.equal(vr, "cola:false,interested:Putin,Madonna,Tarzan")
     t.equal(viewModel.isDirty, false)
     t.equal(viewModel.isPropertyDirty("done"), false)
     t.equal(viewModel.isPropertyDirty("title"), false)
