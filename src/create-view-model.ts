@@ -20,7 +20,6 @@ class ViewModel<T> implements IViewModel<T> {
         invariant(isObservableObject(model), "createViewModel expects an observable object");
         Object.keys(model).forEach(key => {
             invariant(RESERVED_NAMES.indexOf(key) === -1, `The propertyname ${key} is reserved and cannot be used with viewModels`);
-            // TODO: create shallow clones for arrays and maps and observe those
             Object.defineProperty(this, key, {
                 enumerable: true,
                 configurable: true,
