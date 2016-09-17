@@ -94,6 +94,68 @@ test("test from-promise", t => {
         )
     })
 
+    test("case method, fulfillment", t => {
+        const p = Promise.resolve()
+        const obs = utils.fromPromise(p)
+
+        let mapping = {
+            pending: () => 1,
+            fulfilled: x => 2,
+            rejected: y => 3
+        }
+
+        let mapped = obs.case(mapping)
+        t.equal(mapped, 1)
+        mobx.when(
+            () => obs.state !== "pending",
+            () => {
+                let mapped = obs.case(mapping)
+                t.equal(mapped, 2)
+                t.end()
+            }
+        )
+
+    })
+
+    test("case method, rejection", t => {
+        const p = Promise.reject()
+        const obs = utils.fromPromise(p)
+
+        let mapping = {
+            pending: () => 1,
+            fulfilled: x => 2,
+            rejected: y => 3
+        }
+
+        let mapped = obs.case(mapping)
+        t.equal(mapped, 1)
+        mobx.when(
+            () => obs.state !== "pending",
+            () => {
+                let mapped = obs.case(mapping)
+                t.equal(mapped, 3)
+                t.end()
+            }
+        )
+    })
+
+    test("case method, returns undefined when handler is missing", t => {
+        const p = Promise.resolve()
+        const obs = utils.fromPromise(p)
+
+        let mapping = {pending: () => 1}
+
+        let mapped = obs.case(mapping)
+        t.equal(mapped, 1)
+        mobx.when(
+            () => obs.state !== "pending",
+            () => {
+                let mapped = obs.case(mapping)
+                t.equal(mapped, undefined)
+                t.end()
+            }
+        )
+    })
 
     t.end()
 })
