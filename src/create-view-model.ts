@@ -1,4 +1,4 @@
-import {observable, action, ObservableMap, asMap, isObservableObject, isObservableArray, isObservableMap} from "mobx";
+import {action, ObservableMap, asMap, isObservableObject, isObservableArray, isObservableMap, computed} from "mobx";
 import {invariant} from "./utils";
 
 export interface IViewModel<T> {
@@ -12,9 +12,12 @@ export interface IViewModel<T> {
 const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty"];
 
 class ViewModel<T> implements IViewModel<T> {
-    @observable isDirty = false;
     localValues: ObservableMap<any> = asMap({});
     dirtyMap: ObservableMap<any> = asMap({});
+
+    @computed get isDirty() {
+        return this.dirtyMap.size > 0
+    }
 
     constructor(public model: T) {
         invariant(isObservableObject(model), "createViewModel expects an observable object");
@@ -31,7 +34,6 @@ class ViewModel<T> implements IViewModel<T> {
                 },
                 set: action((value: any) => {
                     if (this.isPropertyDirty(key) || value !== (this.model as any)[key]) {
-                        this.isDirty = true;
                         this.dirtyMap.set(key, true);
                         this.localValues.set(key, value);
                     }
@@ -41,42 +43,38 @@ class ViewModel<T> implements IViewModel<T> {
     }
 
     isPropertyDirty(key: string): boolean {
-        return this.dirtyMap.get(key) === true;
+        return this.dirtyMap.has(key);
     }
 
     @action submit() {
-        if (this.isDirty) {
-            this.isDirty = false;
-            this.dirtyMap.entries().forEach(([key, dirty]) => {
-                if (dirty === true) {
-                    const source = this.localValues.get(key);
-                    const destination = (this.model as any)[key];
-                    if (isObservableArray(destination)) {
-                        destination.replace(source);
-                    } else if (isObservableMap(destination)) {
-                        destination.clear();
-                        destination.merge(source);
-                    } else {
-                        (this.model as any)[key] = source;
-                    }
-                    this.dirtyMap.set(key, false);
-                    this.localValues.delete(key);
-                }
-            });
-        }
+        this.dirtyMap.keys().forEach((key) => {
+            const source = this.localValues.get(key);
+            const destination = (this.model as any)[key];
+            if (isObservableArray(destination)) {
+                destination.replace(source);
+            } else if (isObservableMap(destination)) {
+                destination.clear();
+                destination.merge(source);
+            } else {
+                (this.model as any)[key] = source;
+            }
+            this.dirtyMap.delete(key);
+            this.localValues.delete(key);
+        });
     }
 
     @action reset() {
-        if (this.isDirty) {
-            this.isDirty = false;
-            this.dirtyMap.entries().forEach(([key, dirty]) => {
-                if (dirty === true) {
-                    this.dirtyMap.set(key, false);
-                    this.localValues.delete(key);
-                }
-            });
-        }
+        this.dirtyMap.keys().forEach((key) => {
+            this.dirtyMap.delete(key);
+            this.localValues.delete(key);
+        });
     }
+
+    @action resetProperty(key: string) {
+        this.dirtyMap.delete(key);
+        this.localValues.delete(key);
+    }
+
 }
 
 /**
@@ -88,7 +86,8 @@ class ViewModel<T> implements IViewModel<T> {
  *
  * The viewmodel exposes the following additional methods, besides all the enumerable properties of the model:
  * - `submit()`: copies all the values of the viewmodel to the model and resets the state
- * - `reset()`: resets the state of the view model, abandoning all local modificatoins
+ * - `reset()`: resets the state of the viewmodel, abandoning all local modifications
+ * - `resetProperty(propName)`: resets the specified property of the viewmodel
  * - `isDirty`: observable property indicating if the viewModel contains any modifications
  * - `isPropertyDirty(propName)`: returns true if the specified property is dirty
  * - `model`: The original model object for which this viewModel was created

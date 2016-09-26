@@ -79,6 +79,22 @@ test("create view model", t => {
     t.equal(viewModel.isPropertyDirty("usersInterested"), false)
     t.pass(vr.usersInterested === tr.usersInterested)
 
+    mobx.runInAction(() => viewModel.title = "beer")
+    t.equal(tr, "tea:false,interested:Vader,Madonna,Tarzan,Cersei")
+    t.equal(vr, "beer:false,interested:Vader,Madonna,Tarzan,Cersei")
+    t.equal(viewModel.isDirty, true)
+    t.equal(viewModel.isPropertyDirty("title"), true)
+    t.equal(viewModel.isPropertyDirty("done"), false)
+    t.equal(viewModel.isPropertyDirty("usersInterested"), false)
+
+    mobx.runInAction(() =>  viewModel.resetProperty("title"))
+    t.equal(tr, "tea:false,interested:Vader,Madonna,Tarzan,Cersei")
+    t.equal(vr, "tea:false,interested:Vader,Madonna,Tarzan,Cersei")
+    t.equal(viewModel.isDirty, false)
+    t.equal(viewModel.isPropertyDirty("title"), false)
+    t.equal(viewModel.isPropertyDirty("done"), false)
+    t.equal(viewModel.isPropertyDirty("usersInterested"), false)
+
     mobx.runInAction(() =>  {model.usersInterested.pop();model.usersInterested.pop();})
     t.equal(tr, "tea:false,interested:Vader,Madonna")
     t.equal(vr, "tea:false,interested:Vader,Madonna")
