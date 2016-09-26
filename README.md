@@ -20,7 +20,7 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 
 ## fromPromise
 
-[lib/from-promise.js:92-96](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/from-promise.js#L92-L96 "Source code on GitHub")
+[lib/from-promise.js:103-107](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/from-promise.js#L103-L107 "Source code on GitHub")
 
 `fromPromise` takes a Promise and returns an object with 3 observable properties that track
 the status of the promise. The returned object has the following observable properties:
@@ -28,6 +28,8 @@ the status of the promise. The returned object has the following observable prop
 -   `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference
 -   `state`: one of `"pending"`, `"fulfilled"` or `"rejected"`
 -   `promise`: (not observable) the original promise object
+    and the following method:
+-   `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
 
 **Parameters**
 
@@ -57,6 +59,15 @@ const myComponent = observer(({ fetchResult }) => {
   }
 })
 
+// or using the case method instead of switch:
+
+const myComponent = observer(({ fetchResult }) =>
+  fetchResult.case({
+    pending:   () => <div>Loading...</div>
+    rejected:  error => <div>Ooops.. {error}</div>
+    fulfilled: value => <div>Gotcha: {value}</div>
+  }))
+
 Note that the status strings are available as constants:
 `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
 ```
@@ -65,7 +76,7 @@ Returns **IPromiseBasedObservable&lt;T>**
 
 ## lazyObservable
 
-[lib/lazy-observable.js:33-49](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/lazy-observable.js#L33-L49 "Source code on GitHub")
+[lib/lazy-observable.js:33-49](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/lazy-observable.js#L33-L49 "Source code on GitHub")
 
 `lazyObservable` creates an observable around a `fetch` method that will not be invoked
 util the observable is needed the first time.
@@ -99,7 +110,7 @@ const Profile = observer(({ userProfile }) =>
 
 ## fromResource
 
-[lib/from-resource.js:65-99](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/from-resource.js#L65-L99 "Source code on GitHub")
+[lib/from-resource.js:67-101](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/from-resource.js#L67-L101 "Source code on GitHub")
 
 `fromResource` creates an observable which current state can be inspected using `.current()`,
 and which can be kept in sync with some external datasource that can be subscribed to.
@@ -113,6 +124,8 @@ Whatever is passed to `sink` will be returned by `current()`. The values passed 
 observables automatically, but feel free to do so.
 It is the `current()` call itself which is being tracked,
 so make sure that you don't dereference to early.
+
+For inspiration, an example integration with the apollo-client on [github](https://github.com/apollostack/apollo-client/issues/503#issuecomment-241101379)
 
 The following example code creates an observable that connects to a `dbUserRecord`,
 which comes from an imaginary database and notifies when it has changed.
@@ -161,12 +174,13 @@ const userComponent = observer(({ user }) =>
 
 ## createViewModel
 
-[lib/create-view-model.js:122-124](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/create-view-model.js#L122-L124 "Source code on GitHub")
+[lib/create-view-model.js:134-136](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/create-view-model.js#L134-L136 "Source code on GitHub")
 
 `createViewModel` takes an object with observable properties (model)
-and wraps a view model around it. The view model proxies all enumerable property of the original model with the following behavior:
+and wraps a viewmodel around it. The viewmodel proxies all enumerable property of the original model with the following behavior:
 
--   as long as no new value has been assigned to the viewmodel property, the original property will be returned, and any future change in the model will be visible in the view model as well
+-   as long as no new value has been assigned to the viewmodel property, the original property will be returned.
+-   any future change in the model will be visible in the viewmodel as well unless the viewmodel property was dirty at the time of the attempted change.
 -   once a new value has been assigned to a property of the viewmodel, that value will be returned during a read of that property in the future. However, the original model remain untouched until `submit()` is called.
 
 The viewmodel exposes the following additional methods, besides all the enumerable properties of the model:
@@ -177,7 +191,8 @@ The viewmodel exposes the following additional methods, besides all the enumerab
 -   `isPropertyDirty(propName)`: returns true if the specified property is dirty
 -   `model`: The original model object for which this viewModel was created
 
-N.B. doesn't support observable arrays and maps yet
+You may use observable arrays, maps and objects with `createViewModel` but keep in mind to assign fresh instances of those to the viewmodel's properties, otherwise you would end up modifying the properties of the original model.
+Note that if you read a non-dirty property, viewmodel only proxies the read to the model. You therefore need to assign a fresh instance not only the first time you make the assignment but also after calling `reset()` or `submit()`.
 
 **Parameters**
 
@@ -209,7 +224,7 @@ viewModel.reset()
 
 ## whenWithTimeout
 
-[lib/guarded-when.js:32-51](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/guarded-when.js#L32-L51 "Source code on GitHub")
+[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/guarded-when.js#L32-L51 "Source code on GitHub")
 
 Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
 
@@ -245,7 +260,7 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-[lib/keep-alive.js:31-36](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/keep-alive.js#L31-L36 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -272,7 +287,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## keepAlive
 
-[lib/keep-alive.js:31-36](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/keep-alive.js#L31-L36 "Source code on GitHub")
 
 **Parameters**
 
@@ -295,7 +310,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## queueProcessor
 
-[lib/queue-processor.js:22-40](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/queue-processor.js#L22-L40 "Source code on GitHub")
+[lib/queue-processor.js:22-40](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/queue-processor.js#L22-L40 "Source code on GitHub")
 
 `queueProcessor` takes an observable array, observes it and calls `processor`
 once for each item added to the observable array, optionally deboucing the action
