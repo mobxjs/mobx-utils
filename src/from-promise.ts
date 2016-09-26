@@ -12,6 +12,7 @@ export interface IPromiseBasedObservable<T> {
     state: PromiseState;
     reason: any;
     promise: PromiseLike<T>;
+    case<U>(handlers:{pending?:() => U, fulfilled?:(t:T) => U, rejected?:(e:any) => U}):U
 }
 
 class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
@@ -44,6 +45,14 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
         deprecated("In `fromPromise`: `.reason` is deprecated, use `.value` instead");
         return this._reason.get();
     }
+
+    public case<U>(handlers:{pending?:() => U, fulfilled?:(t:T) => U, rejected?:(e:any) => U}):U {
+        switch(this.state) {
+            case "pending": return handlers.pending && handlers.pending()
+            case "rejected": return handlers.rejected && handlers.rejected(this.value)
+            case "fulfilled": return handlers.fulfilled && handlers.fulfilled(this.value)
+        }
+    }
 }
 
 /**
@@ -52,6 +61,8 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
  *  - `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference
  *  - `state`: one of `"pending"`, `"fulfilled"` or `"rejected"`
  *  - `promise`: (not observable) the original promise object
+ * and the following method:
+ * - `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
  *
  * @example
  * const fetchResult = fromPromise(fetch("http://someurl"))
@@ -72,6 +83,15 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
  *      case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
  *   }
  * })
+ *
+ * // or using the case method instead of switch:
+ *
+ * const myComponent = observer(({ fetchResult }) =>
+ *   fetchResult.case({
+ *     pending:   () => <div>Loading...</div>
+ *     rejected:  error => <div>Ooops.. {error}</div>
+ *     fulfilled: value => <div>Gotcha: {value}</div>
+ *   }))
  *
  * Note that the status strings are available as constants:
  * `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`

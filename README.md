@@ -20,7 +20,7 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 
 ## fromPromise
 
-[lib/from-promise.js:85-89](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/from-promise.js#L85-L89 "Source code on GitHub")
+[lib/from-promise.js:92-96](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/from-promise.js#L92-L96 "Source code on GitHub")
 
 `fromPromise` takes a Promise and returns an object with 3 observable properties that track
 the status of the promise. The returned object has the following observable properties:
@@ -65,7 +65,7 @@ Returns **IPromiseBasedObservable&lt;T>**
 
 ## lazyObservable
 
-[lib/lazy-observable.js:33-49](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/lazy-observable.js#L33-L49 "Source code on GitHub")
+[lib/lazy-observable.js:33-49](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/lazy-observable.js#L33-L49 "Source code on GitHub")
 
 `lazyObservable` creates an observable around a `fetch` method that will not be invoked
 util the observable is needed the first time.
@@ -99,7 +99,7 @@ const Profile = observer(({ userProfile }) =>
 
 ## fromResource
 
-[lib/from-resource.js:65-99](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/from-resource.js#L65-L99 "Source code on GitHub")
+[lib/from-resource.js:65-99](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/from-resource.js#L65-L99 "Source code on GitHub")
 
 `fromResource` creates an observable which current state can be inspected using `.current()`,
 and which can be kept in sync with some external datasource that can be subscribed to.
@@ -161,7 +161,7 @@ const userComponent = observer(({ user }) =>
 
 ## createViewModel
 
-[lib/create-view-model.js:122-124](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/create-view-model.js#L122-L124 "Source code on GitHub")
+[lib/create-view-model.js:122-124](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/create-view-model.js#L122-L124 "Source code on GitHub")
 
 `createViewModel` takes an object with observable properties (model)
 and wraps a view model around it. The view model proxies all enumerable property of the original model with the following behavior:
@@ -209,7 +209,7 @@ viewModel.reset()
 
 ## whenWithTimeout
 
-[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/guarded-when.js#L32-L51 "Source code on GitHub")
+[lib/guarded-when.js:32-51](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/guarded-when.js#L32-L51 "Source code on GitHub")
 
 Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
 
@@ -245,7 +245,7 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+[lib/keep-alive.js:31-36](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/keep-alive.js#L31-L36 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -272,7 +272,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## keepAlive
 
-[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+[lib/keep-alive.js:31-36](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/keep-alive.js#L31-L36 "Source code on GitHub")
 
 **Parameters**
 
@@ -295,7 +295,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## queueProcessor
 
-[lib/queue-processor.js:22-40](https://github.com/mobxjs/mobx-utils/blob/33e11ab3354506ea34c2f3e21724a2b70f78428d/lib/queue-processor.js#L22-L40 "Source code on GitHub")
+[lib/queue-processor.js:22-40](https://github.com/spion/mobx-utils/blob/35c251ecfc82526151fab6e1fdc0da56a6f89d0a/lib/queue-processor.js#L22-L40 "Source code on GitHub")
 
 `queueProcessor` takes an observable array, observes it and calls `processor`
 once for each item added to the observable array, optionally deboucing the action
