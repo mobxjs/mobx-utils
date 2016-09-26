@@ -15,6 +15,8 @@ import {NOOP, IDENTITY, IDisposer, invariant} from "./utils";
  * It is the `current()` call itself which is being tracked,
  * so make sure that you don't dereference to early.
  *
+ * For inspiration, an example integration with the apollo-client on [github](https://github.com/apollostack/apollo-client/issues/503#issuecomment-241101379)
+ *
  * The following example code creates an observable that connects to a `dbUserRecord`,
  * which comes from an imaginary database and notifies when it has changed.
  *
