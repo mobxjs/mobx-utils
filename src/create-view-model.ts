@@ -13,10 +13,9 @@ const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty"
 
 class ViewModel<T> implements IViewModel<T> {
     localValues: ObservableMap<any> = asMap({});
-    dirtyMap: ObservableMap<any> = asMap({});
 
     @computed get isDirty() {
-        return this.dirtyMap.size > 0
+        return this.localValues.size > 0
     }
 
     constructor(public model: T) {
@@ -34,7 +33,6 @@ class ViewModel<T> implements IViewModel<T> {
                 },
                 set: action((value: any) => {
                     if (this.isPropertyDirty(key) || value !== (this.model as any)[key]) {
-                        this.dirtyMap.set(key, true);
                         this.localValues.set(key, value);
                     }
                 })
@@ -43,11 +41,11 @@ class ViewModel<T> implements IViewModel<T> {
     }
 
     isPropertyDirty(key: string): boolean {
-        return this.dirtyMap.has(key);
+        return this.localValues.has(key);
     }
 
     @action submit() {
-        this.dirtyMap.keys().forEach((key) => {
+        this.localValues.keys().forEach((key) => {
             const source = this.localValues.get(key);
             const destination = (this.model as any)[key];
             if (isObservableArray(destination)) {
@@ -58,20 +56,15 @@ class ViewModel<T> implements IViewModel<T> {
             } else {
                 (this.model as any)[key] = source;
             }
-            this.dirtyMap.delete(key);
-            this.localValues.delete(key);
         });
+        this.localValues.clear();
     }
 
     @action reset() {
-        this.dirtyMap.keys().forEach((key) => {
-            this.dirtyMap.delete(key);
-            this.localValues.delete(key);
-        });
+        this.localValues.clear();
     }
 
     @action resetProperty(key: string) {
-        this.dirtyMap.delete(key);
         this.localValues.delete(key);
     }
 
