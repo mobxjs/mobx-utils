@@ -1,4 +1,4 @@
-import {observable, action, ObservableMap, asMap, isObservableObject} from "mobx";
+import {observable, action, ObservableMap, asMap, isObservableObject, isObservableArray, isObservableMap} from "mobx";
 import {invariant} from "./utils";
 
 export interface IViewModel<T> {
@@ -20,7 +20,6 @@ class ViewModel<T> implements IViewModel<T> {
         invariant(isObservableObject(model), "createViewModel expects an observable object");
         Object.keys(model).forEach(key => {
             invariant(RESERVED_NAMES.indexOf(key) === -1, `The propertyname ${key} is reserved and cannot be used with viewModels`);
-            // TODO: create shallow clones for arrays and maps and observe those
             Object.defineProperty(this, key, {
                 enumerable: true,
                 configurable: true,
@@ -50,7 +49,16 @@ class ViewModel<T> implements IViewModel<T> {
             this.isDirty = false;
             this.dirtyMap.entries().forEach(([key, dirty]) => {
                 if (dirty === true) {
-                    (this.model as any)[key] = this.localValues.get(key);
+                    const source = this.localValues.get(key);
+                    const destination = (this.model as any)[key];
+                    if (isObservableArray(destination)) {
+                        destination.replace(source);
+                    } else if (isObservableMap(destination)) {
+                        destination.clear();
+                        destination.merge(source);
+                    } else {
+                        (this.model as any)[key] = source;
+                    }
                     this.dirtyMap.set(key, false);
                     this.localValues.delete(key);
                 }
@@ -73,8 +81,9 @@ class ViewModel<T> implements IViewModel<T> {
 
 /**
  * `createViewModel` takes an object with observable properties (model)
- * and wraps a view model around it. The view model proxies all enumerable property of the original model with the following behavior:
- *  - as long as no new value has been assigned to the viewmodel property, the original property will be returned, and any future change in the model will be visible in the view model as well
+ * and wraps a viewmodel around it. The viewmodel proxies all enumerable property of the original model with the following behavior:
+ *  - as long as no new value has been assigned to the viewmodel property, the original property will be returned.
+ *  - any future change in the model will be visible in the viewmodel as well unless the viewmodel property was dirty at the time of the attempted change.
  *  - once a new value has been assigned to a property of the viewmodel, that value will be returned during a read of that property in the future. However, the original model remain untouched until `submit()` is called.
  *
  * The viewmodel exposes the following additional methods, besides all the enumerable properties of the model:
@@ -84,7 +93,8 @@ class ViewModel<T> implements IViewModel<T> {
  * - `isPropertyDirty(propName)`: returns true if the specified property is dirty
  * - `model`: The original model object for which this viewModel was created
  *
- * N.B. doesn't support observable arrays and maps yet
+ * You may use observable arrays, maps and objects with `createViewModel` but keep in mind to assign fresh instances of those to the viewmodel's properties, otherwise you would end up modifying the properties of the original model.
+ * Note that if you read a non-dirty property, viewmodel only proxies the read to the model. You therefore need to assign a fresh instance not only the first time you make the assignment but also after calling `reset()` or `submit()`.
  *
  * @example
  * class Todo {
