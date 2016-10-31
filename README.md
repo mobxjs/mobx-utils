@@ -20,7 +20,7 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 
 ## fromPromise
 
-[lib/from-promise.js:103-107](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/from-promise.js#L103-L107 "Source code on GitHub")
+[lib/from-promise.js:103-107](https://github.com/mobxjs/mobx-utils/blob/9c764dd804ccb5784fa34ee6883d9141ea4b8c5d/lib/from-promise.js#L103-L107 "Source code on GitHub")
 
 `fromPromise` takes a Promise and returns an object with 3 observable properties that track
 the status of the promise. The returned object has the following observable properties:
@@ -76,7 +76,7 @@ Returns **IPromiseBasedObservable&lt;T>**
 
 ## lazyObservable
 
-[lib/lazy-observable.js:33-49](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/lazy-observable.js#L33-L49 "Source code on GitHub")
+[lib/lazy-observable.js:33-49](https://github.com/mobxjs/mobx-utils/blob/9c764dd804ccb5784fa34ee6883d9141ea4b8c5d/lib/lazy-observable.js#L33-L49 "Source code on GitHub")
 
 `lazyObservable` creates an observable around a `fetch` method that will not be invoked
 util the observable is needed the first time.
@@ -110,7 +110,7 @@ const Profile = observer(({ userProfile }) =>
 
 ## fromResource
 
-[lib/from-resource.js:67-101](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/from-resource.js#L67-L101 "Source code on GitHub")
+[lib/from-resource.js:67-101](https://github.com/mobxjs/mobx-utils/blob/9c764dd804ccb5784fa34ee6883d9141ea4b8c5d/lib/from-resource.js#L67-L101 "Source code on GitHub")
 
 `fromResource` creates an observable which current state can be inspected using `.current()`,
 and which can be kept in sync with some external datasource that can be subscribed to.
@@ -174,7 +174,7 @@ const userComponent = observer(({ user }) =>
 
 ## createViewModel
 
-[lib/create-view-model.js:134-136](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/create-view-model.js#L134-L136 "Source code on GitHub")
+[lib/create-view-model.js:127-129](https://github.com/mobxjs/mobx-utils/blob/9c764dd804ccb5784fa34ee6883d9141ea4b8c5d/lib/create-view-model.js#L127-L129 "Source code on GitHub")
 
 `createViewModel` takes an object with observable properties (model)
 and wraps a viewmodel around it. The viewmodel proxies all enumerable property of the original model with the following behavior:
@@ -186,7 +186,8 @@ and wraps a viewmodel around it. The viewmodel proxies all enumerable property o
 The viewmodel exposes the following additional methods, besides all the enumerable properties of the model:
 
 -   `submit()`: copies all the values of the viewmodel to the model and resets the state
--   `reset()`: resets the state of the view model, abandoning all local modificatoins
+-   `reset()`: resets the state of the viewmodel, abandoning all local modifications
+-   `resetProperty(propName)`: resets the specified property of the viewmodel
 -   `isDirty`: observable property indicating if the viewModel contains any modifications
 -   `isPropertyDirty(propName)`: returns true if the specified property is dirty
 -   `model`: The original model object for which this viewModel was created
@@ -224,7 +225,7 @@ viewModel.reset()
 
 ## whenWithTimeout
 
-[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/guarded-when.js#L32-L51 "Source code on GitHub")
+[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/9c764dd804ccb5784fa34ee6883d9141ea4b8c5d/lib/guarded-when.js#L32-L51 "Source code on GitHub")
 
 Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
 
@@ -260,7 +261,7 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/9c764dd804ccb5784fa34ee6883d9141ea4b8c5d/lib/keep-alive.js#L31-L36 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -287,7 +288,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## keepAlive
 
-[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/9c764dd804ccb5784fa34ee6883d9141ea4b8c5d/lib/keep-alive.js#L31-L36 "Source code on GitHub")
 
 **Parameters**
 
@@ -310,7 +311,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## queueProcessor
 
-[lib/queue-processor.js:22-40](https://github.com/mobxjs/mobx-utils/blob/8ff1ddcbcd6b44fef9dc55c2e3baac6f28c99b22/lib/queue-processor.js#L22-L40 "Source code on GitHub")
+[lib/queue-processor.js:22-40](https://github.com/mobxjs/mobx-utils/blob/9c764dd804ccb5784fa34ee6883d9141ea4b8c5d/lib/queue-processor.js#L22-L40 "Source code on GitHub")
 
 `queueProcessor` takes an observable array, observes it and calls `processor`
 once for each item added to the observable array, optionally deboucing the action
@@ -338,19 +339,20 @@ Returns **IDisposer** stops the processor
 
 ## chunkProcessor
 
+[lib/chunk-processor.js:27-52](https://github.com/mobxjs/mobx-utils/blob/9c764dd804ccb5784fa34ee6883d9141ea4b8c5d/lib/chunk-processor.js#L27-L52 "Source code on GitHub")
+
 `chunkProcessor` takes an observable array, observes it and calls `processor`
 once for a chunk of items added to the observable array, optionally deboucing the action.
 The maximum chunk size can be limited by number.
 This allows both, splitting larger into smaller chunks or (when debounced) combining smaller
 chunks and/or single items into reasonable chunks of work.
- 
 
 **Parameters**
 
 -   `observableArray` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
 -   `processor`  
 -   `debounce` **\[[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
--   `maxChunkSize` **\[[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** optional maximal length of a chunk. With maxChunkSize 0 the processor will receive the full array at once (optional, default `0`)
+-   `maxChunkSize` **\[[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** optionally do not call on full array but smaller chunks. With 0 it will process the full array. (optional, default `0`)
 
 **Examples**
 
@@ -364,7 +366,6 @@ const stop = chunkProcessor(trackedActions, chunkOfMax10Items => {
 trackedActions.push("scrolled")
 trackedActions.push("hoveredButton")
 // when both pushes happen within 100ms, there will be only one call to server
-// no more than 10 items will be send within one call. Otherwise more calls will be done (immediately).
 ```
 
 Returns **IDisposer** stops the processor
