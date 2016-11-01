@@ -39,18 +39,17 @@ test("lazy observable should work", t => {
 test("lazy observable refresh", t => {
     let started = 0;
     let i = 10;
-    let p = new Promise((resolve, reject) => {
-        started = started + 1;
-        resolve(i);
-        i++;
-    })
-
+    
     const lo = utils.lazyObservable(
-        sink => p.then(value =>  {
-            sink(value)
-        }),
-        1
-    );
+        sink => new Promise((resolve, reject) => {
+                    started = started + 1;
+                    resolve(i);
+                    i++;
+                }).then(value =>  {
+                    sink(value)
+                }),
+            1
+        );
     
     let values = [];
     const stop = mobx.autorun(() => {
