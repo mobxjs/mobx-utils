@@ -1,3 +1,7 @@
+# 1.1.2
+
+* Introduced `refresh()` to lazy observables. By @voxuanthinh, see [#20](https://github.com/mobxjs/mobx-utils/pull/20)
+
 # 1.1.1
 
 * Introduced `chunkProcessor` by Benjamin Bock, see [#19](https://github.com/mobxjs/mobx-utils/pull/19)

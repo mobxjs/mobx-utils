@@ -23,8 +23,8 @@ import {Atom, observable, action} from "mobx";
  *   : <div>{userProfile.current().displayName}</div>
  * )
  *
- * // need to update profile from user
- * userProfile.invalidating()
+ * // triggers refresh the userProfile
+ * userProfile.refresh()
  *
  * @param {(sink: (newValue: T) => void) => void} fetch method that will be called the first time the value of this observable is accessed. The provided sink can be used to produce a new value, synchronously or asynchronously
  * @param {T} [initialValue=undefined] optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once
