@@ -15,7 +15,7 @@ class ViewModel<T> implements IViewModel<T> {
     localValues: ObservableMap<any> = asMap({});
 
     @computed get isDirty() {
-        return this.localValues.size > 0
+        return this.localValues.size > 0;
     }
 
     constructor(public model: T) {

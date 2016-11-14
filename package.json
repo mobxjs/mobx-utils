@@ -8,8 +8,9 @@
     "build": "tsc -p src && npm run webpack",
     "webpack": "webpack -p",
     "test": "npm run build && tape test/*.js | faucet",
+    "lint": "tslint ./src/*.ts",
     "prepublish": "npm run build && npm run build-docs",
-    "test-travis": "npm run build && istanbul cover tape test/*.js",
+    "test-travis": "npm run build && npm run lint && istanbul cover tape test/*.js",
     "coverage": "npm run build && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
     "build-docs": "npm run build && documentation readme lib/mobx-utils.js --github --section API"
   },
@@ -33,7 +34,9 @@
     "istanbul": "^0.3.21",
     "mobx": "^2.4.2",
     "tape": "^4.2.2",
-    "typescript": "^1.8.10",
+    "tslint": "^3.15.1",
+    "tslint-eslint-rules": "^2.1.0",
+    "typescript": "^2.0.9",
     "webpack": "^1.13.1"
   },
   "dependencies": {},
