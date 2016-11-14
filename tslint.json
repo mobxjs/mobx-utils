@@ -1,0 +1,7 @@
+{
+  "rulesDirectory": "node_modules/tslint-eslint-rules/dist/rules",
+  "rules": {
+    "semicolon": [true, "always"],
+    "no-constant-condition": true
+  }
+}
