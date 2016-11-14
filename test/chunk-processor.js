@@ -1,3 +1,5 @@
+'use strict';
+
 const utils = require('../');
 const mobx = require('mobx');
 const test = require('tape');
