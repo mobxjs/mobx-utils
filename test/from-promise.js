@@ -6,10 +6,7 @@ mobx.useStrict(true);
 
 test('test from-promise', t => {
   test('resolves', t => {
-    const p = new Promise((resolve, reject) => {
-      debugger;
-      resolve(7);
-    });
+    const p = new Promise(resolve => resolve(7));
 
     const obs = utils.fromPromise(p, 3);
     t.equal(obs.value, 3);
@@ -19,7 +16,7 @@ test('test from-promise', t => {
 
     mobx.when(
       () => {
-        return obs.state === 'fulfilled'
+        return obs.state === 'fulfilled';
       },
       () => {
         t.equal(obs.value, 7);
@@ -29,9 +26,7 @@ test('test from-promise', t => {
   });
 
   test('resolves value', t => {
-    const p = new Promise((resolve, reject) => {
-      resolve(7);
-    });
+    const p = new Promise(resolve => resolve(7));
 
     const obs = utils.fromPromise(p, 3);
     t.equal(obs.value, 3);
@@ -71,8 +66,8 @@ test('test from-promise', t => {
   });
 
   test('rejects when throwing', t => {
-    const p = new Promise((resolve, reject) => {
-      throw 7
+    const p = new Promise(() => {
+      throw 7;
     });
 
     const obs = utils.fromPromise(p, 3);
@@ -100,7 +95,7 @@ test('test from-promise', t => {
       pending: () => 1,
       fulfilled: x => 2,
       rejected: y => 3
-    }
+    };
 
     let mapped = obs.case(mapping);
     t.equal(mapped, 1);
@@ -123,7 +118,7 @@ test('test from-promise', t => {
       pending: () => 1,
       fulfilled: x => 2,
       rejected: y => 3
-    }
+    };
 
     let mapped = obs.case(mapping);
     t.equal(mapped, 1);
@@ -141,7 +136,7 @@ test('test from-promise', t => {
     const p = Promise.resolve();
     const obs = utils.fromPromise(p);
 
-    let mapping = {pending: () => 1}
+    let mapping = {pending: () => 1};
 
     let mapped = obs.case(mapping);
     t.equal(mapped, 1);

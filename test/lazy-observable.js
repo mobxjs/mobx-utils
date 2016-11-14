@@ -21,9 +21,7 @@ test('lazy observable should work', t => {
   const values = [];
   t.equal(started, false);
 
-  const stop = mobx.autorun(() => {
-    values.push(lo.current());
-  });
+  mobx.autorun(() => values.push(lo.current()));
 
   t.equal(started, true);
   t.deepEqual(values, [3]);
@@ -41,7 +39,7 @@ test('lazy observable refresh', t => {
   let i = 10;
 
   const lo = utils.lazyObservable(
-    sink => new Promise((resolve, reject) => {
+    sink => new Promise(resolve => {
       started = started + 1;
       resolve(i);
       i++;
@@ -52,17 +50,13 @@ test('lazy observable refresh', t => {
   );
 
   let values = [];
-  const stop = mobx.autorun(() => {
-    values.push(lo.current());
-  });
+  mobx.autorun(() => values.push(lo.current()));
 
   t.equal(started, 1);
   t.deepEqual(values, [1]);
   t.equal(lo.current(), 1);
 
-  setTimeout(() => {
-    lo.refresh();
-  }, 50);
+  setTimeout(() => lo.refresh(), 50);
 
   setTimeout(() => {
     t.equal(started, 2);

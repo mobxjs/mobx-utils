@@ -17,11 +17,11 @@ test('sync processor should work with max', t => {
   t.deepEqual(res, [[1,2,3], [4,5,6], [7,8,9], [10], [1,2,3], [4,5]]);
   t.equal(q.length, 0);
 
-  mobx.runInAction(() => q.push(3))
+  mobx.runInAction(() => q.push(3));
   t.deepEqual(res, [[1,2,3], [4,5,6], [7,8,9], [10], [1,2,3], [4,5], [3]]);
   t.equal(q.length, 0);
 
-  mobx.runInAction(() => q.push(8,9))
+  mobx.runInAction(() => q.push(8,9));
   t.deepEqual(res, [[1,2,3], [4,5,6], [7,8,9], [10], [1,2,3], [4,5], [3], [8,9]]);
   t.equal(q.length, 0);
 
@@ -34,7 +34,7 @@ test('sync processor should work with max', t => {
   t.deepEqual(res, [[1,2,3], [4,5,6], [7,8,9], [10], [1,2,3], [4,5], [3], [8,9], [6, 7]]);
 
   stop();
-  mobx.runInAction(() => q.push(42))
+  mobx.runInAction(() => q.push(42));
   t.equal(q.length, 1);
   t.deepEqual(res, [[1,2,3], [4,5,6], [7,8,9], [10], [1,2,3], [4,5], [3], [8,9], [6, 7]]);
 
@@ -45,12 +45,12 @@ test('sync processor should work with default max', t => {
   const q = mobx.observable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   const res = [];
 
-  const stop = utils.chunkProcessor(q, v => res.push(v))
+  utils.chunkProcessor(q, v => res.push(v));
 
   t.deepEqual(res, [[1,2,3,4,5,6,7,8,9,10]]);
   t.equal(q.length, 0);
 
-  mobx.runInAction(() => q.push(1,2,3,4,5))
+  mobx.runInAction(() => q.push(1,2,3,4,5));
   t.deepEqual(res, [[1,2,3,4,5,6,7,8,9,10], [1,2,3,4,5]]);
   t.equal(q.length, 0);
 
@@ -70,7 +70,7 @@ test('async processor should work', t => {
     t.deepEqual(res, [[1,2,3], [4,5,6], [7,8,9], [10]]);
     t.equal(q.length, 0);
 
-    mobx.runInAction(() => q.push(3))
+    mobx.runInAction(() => q.push(3));
     t.equal(q.length, 1);
     t.deepEqual(res, [[1,2,3], [4,5,6], [7,8,9], [10]]);
 
@@ -104,14 +104,14 @@ test('async processor should combine smaller chunks to max size', t => {
     t.deepEqual(res, [[1,2,3], [4,5,6], [7]]);
     t.equal(q.length, 0);
 
-    mobx.runInAction(() => q.push(8,9))
+    mobx.runInAction(() => q.push(8,9));
     setTimeout(() => {
-      mobx.runInAction(() => q.push(10,11))
+      mobx.runInAction(() => q.push(10,11));
       t.equal(q.length, 4);
       t.deepEqual(res, [[1,2,3], [4,5,6], [7]]);
     }, 2);
     setTimeout(() => {
-      mobx.runInAction(() => q.push(12,13))
+      mobx.runInAction(() => q.push(12,13));
       t.equal(q.length, 6);
       t.deepEqual(res, [[1,2,3], [4,5,6], [7]]);
     }, 4);

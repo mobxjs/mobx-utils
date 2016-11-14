@@ -8,21 +8,21 @@ mobx.useStrict(true);
 
 test('test from-resource', t => {
   function Record(name) {
-    this.data = { name: name }
-    this.subscriptions = []
+    this.data = { name: name };
+    this.subscriptions = [];
   }
   Record.prototype.updateName = function(newName) {
     this.data.name = newName;
     this.subscriptions.forEach(f => f());
-  }
+  };
   Record.prototype.subscribe = function(cb) {
     this.subscriptions.push(cb);
     return () => {
       const idx  = this.subscriptions.indexOf(cb);
       if (idx !== -1);
       this.subscriptions.splice(idx, 1);
-    }
-  }
+    };
+  };
 
   function createObservable(record) {
     let subscription;
@@ -38,9 +38,9 @@ test('test from-resource', t => {
   }
 
   test('basics', t => {
-    let base = console.warn();
-    let warn = []
-    console.warn = msg => warn.push(msg);
+    let base = console.warn(); // eslint-disable-line no-console
+    let warn = [];
+    console.warn = msg => warn.push(msg); // eslint-disable-line no-console
 
     var me = new Record('michel');
     var me$ = createObservable(me);
@@ -50,7 +50,7 @@ test('test from-resource', t => {
     var calcs = 0;
     var disposer = mobx.autorun(() => {
       calcs++;
-      currentName = me$.current().name
+      currentName = me$.current().name;
     });
 
     t.equal(me.subscriptions.length, 1);
@@ -75,7 +75,7 @@ test('test from-resource', t => {
     // resubscribe
     disposer = mobx.autorun(() => {
       calcs++;
-      currentName = me$.current().name
+      currentName = me$.current().name;
     });
 
     t.equal(currentName, 'noa');
@@ -97,7 +97,7 @@ test('test from-resource', t => {
       disposer(); // autorun
 
       t.equal(warn.length, 1);
-      console.warn = base
+      console.warn = base; // eslint-disable-line no-console
       t.end();
     }, 100);
   });

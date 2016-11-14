@@ -8,7 +8,9 @@
     "build": "tsc -p src && npm run webpack",
     "webpack": "webpack -p",
     "test": "npm run build && tape test/*.js | faucet",
-    "lint": "tslint ./src/*.ts",
+    "lint:js": "eslint ./test",
+    "lint:ts": "tslint ./src/*.ts",
+    "lint": "npm run lint:ts && npm run lint:js",
     "prepublish": "npm run build && npm run build-docs",
     "test-travis": "npm run build && npm run lint && istanbul cover tape test/*.js",
     "coverage": "npm run build && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
@@ -28,8 +30,10 @@
     "mobx-utils.umd.js"
   ],
   "devDependencies": {
+    "babel-eslint": "^7.1.0",
     "coveralls": "^2.11.4",
     "documentation": "^4.0.0-beta9",
+    "eslint": "^3.10.1",
     "faucet": "0.0.1",
     "istanbul": "^0.3.21",
     "mobx": "^2.4.2",
