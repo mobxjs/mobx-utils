@@ -1,5 +1,5 @@
-import {NOOP, IDENTITY} from "./utils";
-import {Atom, observable, action} from "mobx";
+import {IDENTITY} from "./utils";
+import {observable, action} from "mobx";
 
 /**
  * `lazyObservable` creates an observable around a `fetch` method that will not be invoked
@@ -10,7 +10,7 @@ import {Atom, observable, action} from "mobx";
  *
  * Note that it is the `current()` call itself which is being tracked by MobX,
  * so make sure that you don't dereference to early.
-
+ *
  * @example
  * const userProfile = lazyObservable(
  *   sink => fetch("/myprofile").then(profile => sink(profile))
@@ -34,6 +34,7 @@ import {Atom, observable, action} from "mobx";
  *     refresh(): T
  * }}
  */
+
 export function lazyObservable<T>(
     fetch: (sink: (newValue: T) => void) => void,
     initialValue: T = undefined,

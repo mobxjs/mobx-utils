@@ -12,7 +12,7 @@ export interface IPromiseBasedObservable<T> {
     state: PromiseState;
     reason: any;
     promise: PromiseLike<T>;
-    case<U>(handlers:{pending?:() => U, fulfilled?:(t:T) => U, rejected?:(e:any) => U}):U;
+    case<U>(handlers: {pending?: () => U, fulfilled?: (t: T) => U, rejected?: (e: any) => U}): U;
 }
 
 class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
@@ -46,8 +46,8 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
         return this._reason.get();
     }
 
-    public case<U>(handlers:{pending?:() => U, fulfilled?:(t:T) => U, rejected?:(e:any) => U}):U {
-        switch(this.state) {
+    public case<U>(handlers: {pending?: () => U, fulfilled?: (t: T) => U, rejected?: (e: any) => U}): U {
+        switch (this.state) {
             case "pending": return handlers.pending && handlers.pending();
             case "rejected": return handlers.rejected && handlers.rejected(this.value);
             case "fulfilled": return handlers.fulfilled && handlers.fulfilled(this.value);
@@ -104,4 +104,3 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
 export function fromPromise<T>(promise: PromiseLike<T>, initialValue: T = undefined, modifier =  IDENTITY): IPromiseBasedObservable<T> {
     return new PromiseBasedObservable(promise, initialValue, modifier);
 }
-
