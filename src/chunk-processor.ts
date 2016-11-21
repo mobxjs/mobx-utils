@@ -18,14 +18,14 @@ import {IDisposer} from "./utils";
  * trackedActions.push("scrolled")
  * trackedActions.push("hoveredButton")
  * // when both pushes happen within 100ms, there will be only one call to server
- * 
+ *
  * @param {T[]} observableArray observable array instance to track
  * @param {(item: T[]) => void} processor action to call per item
  * @param {number} [debounce=0] optional debounce time in ms. With debounce 0 the processor will run synchronously
  * @param {number} [maxChunkSize=0] optionally do not call on full array but smaller chunks. With 0 it will process the full array.
  * @returns {IDisposer} stops the processor
  */
-export function chunkProcessor<T>(observableArray: T[], processor: (item: T[]) => void, debounce = 0, maxChunkSize=0): IDisposer {
+export function chunkProcessor<T>(observableArray: T[], processor: (item: T[]) => void, debounce = 0, maxChunkSize = 0): IDisposer {
     if (!isObservableArray(observableArray))
         throw new Error("Expected observable array as first argument");
     if (!isAction(processor))
@@ -33,7 +33,7 @@ export function chunkProcessor<T>(observableArray: T[], processor: (item: T[]) =
 
     const runner = () => {
 
-        while(observableArray.length > 0) {
+        while (observableArray.length > 0) {
             let chunkSize = maxChunkSize === 0 ? observableArray.length : Math.min(observableArray.length, maxChunkSize);
             // construct a final set
             const items = observableArray.slice(0, chunkSize);

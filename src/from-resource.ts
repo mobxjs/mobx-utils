@@ -1,5 +1,5 @@
-import {Atom, observable, action} from "mobx";
-import {NOOP, IDENTITY, IDisposer, invariant} from "./utils";
+import {Atom, action} from "mobx";
+import {NOOP, IDisposer, invariant} from "./utils";
 
 /**
  * `fromResource` creates an observable which current state can be inspected using `.current()`,

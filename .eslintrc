@@ -1,0 +1,15 @@
+{
+  "extends": "eslint:recommended",
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "Promise": false
+  },
+  "rules": {
+    "semi": [2, "always"],
+    "no-unused-vars": [2, {"vars": "all", "args": "none"}]
+  }
+}
