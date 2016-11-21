@@ -10,11 +10,13 @@ This package provides utility functions and common MobX patterns build on top of
 It is encouraged to take a peek under the hood and read the sources of these utilities.
 Feel free to open a PR with your own utilities. For large new features, please open an issue first.
 
-# Installation
+# Installation & Usage
 
 NPM: `npm install mobx-utils --save`
 
 CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
+
+`import {function_name} from 'mobx-utils'`
 
 # API
 
@@ -44,7 +46,7 @@ const fetchResult = fromPromise(fetch("http://someurl"))
 
 // combine with when..
 when(
-  () => fetchResult.state !== "pending"
+  () => fetchResult.state !== "pending",
   () => {
     console.log("Got ", fetchResult.value)
   }
