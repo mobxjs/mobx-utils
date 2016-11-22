@@ -13,7 +13,7 @@ export interface ThrottledValue<T> {
     stale: boolean;
     
     // Sets the `latest` value
-    set: (value: T) => undefined;
+    set: (value: T) => void;
 }
 
 /**
