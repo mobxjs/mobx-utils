@@ -65,7 +65,7 @@ export function throttledValue<T>(
     });
     
     let lastUpdateTime = 0;
-    let timeout = null;
+    let timeout = 0;
     const set = action((value: T) => {
         values.latest = value;
         const sinceLastUpdate = Date.now() - lastUpdateTime;  
