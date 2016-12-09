@@ -65,3 +65,27 @@ test('lazy observable refresh', t => {
     t.end();
   }, 200);
 });
+
+test('lazy observable reset', t => {
+  const lo = utils.lazyObservable(
+    sink => new Promise(resolve => {
+      resolve(2);
+    }).then(value => {
+      sink(value);
+    }),
+    1
+  );
+
+  lo.current();
+
+  setTimeout(() => {
+    t.equal(lo.current(), 2);
+  }, 50);
+
+  setTimeout(() => lo.reset(), 150);
+
+  setTimeout(() => {
+    t.equal(lo.current(), 1);
+    t.end();
+  }, 200);
+});
