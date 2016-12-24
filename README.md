@@ -22,7 +22,7 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 
 ## fromPromise
 
-[lib/from-promise.js:103-107](https://github.com/mobxjs/mobx-utils/blob/18725e8d316d799ac212610db937d851462daacb/lib/from-promise.js#L103-L107 "Source code on GitHub")
+[lib/from-promise.js:103-107](https://github.com/mobxjs/mobx-utils/blob/b9b35875b25c81073c9483476ebc054f12e13755/lib/from-promise.js#L103-L107 "Source code on GitHub")
 
 `fromPromise` takes a Promise and returns an object with 3 observable properties that track
 the status of the promise. The returned object has the following observable properties:
@@ -46,7 +46,7 @@ const fetchResult = fromPromise(fetch("http://someurl"))
 
 // combine with when..
 when(
-  () => fetchResult.state !== "pending",
+  () => fetchResult.state !== "pending"
   () => {
     console.log("Got ", fetchResult.value)
   }
@@ -78,7 +78,7 @@ Returns **IPromiseBasedObservable&lt;T>**
 
 ## lazyObservable
 
-[lib/lazy-observable.js:37-58](https://github.com/mobxjs/mobx-utils/blob/18725e8d316d799ac212610db937d851462daacb/lib/lazy-observable.js#L37-L58 "Source code on GitHub")
+[lib/lazy-observable.js:37-58](https://github.com/mobxjs/mobx-utils/blob/b9b35875b25c81073c9483476ebc054f12e13755/lib/lazy-observable.js#L37-L58 "Source code on GitHub")
 
 `lazyObservable` creates an observable around a `fetch` method that will not be invoked
 util the observable is needed the first time.
@@ -115,7 +115,7 @@ userProfile.refresh()
 
 ## fromResource
 
-[lib/from-resource.js:67-101](https://github.com/mobxjs/mobx-utils/blob/18725e8d316d799ac212610db937d851462daacb/lib/from-resource.js#L67-L101 "Source code on GitHub")
+[lib/from-resource.js:67-101](https://github.com/mobxjs/mobx-utils/blob/b9b35875b25c81073c9483476ebc054f12e13755/lib/from-resource.js#L67-L101 "Source code on GitHub")
 
 `fromResource` creates an observable which current state can be inspected using `.current()`,
 and which can be kept in sync with some external datasource that can be subscribed to.
@@ -177,9 +177,64 @@ const userComponent = observer(({ user }) =>
 )
 ```
 
+## toStream
+
+[lib/observable-stream.js:37-52](https://github.com/mobxjs/mobx-utils/blob/b9b35875b25c81073c9483476ebc054f12e13755/lib/observable-stream.js#L37-L52 "Source code on GitHub")
+
+Converts an expression to an observable stream (a.k.a. TC 39 Observable / RxJS observable).
+The provided expression is tracked by mobx as long as there are subscribers, automatically
+emitting when new values become available. The expressions respect transactions.
+
+**Parameters**
+
+-   `expression`  
+
+**Examples**
+
+```javascript
+const user = observable({
+  firstName: "C.S",
+  lastName: "Lewis"
+})
+
+Rx.Observable
+  .from(mobxUtils.toStream(() => user.firstname + user.lastName))
+  .scan(nameChanges => nameChanges + 1, 0)
+  .subscribe(nameChanges => console.log("Changed name ", nameChanges, "times"))
+```
+
+Returns **IObservableStream&lt;T>** 
+
+## fromStream
+
+[lib/observable-stream.js:104-107](https://github.com/mobxjs/mobx-utils/blob/b9b35875b25c81073c9483476ebc054f12e13755/lib/observable-stream.js#L104-L107 "Source code on GitHub")
+
+Converts an subscribable, observable stream (TC 39 observable / RxJS stream)
+into an object which stores the current value (as `current`). The subscription can be cancelled through the cancel method
+Takes an initial value as second optional argument
+
+**Parameters**
+
+-   `observable` **IObservableStream&lt;T>** 
+-   `initialValue`  
+
+**Examples**
+
+```javascript
+const debouncedClickDelta = MobxUtils.fromStream(Rx.Observable.fromEvent(button, 'click')
+    .throttleTime(1000)
+    .map(event => event.clientX)
+    .scan((count, clientX) => count + clientX, 0)
+)
+
+autorun(() => {
+    console.log("distance moved", debouncedClickDelta.current)
+})
+```
+
 ## createViewModel
 
-[lib/create-view-model.js:127-129](https://github.com/mobxjs/mobx-utils/blob/18725e8d316d799ac212610db937d851462daacb/lib/create-view-model.js#L127-L129 "Source code on GitHub")
+[lib/create-view-model.js:127-129](https://github.com/mobxjs/mobx-utils/blob/b9b35875b25c81073c9483476ebc054f12e13755/lib/create-view-model.js#L127-L129 "Source code on GitHub")
 
 `createViewModel` takes an object with observable properties (model)
 and wraps a viewmodel around it. The viewmodel proxies all enumerable property of the original model with the following behavior:
@@ -230,7 +285,7 @@ viewModel.reset()
 
 ## whenWithTimeout
 
-[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/18725e8d316d799ac212610db937d851462daacb/lib/guarded-when.js#L32-L51 "Source code on GitHub")
+[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/b9b35875b25c81073c9483476ebc054f12e13755/lib/guarded-when.js#L32-L51 "Source code on GitHub")
 
 Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
 
@@ -266,7 +321,30 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/18725e8d316d799ac212610db937d851462daacb/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/b9b35875b25c81073c9483476ebc054f12e13755/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+
+**Parameters**
+
+-   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
+-   `_1`  
+-   `_2`  
+
+**Examples**
+
+```javascript
+const number = observable(3)
+const doubler = computed(() => number.get() * 2)
+const stop = keepAlive(doubler)
+// doubler will now stay in sync reactively even when there are no further observers
+stop()
+// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
+```
+
+Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
+
+## keepAlive
+
+[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/b9b35875b25c81073c9483476ebc054f12e13755/lib/keep-alive.js#L31-L36 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -291,32 +369,9 @@ const stop = keepAlive(obj, "doubler")
 
 Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
 
-## keepAlive
-
-[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/18725e8d316d799ac212610db937d851462daacb/lib/keep-alive.js#L31-L36 "Source code on GitHub")
-
-**Parameters**
-
--   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
--   `_1`  
--   `_2`  
-
-**Examples**
-
-```javascript
-const number = observable(3)
-const doubler = computed(() => number.get() * 2)
-const stop = keepAlive(doubler)
-// doubler will now stay in sync reactively even when there are no further observers
-stop()
-// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
-```
-
-Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
-
 ## queueProcessor
 
-[lib/queue-processor.js:22-40](https://github.com/mobxjs/mobx-utils/blob/18725e8d316d799ac212610db937d851462daacb/lib/queue-processor.js#L22-L40 "Source code on GitHub")
+[lib/queue-processor.js:22-40](https://github.com/mobxjs/mobx-utils/blob/b9b35875b25c81073c9483476ebc054f12e13755/lib/queue-processor.js#L22-L40 "Source code on GitHub")
 
 `queueProcessor` takes an observable array, observes it and calls `processor`
 once for each item added to the observable array, optionally deboucing the action
@@ -344,7 +399,7 @@ Returns **IDisposer** stops the processor
 
 ## chunkProcessor
 
-[lib/chunk-processor.js:27-52](https://github.com/mobxjs/mobx-utils/blob/18725e8d316d799ac212610db937d851462daacb/lib/chunk-processor.js#L27-L52 "Source code on GitHub")
+[lib/chunk-processor.js:27-52](https://github.com/mobxjs/mobx-utils/blob/b9b35875b25c81073c9483476ebc054f12e13755/lib/chunk-processor.js#L27-L52 "Source code on GitHub")
 
 `chunkProcessor` takes an observable array, observes it and calls `processor`
 once for a chunk of items added to the observable array, optionally deboucing the action.
