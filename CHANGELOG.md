@@ -1,3 +1,7 @@
+# 1.1.3
+
+* Introduced `fromStream` and `toStream` for interoperability with TC 39 / RxJS observable streams, see [Mobx #677](https://github.com/mobxjs/mobx/issues/677)
+
 # 1.1.2
 
 * Introduced `refresh()` to lazy observables. By @voxuanthinh, see [#20](https://github.com/mobxjs/mobx-utils/pull/20)

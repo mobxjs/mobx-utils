@@ -37,6 +37,7 @@
     "faucet": "0.0.1",
     "istanbul": "^0.3.21",
     "mobx": "^2.4.2",
+    "rxjs": "^5.0.2",
     "tape": "^4.2.2",
     "tslint": "^3.15.1",
     "tslint-eslint-rules": "^2.1.0",
