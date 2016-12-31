@@ -17,6 +17,8 @@ const tickers:
  *
  * Multiple clocks with the same interval will automatically be synchronized.
  *
+ * Countdown example: http://jsbin.com/roqesit/1/edit?js,output
+ *
  * @example
  *
  * const start = Date.now()
