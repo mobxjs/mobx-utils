@@ -1,3 +1,7 @@
+# 1.1.4
+
+* Introduced `now(interval?)`, to get an observable that returns the current time at a specified interval
+
 # 1.1.3
 
 * Introduced `fromStream` and `toStream` for interoperability with TC 39 / RxJS observable streams, see [Mobx #677](https://github.com/mobxjs/mobx/issues/677)

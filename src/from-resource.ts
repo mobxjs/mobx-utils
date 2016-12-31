@@ -1,6 +1,12 @@
 import {Atom, action} from "mobx";
 import {NOOP, IDisposer, invariant} from "./utils";
 
+export interface IResource<T> {
+    current(): T;
+    dispose(): void;
+    isAlive(): boolean;
+}
+
 /**
  * `fromResource` creates an observable which current state can be inspected using `.current()`,
  * and which can be kept in sync with some external datasource that can be subscribed to.
@@ -68,11 +74,7 @@ export function fromResource<T>(
     subscriber: (sink: (newValue: T) => void) => void,
     unsubscriber: IDisposer = NOOP,
     initialValue: T = undefined
-): {
-    current(): T;
-    dispose(): void;
-    isAlive(): boolean;
-} {
+): IResource<T> {
     let isActive = false;
     let isDisposed = false;
     let value = initialValue;
