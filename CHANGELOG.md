@@ -1,3 +1,7 @@
+# 1.1.5
+
+* Fixed #32: make sure lazyObservable and fromResources can be initiated from computed values
+
 # 1.1.4
 
 * Introduced `now(interval?)`, to get an observable that returns the current time at a specified interval

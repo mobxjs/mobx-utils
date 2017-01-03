@@ -1,4 +1,4 @@
-import {Atom, action} from "mobx";
+import {Atom, extras} from "mobx";
 import {NOOP, IDisposer, invariant} from "./utils";
 
 export interface IResource<T> {
@@ -92,10 +92,12 @@ export function fromResource<T>(
         () => {
             invariant(!isActive && !isDisposed);
             isActive = true;
-            subscriber(action("ResourceBasedObservable-sink", (newValue: T) => {
-                value = newValue;
-                atom.reportChanged();
-            }));
+            subscriber((newValue: T) => {
+                extras.allowStateChanges(true, () => {
+                    value = newValue;
+                    atom.reportChanged();
+                });
+            });
         },
         suspender
     );

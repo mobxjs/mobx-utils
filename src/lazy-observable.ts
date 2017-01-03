@@ -1,5 +1,5 @@
 import {IDENTITY} from "./utils";
-import {observable, action} from "mobx";
+import {observable, extras} from "mobx";
 
 /**
  * `lazyObservable` creates an observable around a `fetch` method that will not be invoked
@@ -48,9 +48,11 @@ export function lazyObservable<T>(
     let currentFnc = () => {
         if (!started) {
             started = true;
-            fetch(action("lazyObservable-fetch", (newValue: T) => {
-                value.set(newValue);
-            }));
+            fetch((newValue: T) => {
+                extras.allowStateChanges(true, () => {
+                    value.set(newValue);
+                });
+            });
         }
         return value.get();
     };
