@@ -28,7 +28,6 @@ import {observable, extras, action} from "mobx";
  *
  * @param {(sink: (newValue: T) => void) => void} fetch method that will be called the first time the value of this observable is accessed. The provided sink can be used to produce a new value, synchronously or asynchronously
  * @param {T} [initialValue=undefined] optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once
- * @param {any} [modifier=IDENTITY] optional mobx modifier that determines the the comparison and recursion strategy of the observable, for example `asFlat` or `asStructure`
  * @returns {{
  *     current(): T,
  *     refresh(): T,

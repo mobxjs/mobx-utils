@@ -17,11 +17,11 @@ export interface IPromiseBasedObservable<T> {
 
 class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
     private _observable: IObservableValue<T>;
-    private _state: IObservableValue<PromiseState> = observable("pending" as PromiseState);
+    private _state: IObservableValue<PromiseState> = observable(PENDING as any); // MWE: Hm... as any should not be needed...
     private _reason: IObservableValue<any> = observable(undefined as any);
 
-    constructor(public promise: PromiseLike<T>, initialValue: T = undefined, private modifier = IDENTITY) {
-        this._observable = observable(modifier(initialValue));
+    constructor(public promise: PromiseLike<T>, initialValue: T = undefined) {
+        this._observable = observable.box(initialValue);
         promise.then(
             action("observableFromPromise-resolve", (value: T) => {
                 this._observable.set(value);
@@ -98,9 +98,8 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
  *
  * @param {IThenable<T>} promise The promise which will be observed
  * @param {T} [initialValue=undefined] Optional predefined initial value
- * @param {any} [modifier=IDENTITY] MobX modifier, e.g. `asFlat`, to be applied to the resolved value
  * @returns {IPromiseBasedObservable<T>}
  */
-export function fromPromise<T>(promise: PromiseLike<T>, initialValue: T = undefined, modifier =  IDENTITY): IPromiseBasedObservable<T> {
-    return new PromiseBasedObservable(promise, initialValue, modifier);
+export function fromPromise<T>(promise: PromiseLike<T>, initialValue: T = undefined): IPromiseBasedObservable<T> {
+    return new PromiseBasedObservable(promise, initialValue);
 }

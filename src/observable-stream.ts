@@ -1,4 +1,4 @@
-import {computed, observable, asReference, IObservableValue, action, runInAction} from "mobx";
+import {computed, observable, IObservableValue, action, runInAction} from "mobx";
 
 declare var Symbol: any;
 
@@ -29,7 +29,7 @@ export interface IObservableStream<T> {
 /**
  * Converts an expression to an observable stream (a.k.a. TC 39 Observable / RxJS observable).
  * The provided expression is tracked by mobx as long as there are subscribers, automatically
- * emitting when new values become available. The expressions respect transactions.
+ * emitting when new values become available. The expressions respect (trans)actions.
  *
  * @example
  *
@@ -55,8 +55,8 @@ export function toStream<T>(expression: () => T): IObservableStream<T> {
             return {
                 unsubscribe: computedValue.observe(
                     typeof observer === "function"
-                        ? newValue => observer(newValue)
-                        : newValue => observer.next(newValue)
+                        ? ( {newValue}: { newValue: T } ) => observer(newValue)
+                        : ( {newValue}: { newValue: T } ) => observer.next(newValue)
                 )
             };
         },
@@ -65,7 +65,7 @@ export function toStream<T>(expression: () => T): IObservableStream<T> {
 }
 
 class StreamListener<T> implements IStreamObserver<T> {
-    @observable current: T = asReference(undefined);
+    @observable.ref current: T = undefined;
     subscription: ISubscription;
 
     constructor(observable: IObservableStream<T>, initialValue: T) {

@@ -1,3 +1,7 @@
+# 2.0.0
+
+* Upgraded to MobX 3
+
 # 1.1.6
 
 * Fixed #34: fromStream threw when being used in strict mode

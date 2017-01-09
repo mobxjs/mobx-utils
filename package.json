@@ -36,17 +36,17 @@
     "eslint": "^3.10.1",
     "faucet": "0.0.1",
     "istanbul": "^0.3.21",
-    "mobx": "^2.4.2",
+    "mobx": "^3.0.0",
     "rxjs": "^5.0.2",
     "tape": "^4.2.2",
     "tslint": "^3.15.1",
     "tslint-eslint-rules": "^2.1.0",
-    "typescript": "^2.0.9",
+    "typescript": "^2.1.4",
     "webpack": "^1.13.1"
   },
   "dependencies": {},
   "peerDependencies": {
-    "mobx": "^2.4.2"
+    "mobx": "^3.0.0"
   },
   "keywords": [
     "mobx",
