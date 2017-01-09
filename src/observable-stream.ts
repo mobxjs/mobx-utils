@@ -1,4 +1,4 @@
-import {computed, observable, asReference, IObservableValue} from "mobx";
+import {computed, observable, asReference, IObservableValue, action, runInAction} from "mobx";
 
 declare var Symbol: any;
 
@@ -69,22 +69,26 @@ class StreamListener<T> implements IStreamObserver<T> {
     subscription: ISubscription;
 
     constructor(observable: IObservableStream<T>, initialValue: T) {
-        this.current = initialValue;
-        this.subscription = observable.subscribe(this);
+        runInAction(() => {
+            this.current = initialValue;
+            this.subscription = observable.subscribe(this);
+        });
     }
 
     dispose() {
         this.subscription.unsubscribe();
     }
 
-    next(value: T) {
+    @action next(value: T) {
         this.current = value;
     }
-    complete() {
+
+    @action complete() {
         this.subscription.unsubscribe();
         this.dispose();
     }
-    error(value: T) {
+
+    @action error(value: T) {
         this.current = value;
         this.dispose();
     }

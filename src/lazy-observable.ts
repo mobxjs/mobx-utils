@@ -1,5 +1,5 @@
 import {IDENTITY} from "./utils";
-import {observable, extras} from "mobx";
+import {observable, extras, action} from "mobx";
 
 /**
  * `lazyObservable` creates an observable around a `fetch` method that will not be invoked

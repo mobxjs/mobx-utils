@@ -41,6 +41,7 @@ test("to observable", t => {
 })
 
 test("from observable", t => {
+  mobx.useStrict(true)
   const fromStream = utils.fromStream(Rx.Observable.interval(100), -1)
   const values = [];
   const d = mobx.autorun(() => {
@@ -62,6 +63,7 @@ test("from observable", t => {
     t.equal(fromStream.current, 1)
     t.deepEqual(values, [-1, 0, 1])
     d()
+    mobx.useStrict(false)
     t.end()
   }, 350)
 })
