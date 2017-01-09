@@ -1,3 +1,8 @@
+# 1.1.6
+
+* Fixed #34: fromStream threw when being used in strict mode
+* Introduced `reset()`  on lazyObservable, see #28 by @daitr92
+
 # 1.1.5
 
 * Fixed #32: make sure lazyObservable and fromResources can be initiated from computed values
