@@ -31,7 +31,8 @@ import {observable, extras} from "mobx";
  * @param {any} [modifier=IDENTITY] optional mobx modifier that determines the the comparison and recursion strategy of the observable, for example `asFlat` or `asStructure`
  * @returns {{
  *     current(): T,
- *     refresh(): T
+ *     refresh(): T,
+ *     reset(): T
  * }}
  */
 
@@ -41,7 +42,8 @@ export function lazyObservable<T>(
     modifier = IDENTITY
 ): {
     current(): T,
-    refresh(): T
+    refresh(): T,
+    reset(): T
 } {
     let started = false;
     const value = observable(modifier(initialValue));
@@ -56,11 +58,18 @@ export function lazyObservable<T>(
         }
         return value.get();
     };
+    let resetFnc = action("lazyObservable-reset", () => {
+      value.set(initialValue);
+      return value.get();
+    });
     return {
         current: currentFnc,
         refresh: () => {
             started = false;
             return currentFnc();
+        },
+        reset: () => {
+            return resetFnc();
         }
     };
 }
