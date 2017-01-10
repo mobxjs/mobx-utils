@@ -1,4 +1,4 @@
-import {action, ObservableMap, asMap, isObservableObject, isObservableArray, isObservableMap, computed} from "mobx";
+import {action, ObservableMap, observable, isObservableObject, isObservableArray, isObservableMap, computed} from "mobx";
 import {invariant} from "./utils";
 
 export interface IViewModel<T> {
@@ -12,7 +12,7 @@ export interface IViewModel<T> {
 const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty"];
 
 class ViewModel<T> implements IViewModel<T> {
-    localValues: ObservableMap<any> = asMap({});
+    localValues: ObservableMap<any> = observable.map({});
 
     @computed get isDirty() {
         return this.localValues.size > 0;
