@@ -23,7 +23,7 @@ test("to observable", t => {
 
   user.firstName = "John"
 
-  mobx.transaction(() => {
+  mobx.runInAction(() => {
     user.firstName = "Jane";
     user.lastName = "Jack";
   })
