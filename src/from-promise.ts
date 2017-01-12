@@ -18,7 +18,7 @@ export interface IPromiseBasedObservable<T> {
 class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
     private _observable: IObservableValue<T>;
     private _state: IObservableValue<PromiseState> = observable(PENDING as any); // MWE: Hm... as any should not be needed...
-    private _reason: IObservableValue<any> = observable(undefined as any);
+    private _reason: IObservableValue<any> = observable.shallowBox(undefined as any);
 
     constructor(public promise: PromiseLike<T>, initialValue: T = undefined) {
         this._observable = observable.box(initialValue);
