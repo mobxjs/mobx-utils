@@ -64,8 +64,12 @@ export function lazyObservable<T>(
     return {
         current: currentFnc,
         refresh: () => {
-            started = false;
-            return currentFnc();
+            if (started) {
+                started = false;
+                return currentFnc();
+            } else {
+                return value.get();
+            }
         },
         reset: () => {
             return resetFnc();

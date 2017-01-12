@@ -21,6 +21,9 @@ test('lazy observable should work', t => {
   const values = [];
   t.equal(started, false);
 
+  lo.refresh();
+  t.equal(started, false);
+
   mobx.autorun(() => values.push(lo.current()));
 
   t.equal(started, true);
