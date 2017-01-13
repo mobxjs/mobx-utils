@@ -1,3 +1,9 @@
+# 2.0.1
+
+* Fixed several deprecation messages related to MobX 3 upgrade (see #36 by RainerAtSpirit)
+* Fixed #26: Rejected promises not playing nicely with JQuery
+* Fixed #25: Refreshing a lazy observable should not accidentally refresh it if it didn't start yet
+
 # 2.0.0
 
 * Upgraded to MobX 3
