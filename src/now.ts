@@ -17,7 +17,7 @@ const tickers:
  *
  * Multiple clocks with the same interval will automatically be synchronized.
  *
- * Countdown example: http://jsbin.com/roqesit/1/edit?js,output
+ * Countdown example: http://jsbin.com/roqesit/edit?js,output
  *
  * @example
  *
