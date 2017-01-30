@@ -105,8 +105,9 @@ export function fromPromise<T>(promise: PromiseLike<T>, initialValue: T = undefi
 }
 
 /**
-  * Returns true if the provided value is a promise based observable.
-  * @param value object
+  * Returns true if the provided value is a promise-based observable.
+  * @param value any
+  * @returns {boolean}
   */
 export function isPromiseBasedObservable(value: any): value is IPromiseBasedObservable<any> {
     return value instanceof PromiseBasedObservable;
