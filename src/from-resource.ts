@@ -1,5 +1,11 @@
-import {Atom, action} from "mobx";
+import {Atom, extras} from "mobx";
 import {NOOP, IDisposer, invariant} from "./utils";
+
+export interface IResource<T> {
+    current(): T;
+    dispose(): void;
+    isAlive(): boolean;
+}
 
 /**
  * `fromResource` creates an observable which current state can be inspected using `.current()`,
@@ -15,7 +21,8 @@ import {NOOP, IDisposer, invariant} from "./utils";
  * It is the `current()` call itself which is being tracked,
  * so make sure that you don't dereference to early.
  *
- * For inspiration, an example integration with the apollo-client on [github](https://github.com/apollostack/apollo-client/issues/503#issuecomment-241101379)
+ * For inspiration, an example integration with the apollo-client on [github](https://github.com/apollostack/apollo-client/issues/503#issuecomment-241101379),
+ * or the [implementation](https://github.com/mobxjs/mobx-utils/blob/1d17cf7f7f5200937f68cc0b5e7ec7f3f71dccba/src/now.ts#L43-L57) of `mobxUtils.now`
  *
  * The following example code creates an observable that connects to a `dbUserRecord`,
  * which comes from an imaginary database and notifies when it has changed.
@@ -68,11 +75,7 @@ export function fromResource<T>(
     subscriber: (sink: (newValue: T) => void) => void,
     unsubscriber: IDisposer = NOOP,
     initialValue: T = undefined
-): {
-    current(): T;
-    dispose(): void;
-    isAlive(): boolean;
-} {
+): IResource<T> {
     let isActive = false;
     let isDisposed = false;
     let value = initialValue;
@@ -89,10 +92,12 @@ export function fromResource<T>(
         () => {
             invariant(!isActive && !isDisposed);
             isActive = true;
-            subscriber(action("ResourceBasedObservable-sink", (newValue: T) => {
-                value = newValue;
-                atom.reportChanged();
-            }));
+            subscriber((newValue: T) => {
+                extras.allowStateChanges(true, () => {
+                    value = newValue;
+                    atom.reportChanged();
+                });
+            });
         },
         suspender
     );

@@ -49,7 +49,7 @@ test('keep alive should work for properties', t => {
   let calcs = 0;
   const x = mobx.observable({
     a: 1,
-    doubler: function() {
+    get doubler() {
       calcs++;
       return this.a * 2;
     }

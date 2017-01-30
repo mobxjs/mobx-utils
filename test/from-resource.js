@@ -38,7 +38,7 @@ test('test from-resource', t => {
   }
 
   test('basics', t => {
-    let base = console.warn(); // eslint-disable-line no-console
+    let base = console.warn; // eslint-disable-line no-console
     let warn = [];
     console.warn = msg => warn.push(msg); // eslint-disable-line no-console
 
@@ -101,6 +101,22 @@ test('test from-resource', t => {
       t.end();
     }, 100);
   });
+
+  test('from computed, #32', t => {
+    var you = new Record("You");
+    var you$ = createObservable(you);
+
+    var computedName = mobx.computed(() => you$.current().name.toUpperCase());
+    var name;
+    var d = mobx.autorun(() => name = computedName.get());
+    t.equal(name, "YOU");
+    you.updateName("Me");
+    t.equal(name, "ME");
+    d();
+    you.updateName("Hi");
+    t.equal(name, "ME");
+    t.end()
+  })
 
   t.end();
 });
