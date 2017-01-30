@@ -103,3 +103,11 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
 export function fromPromise<T>(promise: PromiseLike<T>, initialValue: T = undefined): IPromiseBasedObservable<T> {
     return new PromiseBasedObservable(promise, initialValue);
 }
+
+/**
+  * Returns true if the provided value is a promise based observable.
+  * @param value object
+  */
+export function isPromiseBasedObservable(value: any): value is IPromiseBasedObservable<any> {
+    return value instanceof PromiseBasedObservable;
+}
