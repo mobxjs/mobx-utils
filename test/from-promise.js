@@ -153,7 +153,7 @@ test('test from-promise', t => {
   });
   
   test('isPromiseBasedObservable, true', t => {
-    const obs = utils.fromPromise(p, Promise.resolve(123));
+    const obs = utils.fromPromise(Promise.resolve(123));
     t.ok(utils.isPromiseBasedObservable(obs));
     t.end();
   });
