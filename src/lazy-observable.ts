@@ -1,6 +1,12 @@
 import {IDENTITY} from "./utils";
 import {observable, extras, action} from "mobx";
 
+export interface ILazyObservable<T> {
+    current(): T;
+    refresh(): T;
+    reset(): T;
+}
+
 /**
  * `lazyObservable` creates an observable around a `fetch` method that will not be invoked
  * util the observable is needed the first time.
@@ -39,11 +45,7 @@ export function lazyObservable<T>(
     fetch: (sink: (newValue: T) => void) => void,
     initialValue: T = undefined,
     modifier = IDENTITY
-): {
-    current(): T,
-    refresh(): T,
-    reset(): T
-} {
+): ILazyObservable<T> {
     let started = false;
     const value = observable(modifier(initialValue));
     let currentFnc = () => {
