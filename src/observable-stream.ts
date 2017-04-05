@@ -76,7 +76,9 @@ class StreamListener<T> implements IStreamObserver<T> {
     }
 
     dispose() {
-        this.subscription.unsubscribe();
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
     }
 
     @action next(value: T) {
@@ -84,7 +86,6 @@ class StreamListener<T> implements IStreamObserver<T> {
     }
 
     @action complete() {
-        this.subscription.unsubscribe();
         this.dispose();
     }
 
