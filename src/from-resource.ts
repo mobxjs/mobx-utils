@@ -8,7 +8,7 @@ export interface IResource<T> {
 }
 
 /**
- * `fromResource` creates an observable which current state can be inspected using `.current()`,
+ * `fromResource` creates an observable whose current state can be inspected using `.current()`,
  * and which can be kept in sync with some external datasource that can be subscribed to.
  *
  * The created observable will only subscribe to the datasource if it is in use somewhere,
