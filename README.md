@@ -72,7 +72,7 @@ const myComponent = observer(({ fetchResult }) =>
   }))
 
 Note that the status strings are available as constants:
-`mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
+`mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtils.FULFILLED`
 ```
 
 Returns **IPromiseBasedObservable&lt;T>** 
