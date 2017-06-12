@@ -40,7 +40,7 @@ class ViewModel<T> implements IViewModel<T> {
         });
     }
 
-    isPropertyDirty(key: string): boolean {
+    @action isPropertyDirty(key: string): boolean {
         return this.localValues.has(key);
     }
 
