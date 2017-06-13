@@ -24,7 +24,7 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 
 ## fromPromise
 
-[lib/from-promise.js:100-103](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/from-promise.js#L100-L103 "Source code on GitHub")
+[lib/from-promise.js:100-103](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/from-promise.js#L100-L103 "Source code on GitHub")
 
 `fromPromise` takes a Promise and returns an object with 3 observable properties that track
 the status of the promise. The returned object has the following observable properties:
@@ -72,17 +72,29 @@ const myComponent = observer(({ fetchResult }) =>
   }))
 
 Note that the status strings are available as constants:
-`mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtils.FULFILLED`
+`mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
 ```
 
 Returns **IPromiseBasedObservable&lt;T>** 
 
+## isPromiseBasedObservable
+
+[lib/from-promise.js:110-112](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/from-promise.js#L110-L112 "Source code on GitHub")
+
+Returns true if the provided value is a promise-based observable.
+
+**Parameters**
+
+-   `value`  any
+
+Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+
 ## lazyObservable
 
-[lib/lazy-observable.js:37-72](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/lazy-observable.js#L37-L72 "Source code on GitHub")
+[lib/lazy-observable.js:37-72](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/lazy-observable.js#L37-L72 "Source code on GitHub")
 
 `lazyObservable` creates an observable around a `fetch` method that will not be invoked
-util the observable is needed the first time.
+until the observable is needed the first time.
 The fetch method receives a `sink` callback which can be used to replace the
 current value of the lazyObservable. It is allowed to call `sink` multiple times
 to keep the lazyObservable up to date with some external resource.
@@ -116,9 +128,9 @@ userProfile.refresh()
 
 ## fromResource
 
-[lib/from-resource.js:68-104](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/from-resource.js#L68-L104 "Source code on GitHub")
+[lib/from-resource.js:68-104](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/from-resource.js#L68-L104 "Source code on GitHub")
 
-`fromResource` creates an observable which current state can be inspected using `.current()`,
+`fromResource` creates an observable whose current state can be inspected using `.current()`,
 and which can be kept in sync with some external datasource that can be subscribed to.
 
 The created observable will only subscribe to the datasource if it is in use somewhere,
@@ -181,7 +193,7 @@ const userComponent = observer(({ user }) =>
 
 ## toStream
 
-[lib/observable-stream.js:37-57](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/observable-stream.js#L37-L57 "Source code on GitHub")
+[lib/observable-stream.js:37-57](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/observable-stream.js#L37-L57 "Source code on GitHub")
 
 Converts an expression to an observable stream (a.k.a. TC 39 Observable / RxJS observable).
 The provided expression is tracked by mobx as long as there are subscribers, automatically
@@ -209,7 +221,7 @@ Returns **IObservableStream&lt;T>**
 
 ## fromStream
 
-[lib/observable-stream.js:121-124](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/observable-stream.js#L121-L124 "Source code on GitHub")
+[lib/observable-stream.js:122-125](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/observable-stream.js#L122-L125 "Source code on GitHub")
 
 Converts an subscribable, observable stream (TC 39 observable / RxJS stream)
 into an object which stores the current value (as `current`). The subscription can be cancelled through the `dispose` method.
@@ -236,7 +248,7 @@ autorun(() => {
 
 ## createViewModel
 
-[lib/create-view-model.js:127-129](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/create-view-model.js#L127-L129 "Source code on GitHub")
+[lib/create-view-model.js:127-129](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/create-view-model.js#L127-L129 "Source code on GitHub")
 
 `createViewModel` takes an object with observable properties (model)
 and wraps a viewmodel around it. The viewmodel proxies all enumerable property of the original model with the following behavior:
@@ -287,7 +299,7 @@ viewModel.reset()
 
 ## whenWithTimeout
 
-[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/guarded-when.js#L32-L51 "Source code on GitHub")
+[lib/guarded-when.js:32-51](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/guarded-when.js#L32-L51 "Source code on GitHub")
 
 Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
 
@@ -323,7 +335,7 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/keep-alive.js#L31-L36 "Source code on GitHub")
 
 **Parameters**
 
@@ -346,7 +358,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## keepAlive
 
-[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/keep-alive.js#L31-L36 "Source code on GitHub")
+[lib/keep-alive.js:31-36](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/keep-alive.js#L31-L36 "Source code on GitHub")
 
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
@@ -373,7 +385,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## queueProcessor
 
-[lib/queue-processor.js:22-40](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/queue-processor.js#L22-L40 "Source code on GitHub")
+[lib/queue-processor.js:22-40](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/queue-processor.js#L22-L40 "Source code on GitHub")
 
 `queueProcessor` takes an observable array, observes it and calls `processor`
 once for each item added to the observable array, optionally deboucing the action
@@ -401,7 +413,7 @@ Returns **IDisposer** stops the processor
 
 ## chunkProcessor
 
-[lib/chunk-processor.js:27-52](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/chunk-processor.js#L27-L52 "Source code on GitHub")
+[lib/chunk-processor.js:27-52](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/chunk-processor.js#L27-L52 "Source code on GitHub")
 
 `chunkProcessor` takes an observable array, observes it and calls `processor`
 once for a chunk of items added to the observable array, optionally deboucing the action.
@@ -434,7 +446,7 @@ Returns **IDisposer** stops the processor
 
 ## now
 
-[lib/now.js:30-39](https://github.com/mobxjs/mobx-utils/blob/626e6e984b7b8d52457873cdb5c1ab72e6d0d5da/lib/now.js#L30-L39 "Source code on GitHub")
+[lib/now.js:30-39](https://github.com/mobxjs/mobx-utils/blob/2e0d881a4901917426571319d529adbc9a3b3afa/lib/now.js#L30-L39 "Source code on GitHub")
 
 Returns the current date time as epoch number.
 The date time is read from an observable which is updated automatically after the given interval.
@@ -446,7 +458,7 @@ If no interval is given, it will update each second. If "frame" is specified, it
 
 Multiple clocks with the same interval will automatically be synchronized.
 
-Countdown example: <http://jsbin.com/roqesit/1/edit?js,output>
+Countdown example: <https://jsfiddle.net/mweststrate/na0qdmkw/>
 
 **Parameters**
 
