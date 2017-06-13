@@ -47,7 +47,7 @@ export function lazyObservable<T>(
     modifier = IDENTITY
 ): ILazyObservable<T> {
     let started = false;
-    const value = observable(modifier(initialValue));
+    const value = observable.box(modifier(initialValue));
     let currentFnc = () => {
         if (!started) {
             started = true;
