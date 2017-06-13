@@ -40,11 +40,11 @@ class ViewModel<T> implements IViewModel<T> {
         });
     }
 
-    isPropertyDirty(key: string): boolean {
+    isPropertyDirty = (key: string): boolean => {
         return this.localValues.has(key);
     }
 
-    @action submit() {
+    @action.bound submit() {
         this.localValues.keys().forEach((key) => {
             const source = this.localValues.get(key);
             const destination = (this.model as any)[key];
@@ -60,11 +60,11 @@ class ViewModel<T> implements IViewModel<T> {
         this.localValues.clear();
     }
 
-    @action reset() {
+    @action.bound reset() {
         this.localValues.clear();
     }
 
-    @action resetProperty(key: string) {
+    @action.bound resetProperty(key: string) {
         this.localValues.delete(key);
     }
 
