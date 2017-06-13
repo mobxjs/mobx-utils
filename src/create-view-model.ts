@@ -26,13 +26,13 @@ class ViewModel<T> implements IViewModel<T> {
                 enumerable: true,
                 configurable: true,
                 get: () => {
-                    if (this.localValues.has(key))
+                    if (isPropertyDirty(key))
                         return this.localValues.get(key);
                     else
                         return (this.model as any)[key];
                 },
                 set: action((value: any) => {
-                    if (this.localValues.has(key) || value !== (this.model as any)[key]) {
+                    if (isPropertyDirty(key) || value !== (this.model as any)[key]) {
                         this.localValues.set(key, value);
                     }
                 })
@@ -40,7 +40,7 @@ class ViewModel<T> implements IViewModel<T> {
         });
     }
 
-    @action.bound isPropertyDirty(key: string): boolean {
+    isPropertyDirty = (key: string): boolean => {
         return this.localValues.has(key);
     }
 
