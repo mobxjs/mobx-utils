@@ -1,3 +1,10 @@
+# 2.0.2
+
+* Fixed #44, lazyObservable not accepting an array as initial value.
+* ViewModel methods are now automatically bound, see #59, by @tekacs
+* Fixed stream issue regarding disposing already completed streams, see #57, by @rkorohu
+* Improved typings of lazy observables, see #38 by @jamiewinder
+
 # 2.0.1
 
 * Fixed several deprecation messages related to MobX 3 upgrade (see #36 by RainerAtSpirit)
