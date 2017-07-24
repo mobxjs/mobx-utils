@@ -4,3 +4,4 @@ lib
 coverage
 mobx-utils.umd.js
 .idea
+/.test-ts/

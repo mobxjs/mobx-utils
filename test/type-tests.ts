@@ -1,4 +1,4 @@
-import {fromPromise, FULFILLED} from "../src/mobx-utils";
+import {fromPromise, FULFILLED} from "..";
 
 {
     // test typings of fromPromise

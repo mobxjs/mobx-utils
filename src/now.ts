@@ -43,7 +43,7 @@ export function now(interval: number | "frame" = 1000) {
 }
 
 function createIntervalTicker(interval: number): IResource<number> {
-    let subscriptionHandle: number;
+    let subscriptionHandle: any;
     return fromResource<number>(
         sink => {
             subscriptionHandle = setInterval(
@@ -57,7 +57,6 @@ function createIntervalTicker(interval: number): IResource<number> {
         Date.now()
     );
 }
-
 
 function createAnimationFrameTicker(): IResource<number> {
     let subscriptionHandle: number;

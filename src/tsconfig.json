@@ -11,7 +11,7 @@
         "moduleResolution": "node",
         "experimentalDecorators": true,
         "lib": [
-            "dom", "es5", "scripthost", "es2015.promise"
+            "dom", "es2015", "scripthost", "es2015.promise", "es2015.generator", "es2015.iterable"
         ]
     },
     "exclude": [

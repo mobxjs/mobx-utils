@@ -7,13 +7,13 @@
   "scripts": {
     "build": "tsc -p src && npm run webpack",
     "webpack": "webpack -p",
-    "test": "npm run build && tape test/*.js | faucet && tsc -p test",
+    "test": "npm run build && tsc -p test && tape test/*.js .test-ts/*.js | faucet",
     "lint:js": "eslint ./test",
     "lint:ts": "tslint ./src/*.ts",
     "lint": "npm run lint:ts && npm run lint:js",
     "prepublish": "npm run build && npm run build-docs",
-    "test-travis": "npm run build && npm run lint && istanbul cover tape test/*.js",
-    "coverage": "npm run build && istanbul cover tape test/*.js && cat ./coverage/lcov.info|coveralls",
+    "test-travis": "npm run build && tsc -p test && npm run lint && istanbul cover tape test/*.js .test-ts/*.js",
+    "coverage": "npm run build && tsc -p test && istanbul cover tape test/*.js && .test-ts/*.js && cat ./coverage/lcov.info|coveralls",
     "build-docs": "npm run build && documentation readme lib/mobx-utils.js --section API"
   },
   "repository": {
@@ -30,6 +30,7 @@
     "mobx-utils.umd.js"
   ],
   "devDependencies": {
+    "@types/tape": "^4.2.30",
     "babel-eslint": "^7.1.0",
     "coveralls": "^2.11.4",
     "documentation": "^4.0.0-beta.18",
@@ -41,7 +42,7 @@
     "tape": "^4.2.2",
     "tslint": "^3.15.1",
     "tslint-eslint-rules": "^2.1.0",
-    "typescript": "^2.1.4",
+    "typescript": "^2.4.2",
     "webpack": "^1.13.1"
   },
   "dependencies": {},
