@@ -96,11 +96,11 @@ class PromiseBasedObservable<T> {
  * Note that the status strings are available as constants:
  * `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
  *
- * For testing, promises can be created immediatly in a certain state using
- * `fromPromise.reject(reason)` or `fromPromise.resolve(reason)`
+ * Observable promises can be created immediatly in a certain state using
+ * `fromPromise.reject(reason)` or `fromPromise.resolve(value?)`.
+ * The mean advantagate of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
  *
  * @param {IThenable<T>} promise The promise which will be observed
- * @param {T} [initialValue=undefined] Optional predefined initial value
  * @returns {IPromiseBasedObservable<T>}
  */
 export const fromPromise: {
@@ -128,10 +128,10 @@ fromPromise.resolve = action("fromPromise.resolve", function(value: any = undefi
 }) as any;
 
 /**
-  * Returns true if the provided value is a promise-based observable.
-  * @param value any
-  * @returns {boolean}
-  */
+ * Returns true if the provided value is a promise-based observable.
+ * @param value any
+ * @returns {boolean}
+ */
 export function isPromiseBasedObservable(value: any): value is IPromiseBasedObservable<any> {
     return value instanceof PromiseBasedObservable;
 }

@@ -1,11 +1,12 @@
 # 3.0.0
 
-* **BREAKING** Fixed #54, the resolved value of a promise is no longer deeply converted to an observable
-* **BREAKING** Dropped `fromPromise().reason`
-* **BREAKING** Improved typings of `fromPromise`. For example, the `value` property is now only available if `.state === "resolved"`
-* **BREAKING** Dropped optional `initialvalue` param from `fromPromise`. use `fromPromise.fullfilled(value)` instead to create a promise in some ready state (see #39)
-* Introduced `fromPromise.reject(reason)` and `fromPromise.resolve(value?)` to create a promise based observable in a certain state
-* Fixed #56, observable promises attributes `state` and `value` are now explicit observables
+* Revamped `fromPromise`:
+  * **BREAKING** Fixed #54, the resolved value of a promise is no longer deeply converted to an observable
+  * **BREAKING** Dropped `fromPromise().reason`
+  * **BREAKING** Improved typings of `fromPromise`. For example, the `value` property is now only available if `.state === "resolved"` (#41)
+  * **BREAKING** Dropped optional `initialvalue` param from `fromPromise`. use `fromPromise.fullfilled(value)` instead to create a promise in some ready state
+  * Introduced `fromPromise.reject(reason)` and `fromPromise.resolve(value?)` to create a promise based observable in a certain state, see #39
+  * Fixed #56, observable promises attributes `state` and `value` are now explicit observables
 
 # 2.0.2
 
