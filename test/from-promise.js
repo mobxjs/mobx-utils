@@ -151,18 +151,26 @@ test('test from-promise', t => {
       }
     );
   });
-  
+
   test('isPromiseBasedObservable, true', t => {
     const obs = utils.fromPromise(Promise.resolve(123));
     t.ok(utils.isPromiseBasedObservable(obs));
     t.end();
   });
-  
+
   test('isPromiseBasedObservable, false', t => {
     t.notOk(utils.isPromiseBasedObservable({}));
     t.end();
   });
-  
+
+  test('state and value are observable, #56', t => {
+    const obs = utils.fromPromise(Promise.resolve(123));
+    t.ok(mobx.isObservable(obs))
+    t.ok(mobx.isObservable(obs, "state"))
+    t.ok(mobx.isObservable(obs, "value"))
+    t.end()
+  })
+
   t.end();
 });
 

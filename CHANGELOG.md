@@ -1,3 +1,7 @@
+# 2.0.3
+
+* Fixed #56, observable promises attributes `state` and `value` are now explicit observables
+
 # 2.0.2
 
 * Fixed #44, lazyObservable not accepting an array as initial value.

@@ -8,49 +8,44 @@ export const FULFILLED = "fulfilled";
 export const REJECTED = "rejected";
 
 export interface IPromiseBasedObservable<T> {
-    value: T;
-    state: PromiseState;
-    reason: any;
-    promise: PromiseLike<T>;
+    readonly value: T;
+    readonly state: PromiseState;
+    readonly reason: any;
+    readonly promise: PromiseLike<T>;
     case<U>(handlers: {pending?: () => U, fulfilled?: (t: T) => U, rejected?: (e: any) => U}): U;
 }
 
 class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
-    private _observable: IObservableValue<T>;
-    private _state: IObservableValue<PromiseState> = observable(PENDING as any); // MWE: Hm... as any should not be needed...
-    private _reason: IObservableValue<any> = observable.shallowBox(undefined as any);
+    @observable.ref value: T = undefined;
+    @observable.ref state: PromiseState = PENDING;
+    @observable.ref _reason: any = undefined;
 
     constructor(public promise: PromiseLike<T>, initialValue: T = undefined) {
-        this._observable = observable.box(initialValue);
+        this.value = initialValue;
         promise.then(
             action("observableFromPromise-resolve", (value: T) => {
-                this._observable.set(value);
-                this._state.set("fulfilled");
+                this.value = value;
+                this.state = FULFILLED;
             }),
             action("observableFromPromise-reject", (reason: any) => {
-                this._reason.set(reason);
-                this._observable.set(reason);
-                this._state.set("rejected");
+                this._reason = reason;
+                this.value = reason;
+                this.state = REJECTED;
             })
         );
     }
 
-    get value(): T {
-        return this._observable.get();
-    }
-    get state(): PromiseState {
-        return this._state.get();
-    }
     get reason(): any {
+        // TODO: kill in next major
         deprecated("In `fromPromise`: `.reason` is deprecated, use `.value` instead");
-        return this._reason.get();
+        return this._reason;
     }
 
     public case<U>(handlers: {pending?: () => U, fulfilled?: (t: T) => U, rejected?: (e: any) => U}): U {
         switch (this.state) {
-            case "pending": return handlers.pending && handlers.pending();
-            case "rejected": return handlers.rejected && handlers.rejected(this.value);
-            case "fulfilled": return handlers.fulfilled && handlers.fulfilled(this.value);
+            case PENDING: return handlers.pending && handlers.pending();
+            case REJECTED: return handlers.rejected && handlers.rejected(this.value);
+            case FULFILLED: return handlers.fulfilled && handlers.fulfilled(this.value);
         }
     }
 }
