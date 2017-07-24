@@ -19,3 +19,15 @@ test('now should tick', t => {
         t.end()
     }, 500)
 })
+
+test('now should be up to date outside reaction, #40', t => {
+    const d1 = utils.now(1000);
+    t.true(typeof d1 === "number");
+    setTimeout(() => {
+        const d2 = utils.now(1000);
+        t.true(typeof d2 === "number");
+        t.notEqual(d1, d2);
+        t.true((d2 - d1) > 400);
+        t.end();
+    }, 500)
+})

@@ -1,3 +1,4 @@
+import {extras} from "mobx";
 import {fromResource, IResource} from "./from-resource";
 
 const tickers:
@@ -33,6 +34,10 @@ const tickers:
  * @returns
  */
 export function now(interval: number | "frame" = 1000) {
+    if (!extras.isComputingDerivation()) {
+        // See #40
+        return Date.now();
+    }
     if (!tickers[interval]) {
         if (typeof interval === "number")
             tickers[interval] = createIntervalTicker(interval);
@@ -57,7 +62,6 @@ function createIntervalTicker(interval: number): IResource<number> {
         Date.now()
     );
 }
-
 
 function createAnimationFrameTicker(): IResource<number> {
     let subscriptionHandle: number;
