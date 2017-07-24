@@ -9,7 +9,10 @@
         "outDir": "../lib/",
         "noImplicitAny": true,
         "moduleResolution": "node",
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "lib": [
+            "dom", "es5", "scripthost", "es2015.promise"
+        ]
     },
     "exclude": [
         "node_modules"

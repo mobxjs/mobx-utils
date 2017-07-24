@@ -9,3 +9,10 @@ import {fromPromise, FULFILLED} from "../src/mobx-utils";
         p.value.x = 4; // value only available if state is checked!
     }
 }
+
+{
+    // typings: can create a resolved promise
+    const x = { x: 3 };
+    const p = fromPromise.resolve(x);
+    p.value.x = 7;
+}

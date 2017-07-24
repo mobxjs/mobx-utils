@@ -4,6 +4,7 @@
 * **BREAKING** Dropped `fromPromise().reason`
 * **BREAKING** Improved typings of `fromPromise`. For example, the `value` property is now only available if `.state === "resolved"`
 * **BREAKING** Dropped optional `initialvalue` param from `fromPromise`. use `fromPromise.fullfilled(value)` instead to create a promise in some ready state (see #39)
+* Introduced `fromPromise.reject(reason)` and `fromPromise.resolve(value?)` to create a promise based observable in a certain state
 * Fixed #56, observable promises attributes `state` and `value` are now explicit observables
 
 # 2.0.2

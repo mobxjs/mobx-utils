@@ -177,6 +177,54 @@ test('test from-promise', t => {
     })
   })
 
+  test('it is possible to create a promise in a rejected state, #36', t=> {
+    const someObject = { a: 3 }
+    const obs = utils.fromPromise.reject(someObject);
+    t.is(obs.state, utils.REJECTED);
+    t.is(obs.value, someObject);
+
+    // still a real promise backing it, which can be thenned...
+    obs.promise.catch((v) => {
+      t.is(obs.state, utils.REJECTED)
+      t.false(mobx.isObservable(obs.value))
+      t.true(obs.value === someObject)
+      t.true(v === someObject)
+      t.end()
+    })
+  })
+
+  test('it is possible to create a promise in a fullfilled state, #36', t=> {
+    const someObject = { a: 3 }
+    const obs = utils.fromPromise.resolve(someObject);
+    t.is(obs.state, utils.FULFILLED);
+    t.is(obs.value, someObject);
+
+    // still a real promise backing it, which can be thenned...
+    obs.promise.then((v) => {
+      t.is(obs.state, utils.FULFILLED)
+      t.false(mobx.isObservable(obs.value))
+      t.true(obs.value === someObject)
+      t.true(v === someObject)
+      t.end()
+    })
+  })
+
+  test('when creating a promise in a fullfilled state it should not fire twice, #36', t=> {
+    let events = 0;
+    const obs = utils.fromPromise.resolve(3);
+
+    mobx.autorun(() => {
+      obs.state; // track state & value
+      obs.value;
+      events++;
+    })
+
+    obs.promise.then((v) => {
+      t.is(events, 1); // only initial run should have run
+      t.end()
+    })
+  })
+
   t.end();
 });
 
