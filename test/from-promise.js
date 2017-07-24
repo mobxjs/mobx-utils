@@ -43,6 +43,20 @@ test('test from-promise', t => {
     );
   });
 
+test('resolves value from promise function', t => {
+    const obs = utils.fromPromise(resolve => resolve(7));
+    t.equal(obs.value, undefined);
+    t.equal(obs.state, 'pending');
+
+    mobx.when(
+      () => obs.value === 7,
+      () => {
+        t.equal(obs.state, utils.FULFILLED);
+        t.end();
+      }
+    );
+  });
+
   test('rejects with reason value', t => {
     const p = new Promise((resolve, reject) => {
       reject(7);
@@ -52,6 +66,23 @@ test('test from-promise', t => {
     t.equal(obs.value, undefined);
     t.equal(obs.state, 'pending');
     t.ok(obs.promise === p);
+
+    mobx.when(
+      () => obs.state !== utils.PENDING,
+      () => {
+        t.equal(obs.state, utils.REJECTED);
+        t.equal(obs.value, 7);
+        t.end();
+      }
+    );
+  });
+
+  test('rejects with reason value from fn', t => {
+    const obs = utils.fromPromise((resolve, reject) => {
+      reject(7);
+    });
+    t.equal(obs.value, undefined);
+    t.equal(obs.state, 'pending');
 
     mobx.when(
       () => obs.state !== utils.PENDING,
@@ -224,6 +255,29 @@ test('test from-promise', t => {
       t.end()
     })
   })
+
+  test('it creates a real promise, #45', t => {
+    Promise.all([
+      utils.fromPromise.resolve(2),
+      utils.fromPromise(Promise.resolve(3))
+    ]).then(x => {
+      t.deepEqual(x, [2, 3])
+      t.end()
+    })
+  })
+
+  test('it can construct new promises from function, #45', t => {
+    Promise.all([
+      utils.fromPromise((resolve, reject) => {
+        setTimeout(() => resolve(2), 200)
+      }),
+      utils.fromPromise(Promise.resolve(3))
+    ]).then(x => {
+      t.deepEqual(x, [2, 3])
+      t.end()
+    })
+  })
+
 
   t.end();
 });

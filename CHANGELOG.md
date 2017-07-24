@@ -1,6 +1,8 @@
 # 3.0.0
 
 * Revamped `fromPromise`:
+  * It is now possible to directly pass a `(resolve, reject) => {}` function to `fromPromise`, instead of a promise object
+  * **BREAKING** `fromPromise` no longer creates a wrapping object, but rather extends the given promise, #45
   * **BREAKING** Fixed #54, the resolved value of a promise is no longer deeply converted to an observable
   * **BREAKING** Dropped `fromPromise().reason`
   * **BREAKING** Improved typings of `fromPromise`. For example, the `value` property is now only available if `.state === "resolved"` (#41)
