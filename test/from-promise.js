@@ -10,10 +10,9 @@ test('test from-promise', t => {
   test('resolves', t => {
     const p = new Promise(resolve => resolve(7));
 
-    const obs = utils.fromPromise(p, 3);
-    t.equal(obs.value, 3);
+    const obs = utils.fromPromise(p);
+    t.equal(obs.value, undefined);
     t.equal(obs.state, 'pending');
-    t.equal(obs.reason, undefined);
     t.ok(obs.promise === p);
 
     mobx.when(
@@ -30,10 +29,9 @@ test('test from-promise', t => {
   test('resolves value', t => {
     const p = new Promise(resolve => resolve(7));
 
-    const obs = utils.fromPromise(p, 3);
-    t.equal(obs.value, 3);
+    const obs = utils.fromPromise(p);
+    t.equal(obs.value, undefined);
     t.equal(obs.state, 'pending');
-    t.equal(obs.reason, undefined);
     t.ok(obs.promise === p);
 
     mobx.when(
@@ -50,10 +48,9 @@ test('test from-promise', t => {
       reject(7);
     });
 
-    const obs = utils.fromPromise(p, 3);
-    t.equal(obs.value, 3);
+    const obs = utils.fromPromise(p);
+    t.equal(obs.value, undefined);
     t.equal(obs.state, 'pending');
-    t.equal(obs.reason, undefined);
     t.ok(obs.promise === p);
 
     mobx.when(
@@ -61,7 +58,6 @@ test('test from-promise', t => {
       () => {
         t.equal(obs.state, utils.REJECTED);
         t.equal(obs.value, 7);
-        t.equal(obs.reason, 7);
         t.end();
       }
     );
@@ -72,10 +68,9 @@ test('test from-promise', t => {
       throw 7;
     });
 
-    const obs = utils.fromPromise(p, 3);
-    t.equal(obs.value, 3);
+    const obs = utils.fromPromise(p);
+    t.equal(obs.value, undefined);
     t.equal(obs.state, 'pending');
-    t.equal(obs.reason, undefined);
     t.ok(obs.promise === p);
 
     mobx.when(
@@ -83,7 +78,6 @@ test('test from-promise', t => {
       () => {
         t.equal(obs.state, 'rejected');
         t.equal(obs.value, 7);
-        t.equal(obs.reason, 7);
         t.end();
       }
     );
@@ -169,6 +163,18 @@ test('test from-promise', t => {
     t.ok(mobx.isObservable(obs, "state"))
     t.ok(mobx.isObservable(obs, "value"))
     t.end()
+  })
+
+  test('the resolved value of a promise is not convertd to some deep observable, #54', t => {
+    const someObject = { a: 3 }
+    const obs = utils.fromPromise(Promise.resolve(someObject));
+    obs.promise.then((v) => {
+      t.is(obs.state, utils.FULFILLED)
+      t.false(mobx.isObservable(obs.value))
+      t.true(obs.value === someObject)
+      t.true(v === someObject)
+      t.end()
+    })
   })
 
   t.end();

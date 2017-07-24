@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -p src && npm run webpack",
     "webpack": "webpack -p",
-    "test": "npm run build && tape test/*.js | faucet",
+    "test": "npm run build && tape test/*.js | faucet && tsc -p test",
     "lint:js": "eslint ./test",
     "lint:ts": "tslint ./src/*.ts",
     "lint": "npm run lint:ts && npm run lint:js",
