@@ -1,12 +1,9 @@
 {
     "version": "1.8.10",
     "compilerOptions": {
+        "noEmit": true,
         "target": "es5",
-        "sourceMap": false,
-        "declaration": true,
         "module": "commonjs",
-        "removeComments": false,
-        "outDir": "../lib/",
         "noImplicitAny": true,
         "moduleResolution": "node",
         "experimentalDecorators": true,
@@ -14,7 +11,10 @@
             "dom", "es5", "scripthost", "es2015.promise"
         ]
     },
+    "files": [
+        "type-tests.ts"
+    ],
     "exclude": [
-        "node_modules"
+        "../node_modules"
     ]
 }

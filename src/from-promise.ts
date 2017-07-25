@@ -1,5 +1,5 @@
-import {IObservableValue, observable, action} from "mobx";
-import {IDENTITY, deprecated} from "./utils";
+import {IObservableValue, extendShallowObservable, action} from "mobx";
+import {IDENTITY, deprecated, invariant} from "./utils";
 
 export type PromiseState = "pending" | "fulfilled" | "rejected";
 
@@ -7,52 +7,78 @@ export const PENDING = "pending";
 export const FULFILLED = "fulfilled";
 export const REJECTED = "rejected";
 
-export interface IPromiseBasedObservable<T> {
-    value: T;
-    state: PromiseState;
-    reason: any;
-    promise: PromiseLike<T>;
+export type IBasePromiseBasedObservable<T> = {
+    isPromiseBasedObservable: true,
     case<U>(handlers: {pending?: () => U, fulfilled?: (t: T) => U, rejected?: (e: any) => U}): U;
+} & PromiseLike<T>
+
+export type IPendingPromise = {
+    readonly state: "pending";
+    readonly reason: any;
 }
 
-class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
-    private _observable: IObservableValue<T>;
-    private _state: IObservableValue<PromiseState> = observable(PENDING as any); // MWE: Hm... as any should not be needed...
-    private _reason: IObservableValue<any> = observable.shallowBox(undefined as any);
+export type IFulfilledPromise<T> = {
+    readonly state: "fulfilled";
+    readonly value: T;
+}
 
-    constructor(public promise: PromiseLike<T>, initialValue: T = undefined) {
-        this._observable = observable.box(initialValue);
-        promise.then(
-            action("observableFromPromise-resolve", (value: T) => {
-                this._observable.set(value);
-                this._state.set("fulfilled");
-            }),
-            action("observableFromPromise-reject", (reason: any) => {
-                this._reason.set(reason);
-                this._observable.set(reason);
-                this._state.set("rejected");
-            })
-        );
+export type IRejectedPromise = {
+    readonly state: "rejected";
+    readonly value: any;
+}
+
+export type IPromiseBasedObservable<T> = IBasePromiseBasedObservable<T> & (IPendingPromise | IFulfilledPromise<T> | IRejectedPromise)
+
+function caseImpl<U, T>(handlers: {pending?: () => U, fulfilled?: (t: T) => U, rejected?: (e: any) => U}): U {
+    switch (this.state) {
+        case PENDING: return handlers.pending && handlers.pending();
+        case REJECTED: return handlers.rejected && handlers.rejected(this.value);
+        case FULFILLED: return handlers.fulfilled && handlers.fulfilled(this.value);
+    }
+}
+
+function createObservablePromise(origPromise: any) {
+    invariant(arguments.length === 1, "fromPromise expects exactly one argument");
+    invariant(
+        typeof origPromise === "function" ||
+            (typeof origPromise === "object" && origPromise && typeof origPromise.then === "function"),
+        "Please pass a promise or function to fromPromise"
+    );
+
+    if (typeof origPromise === "function") {
+        // If it is a (reject, resolve function, wrap it)
+        origPromise = new Promise(origPromise as any);
     }
 
-    get value(): T {
-        return this._observable.get();
-    }
-    get state(): PromiseState {
-        return this._state.get();
-    }
-    get reason(): any {
-        deprecated("In `fromPromise`: `.reason` is deprecated, use `.value` instead");
-        return this._reason.get();
-    }
+    const promise = new Promise((resolve, reject) => {
+        origPromise.then(action("observableFromPromise-resolve", (value: any) => {
+            promise.value = value;
+            promise.state = FULFILLED;
+            resolve(value);
+        }),
+        action("observableFromPromise-reject", (reason: any) => {
+            promise.value = reason;
+            promise.state = REJECTED;
+            reject(reason);
+        }));
+    }) as any;
 
-    public case<U>(handlers: {pending?: () => U, fulfilled?: (t: T) => U, rejected?: (e: any) => U}): U {
-        switch (this.state) {
-            case "pending": return handlers.pending && handlers.pending();
-            case "rejected": return handlers.rejected && handlers.rejected(this.value);
-            case "fulfilled": return handlers.fulfilled && handlers.fulfilled(this.value);
+    promise.isPromiseBasedObservable = true;
+    promise.case = caseImpl;
+    extendShallowObservable(promise, {
+        value: undefined,
+        state: PENDING
+    });
+
+    // TODO: remove in next major
+    Object.defineProperty(promise, "promise", {
+        get() {
+            deprecated("fromPromise().promise is deprecated. fromPromise now directly returns a promise");
+            return origPromise;
         }
-    }
+    });
+
+    return promise;
 }
 
 /**
@@ -64,7 +90,19 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
  * and the following method:
  * - `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
  *
+ *
+ * Note that the status strings are available as constants:
+ * `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
+ *
+ * Observable promises can be created immediatly in a certain state using
+ * `fromPromise.reject(reason)` or `fromPromise.resolve(value?)`.
+ * The mean advantagate of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
+ *
+ * It is possible to directly create a promise using a resolve, reject function:
+ * `fromPromise((resolve, reject) => setTimeout(() => resolve(true), 1000))`
+ *
  * @example
+ * ```javascript
  * const fetchResult = fromPromise(fetch("http://someurl"))
  *
  * // combine with when..
@@ -92,23 +130,36 @@ class PromiseBasedObservable<T> implements IPromiseBasedObservable<T> {
  *     rejected:  error => <div>Ooops.. {error}</div>
  *     fulfilled: value => <div>Gotcha: {value}</div>
  *   }))
- *
- * Note that the status strings are available as constants:
- * `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
+ * ```
  *
  * @param {IThenable<T>} promise The promise which will be observed
- * @param {T} [initialValue=undefined] Optional predefined initial value
  * @returns {IPromiseBasedObservable<T>}
  */
-export function fromPromise<T>(promise: PromiseLike<T>, initialValue: T = undefined): IPromiseBasedObservable<T> {
-    return new PromiseBasedObservable(promise, initialValue);
-}
+export const fromPromise: {
+    <T>(promise: PromiseLike<T>): IPromiseBasedObservable<T>;
+    reject<T>(reason: any): IRejectedPromise & IBasePromiseBasedObservable<T>;
+    resolve<T>(value?: T): IFulfilledPromise<T> & IBasePromiseBasedObservable<T>;
+} = createObservablePromise as any;
+
+fromPromise.reject = action("fromPromise.reject", function(reason: any) {
+    const p: any = fromPromise(Promise.reject(reason));
+    p.state = REJECTED;
+    p.value = reason;
+    return p;
+}) as any;
+
+fromPromise.resolve = action("fromPromise.resolve", function(value: any = undefined) {
+    const p: any = fromPromise(Promise.resolve(value));
+    p.state = FULFILLED;
+    p.value = value;
+    return p;
+}) as any;
 
 /**
-  * Returns true if the provided value is a promise-based observable.
-  * @param value any
-  * @returns {boolean}
-  */
+ * Returns true if the provided value is a promise-based observable.
+ * @param value any
+ * @returns {boolean}
+ */
 export function isPromiseBasedObservable(value: any): value is IPromiseBasedObservable<any> {
-    return value instanceof PromiseBasedObservable;
+    return value && value.isPromiseBasedObservable === true;
 }

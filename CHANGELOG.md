@@ -1,3 +1,15 @@
+# 3.0.0
+
+* Revamped `fromPromise`:
+  * It is now possible to directly pass a `(resolve, reject) => {}` function to `fromPromise`, instead of a promise object
+  * **BREAKING** `fromPromise` no longer creates a wrapping object, but rather extends the given promise, #45
+  * **BREAKING** Fixed #54, the resolved value of a promise is no longer deeply converted to an observable
+  * **BREAKING** Dropped `fromPromise().reason`
+  * **BREAKING** Improved typings of `fromPromise`. For example, the `value` property is now only available if `.state === "resolved"` (#41)
+  * **BREAKING** Dropped optional `initialvalue` param from `fromPromise`. use `fromPromise.fullfilled(value)` instead to create a promise in some ready state
+  * Introduced `fromPromise.reject(reason)` and `fromPromise.resolve(value?)` to create a promise based observable in a certain state, see #39
+  * Fixed #56, observable promises attributes `state` and `value` are now explicit observables
+
 # 2.0.2
 
 * Fixed #44, lazyObservable not accepting an array as initial value.
