@@ -153,7 +153,7 @@ test("it should support logging", t => {
           spyReportStart: true,
           type: "action"
         },
-        { spyReportEnd: true, time: 1 },
+        { spyReportEnd: true },
         {
           arguments: [undefined],
           name: "myaction - runid: 6 - yield 0",
@@ -168,7 +168,7 @@ test("it should support logging", t => {
           type: "update"
         },
         { spyReportEnd: true },
-        { spyReportEnd: true, time: 1 },
+        { spyReportEnd: true },
         {
           arguments: [5],
           name: "myaction - runid: 6 - yield 1",
@@ -191,7 +191,7 @@ test("it should support logging", t => {
           type: "update"
         },
         { spyReportEnd: true },
-        { spyReportEnd: true, time: 0 },
+        { spyReportEnd: true },
         {
           arguments: [3],
           name: "myaction - runid: 6 - yield 2",
@@ -206,7 +206,7 @@ test("it should support logging", t => {
           type: "update"
         },
         { spyReportEnd: true },
-        { spyReportEnd: true, time: 0 }
+        { spyReportEnd: true }
       ]);
       d();
       t.end();
@@ -218,6 +218,7 @@ function stripEvents(events) {
   return events.map(e => {
     delete e.object;
     delete e.fn;
+    delete e.time;
     return e;
   });
 }
