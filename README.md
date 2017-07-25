@@ -33,45 +33,53 @@ the status of the promise. The returned object has the following observable prop
     and the following method:
 -   `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
 
+Note that the status strings are available as constants:
+`mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
+
+Observable promises can be created immediatly in a certain state using
+`fromPromise.reject(reason)` or `fromPromise.resolve(value?)`.
+The mean advantagate of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
+
+It is possible to directly create a promise using a resolve, reject function:
+`fromPromise((resolve, reject) => setTimeout(() => resolve(true), 1000))`
+
 **Parameters**
 
 -   `promise` **IThenable&lt;T>** The promise which will be observed
--   `initialValue` **T?** Optional predefined initial value (optional, default `undefined`)
 
 **Examples**
 
-```javascript
-const fetchResult = fromPromise(fetch("http://someurl"))
+````javascript
+    ```javascript
+    const fetchResult = fromPromise(fetch("http://someurl"))
 
-// combine with when..
-when(
-  () => fetchResult.state !== "pending"
-  () => {
-    console.log("Got ", fetchResult.value)
-  }
-)
+    // combine with when..
+    when(
+      () => fetchResult.state !== "pending"
+      () => {
+        console.log("Got ", fetchResult.value)
+      }
+    )
 
-// or a mobx-react component..
-const myComponent = observer(({ fetchResult }) => {
-  switch(fetchResult.state) {
-     case "pending": return <div>Loading...</div>
-     case "rejected": return <div>Ooops... {fetchResult.value}</div>
-     case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
-  }
-})
+    // or a mobx-react component..
+    const myComponent = observer(({ fetchResult }) => {
+      switch(fetchResult.state) {
+         case "pending": return <div>Loading...</div>
+         case "rejected": return <div>Ooops... {fetchResult.value}</div>
+         case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
+      }
+    })
 
-// or using the case method instead of switch:
+    // or using the case method instead of switch:
 
-const myComponent = observer(({ fetchResult }) =>
-  fetchResult.case({
-    pending:   () => <div>Loading...</div>
-    rejected:  error => <div>Ooops.. {error}</div>
-    fulfilled: value => <div>Gotcha: {value}</div>
-  }))
-
-Note that the status strings are available as constants:
-`mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
-```
+    const myComponent = observer(({ fetchResult }) =>
+      fetchResult.case({
+        pending:   () => <div>Loading...</div>
+        rejected:  error => <div>Ooops.. {error}</div>
+        fulfilled: value => <div>Gotcha: {value}</div>
+      }))
+    ```
+````
 
 Returns **IPromiseBasedObservable&lt;T>** 
 
@@ -447,3 +455,76 @@ autorun(() => {
   console.log("Seconds elapsed: ", (mobxUtils.now() - start) / 1000)
 })
 ```
+
+## asyncAction
+
+`asyncAction` takes a generator function and automatically wraps all parts of the process in actions. See the examples below.
+`asyncAction` can be used both as decorator or to wrap functions.
+
+-   It is important that `asyncAction should always be used with a generator function (recognizable as`function_`or`_name\` syntax)
+-   Each yield statement should return a Promise. The generator function will continue as soon as the promise settles, with the settled value
+-   When the generator function finishes, you can return a normal value. The `asyncAction` wrapped function will always produce a promise delivering that value.
+
+When using the mobx devTools, an asyncAction will emit `action` events with names like:
+
+-   `"fetchUsers - runid: 6 - init"`
+-   `"fetchUsers - runid: 6 - yield 0"`
+-   `"fetchUsers - runid: 6 - yield 1"`
+
+The `runId` represents the generator instance. In other words, if `fetchUsers` is invoked multiple times concurrently, the events with the same `runid` belong toghether.
+The `yield` number indicates the progress of the generator. `init` indicates spawning (it won't do anything, but you can find the original arguments of the `asyncAction` here).
+`yield 0` ... `yield n` indicates the code block that is now being executed. `yield 0` is before the first `yield`, `yield 1` after the first one etc. Note that yield numbers are not determined lexically but by the runtime flow.
+
+`asyncActions` requires `Promise` and `generators` to be available on the target environment. Polyfill `Promise` if needed. Both TypeScript and Babel can compile generator functions down to ES5.
+
+**Parameters**
+
+-   `arg1`  
+-   `arg2`  
+
+**Examples**
+
+```javascript
+import {asyncAction} from "mobx-utils"
+
+let users = []
+
+const fetchUsers = asyncAction("fetchUsers", function* (url) {
+  const start = Date.now()
+  const data = yield window.fetch(url)
+  users = yield data.json()
+  return start - Date.now()
+})
+
+fetchUsers("http://users.com").then(time => {
+  console.dir("Got users", users, "in ", time, "ms")
+})
+```
+
+```javascript
+import {asyncAction} from "mobx-utils"
+
+mobx.useStrict(true) // don't allow state modifications outside actions
+
+class Store {
+	\@observable githubProjects = []
+	\@state = "pending" // "pending" / "done" / "error"
+
+	\@asyncAction
+	*fetchProjects() { // <- note the star, this a generator function!
+		this.githubProjects = []
+		this.state = "pending"
+		try {
+			const projects = yield fetchGithubProjectsSomehow() // yield instead of await
+			const filteredProjects = somePreprocessing(projects)
+			// the asynchronous blocks will automatically be wrapped actions
+			this.state = "done"
+			this.githubProjects = filteredProjects
+		} catch (error) {
+			this.state = "error"
+		}
+	}
+}
+```
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 

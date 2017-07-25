@@ -171,7 +171,7 @@ test("it should support logging", t => {
         { spyReportEnd: true, time: 1 },
         {
           arguments: [5],
-          name: "myaction - runid: 6 - yield 0",
+          name: "myaction - runid: 6 - yield 1",
           spyReportStart: true,
           type: "action"
         },
@@ -194,7 +194,7 @@ test("it should support logging", t => {
         { spyReportEnd: true, time: 0 },
         {
           arguments: [3],
-          name: "myaction - runid: 6 - yield 0",
+          name: "myaction - runid: 6 - yield 2",
           spyReportStart: true,
           type: "action"
         },
