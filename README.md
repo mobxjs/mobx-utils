@@ -49,37 +49,35 @@ It is possible to directly create a promise using a resolve, reject function:
 
 **Examples**
 
-````javascript
-    ```javascript
-    const fetchResult = fromPromise(fetch("http://someurl"))
+```javascript
+const fetchResult = fromPromise(fetch("http://someurl"))
 
-    // combine with when..
-    when(
-      () => fetchResult.state !== "pending"
-      () => {
-        console.log("Got ", fetchResult.value)
-      }
-    )
+// combine with when..
+when(
+  () => fetchResult.state !== "pending"
+  () => {
+    console.log("Got ", fetchResult.value)
+  }
+)
 
-    // or a mobx-react component..
-    const myComponent = observer(({ fetchResult }) => {
-      switch(fetchResult.state) {
-         case "pending": return <div>Loading...</div>
-         case "rejected": return <div>Ooops... {fetchResult.value}</div>
-         case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
-      }
-    })
+// or a mobx-react component..
+const myComponent = observer(({ fetchResult }) => {
+  switch(fetchResult.state) {
+     case "pending": return <div>Loading...</div>
+     case "rejected": return <div>Ooops... {fetchResult.value}</div>
+     case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
+  }
+})
 
-    // or using the case method instead of switch:
+// or using the case method instead of switch:
 
-    const myComponent = observer(({ fetchResult }) =>
-      fetchResult.case({
-        pending:   () => <div>Loading...</div>
-        rejected:  error => <div>Ooops.. {error}</div>
-        fulfilled: value => <div>Gotcha: {value}</div>
-      }))
-    ```
-````
+const myComponent = observer(({ fetchResult }) =>
+  fetchResult.case({
+    pending:   () => <div>Loading...</div>
+    rejected:  error => <div>Ooops.. {error}</div>
+    fulfilled: value => <div>Gotcha: {value}</div>
+  }))
+```
 
 Returns **IPromiseBasedObservable&lt;T>** 
 
