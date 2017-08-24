@@ -149,9 +149,9 @@ which comes from an imaginary database and notifies when it has changed.
 
 **Parameters**
 
+-   `subscriber`
 -   `unsubscriber` **IDisposer?**  (optional, default `NOOP`)
 -   `initialValue` **T?** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
--   `subscriber`  
 
 **Examples**
 
