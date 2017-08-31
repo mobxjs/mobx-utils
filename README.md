@@ -323,6 +323,22 @@ test("expect store to load", t => {
 
 Returns **IDisposer** disposer function that can be used to cancel the when prematurely. Neither action or onTimeout will be fired if disposed
 
+## whenAsync
+
+Like normal `when`, except that this `when` will return a promise that resolves when the expression becomes truthy.
+
+**Parameters**
+
+-   `expr`  
+
+**Examples**
+
+```javascript
+await whenAsync(() => !state.someBoolean)
+```
+
+Returns **Promise** that won't resolve until the expression becomes truthy.
+
 ## keepAlive
 
 MobX normally suspends any computed value that is not in use by any reaction,

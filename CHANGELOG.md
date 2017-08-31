@@ -1,3 +1,6 @@
+# 3.1.0
+* Introduced `whenAsync`, which is like normal `when`, except that this `when` will return a promise that resolves when the expression becomes truthy. See #66 and #68
+
 # 3.0.0
 
 ### Revamped `fromPromise`:
