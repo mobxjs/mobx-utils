@@ -36,7 +36,7 @@ the status of the promise. The returned object has the following observable prop
 Note that the status strings are available as constants:
 `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
 
-Observable promises can be created immediatly in a certain state using
+Observable promises can be created immediately in a certain state using
 `fromPromise.reject(reason)` or `fromPromise.resolve(value?)`.
 The mean advantagate of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
 
@@ -49,35 +49,37 @@ It is possible to directly create a promise using a resolve, reject function:
 
 **Examples**
 
-```javascript
-const fetchResult = fromPromise(fetch("http://someurl"))
+````javascript
+    ```javascript
+    const fetchResult = fromPromise(fetch("http://someurl"))
 
-// combine with when..
-when(
-  () => fetchResult.state !== "pending"
-  () => {
-    console.log("Got ", fetchResult.value)
-  }
-)
+    // combine with when..
+    when(
+      () => fetchResult.state !== "pending"
+      () => {
+        console.log("Got ", fetchResult.value)
+      }
+    )
 
-// or a mobx-react component..
-const myComponent = observer(({ fetchResult }) => {
-  switch(fetchResult.state) {
-     case "pending": return <div>Loading...</div>
-     case "rejected": return <div>Ooops... {fetchResult.value}</div>
-     case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
-  }
-})
+    // or a mobx-react component..
+    const myComponent = observer(({ fetchResult }) => {
+      switch(fetchResult.state) {
+         case "pending": return <div>Loading...</div>
+         case "rejected": return <div>Ooops... {fetchResult.value}</div>
+         case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
+      }
+    })
 
-// or using the case method instead of switch:
+    // or using the case method instead of switch:
 
-const myComponent = observer(({ fetchResult }) =>
-  fetchResult.case({
-    pending:   () => <div>Loading...</div>
-    rejected:  error => <div>Ooops.. {error}</div>
-    fulfilled: value => <div>Gotcha: {value}</div>
-  }))
-```
+    const myComponent = observer(({ fetchResult }) =>
+      fetchResult.case({
+        pending:   () => <div>Loading...</div>
+        rejected:  error => <div>Ooops.. {error}</div>
+        fulfilled: value => <div>Gotcha: {value}</div>
+      }))
+    ```
+````
 
 Returns **IPromiseBasedObservable&lt;T>** 
 
@@ -149,9 +151,9 @@ which comes from an imaginary database and notifies when it has changed.
 
 **Parameters**
 
--   `subscriber`
 -   `unsubscriber` **IDisposer?**  (optional, default `NOOP`)
 -   `initialValue` **T?** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
+-   `subscriber`  
 
 **Examples**
 
@@ -323,21 +325,26 @@ test("expect store to load", t => {
 
 Returns **IDisposer** disposer function that can be used to cancel the when prematurely. Neither action or onTimeout will be fired if disposed
 
-## whenAsync
-
-Like normal `when`, except that this `when` will return a promise that resolves when the expression becomes truthy.
+## keepAlive
 
 **Parameters**
 
--   `expr`  
+-   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
+-   `_1`  
+-   `_2`  
 
 **Examples**
 
 ```javascript
-await whenAsync(() => !state.someBoolean)
+const number = observable(3)
+const doubler = computed(() => number.get() * 2)
+const stop = keepAlive(doubler)
+// doubler will now stay in sync reactively even when there are no further observers
+stop()
+// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
 ```
 
-Returns **Promise** that won't resolve until the expression becomes truthy.
+Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
 
 ## keepAlive
 
@@ -360,27 +367,6 @@ const obj = observable({
   doubler: function() { return this.number * 2 }
 })
 const stop = keepAlive(obj, "doubler")
-```
-
-Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
-
-## keepAlive
-
-**Parameters**
-
--   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
--   `_1`  
--   `_2`  
-
-**Examples**
-
-```javascript
-const number = observable(3)
-const doubler = computed(() => number.get() * 2)
-const stop = keepAlive(doubler)
-// doubler will now stay in sync reactively even when there are no further observers
-stop()
-// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
 ```
 
 Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
