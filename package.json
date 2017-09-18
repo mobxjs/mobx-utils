@@ -2,11 +2,11 @@
   "name": "mobx-utils",
   "version": "3.1.1",
   "description": "Utility functions and common patterns for MobX",
-  "main": "lib/mobx-utils.js",
+  "main": "mobx-utils.umd.js",
+  "module": "mobx-utils.mjs",
   "typings": "lib/mobx-utils.d.ts",
   "scripts": {
-    "build": "tsc -p src && npm run webpack",
-    "webpack": "webpack -p",
+    "build": "tsc -p src && rollup lib/mobx-utils.js -o mobx-utils.umd.js -f umd --name mobxUtils && rollup lib/mobx-utils.js -o mobx-utils.mjs -f es",
     "test": "npm run build && tsc -p test && tape test/*.js .test-ts/*.js | faucet",
     "lint:js": "eslint ./test",
     "lint:ts": "tslint ./src/*.ts",
@@ -37,12 +37,12 @@
     "faucet": "0.0.1",
     "istanbul": "^0.3.21",
     "mobx": "^3.0.0",
+    "rollup": "^0.50.0",
     "rxjs": "^5.0.2",
     "tape": "^4.2.2",
     "tslint": "^3.15.1",
     "tslint-eslint-rules": "^2.1.0",
-    "typescript": "^2.4.2",
-    "webpack": "^1.13.1"
+    "typescript": "^2.4.2"
   },
   "dependencies": {},
   "peerDependencies": {

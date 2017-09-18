@@ -2,6 +2,7 @@ node_modules
 *.log
 lib
 coverage
+mobx-utils.mjs
 mobx-utils.umd.js
 .idea
 /.test-ts/

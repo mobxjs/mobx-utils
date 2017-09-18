@@ -4,7 +4,7 @@
         "target": "es5",
         "sourceMap": false,
         "declaration": true,
-        "module": "commonjs",
+        "module": "es6",
         "removeComments": false,
         "outDir": "../lib/",
         "noImplicitAny": true,
