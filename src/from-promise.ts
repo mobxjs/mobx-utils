@@ -102,7 +102,6 @@ function createObservablePromise(origPromise: any) {
  * `fromPromise((resolve, reject) => setTimeout(() => resolve(true), 1000))`
  *
  * @example
- * ```javascript
  * const fetchResult = fromPromise(fetch("http://someurl"))
  *
  * // combine with when..
@@ -130,7 +129,6 @@ function createObservablePromise(origPromise: any) {
  *     rejected:  error => <div>Ooops.. {error}</div>
  *     fulfilled: value => <div>Gotcha: {value}</div>
  *   }))
- * ```
  *
  * @param {IThenable<T>} promise The promise which will be observed
  * @returns {IPromiseBasedObservable<T>}
