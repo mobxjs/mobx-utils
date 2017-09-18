@@ -49,37 +49,35 @@ It is possible to directly create a promise using a resolve, reject function:
 
 **Examples**
 
-````javascript
-    ```javascript
-    const fetchResult = fromPromise(fetch("http://someurl"))
+```javascript
+const fetchResult = fromPromise(fetch("http://someurl"))
 
-    // combine with when..
-    when(
-      () => fetchResult.state !== "pending"
-      () => {
-        console.log("Got ", fetchResult.value)
-      }
-    )
+// combine with when..
+when(
+  () => fetchResult.state !== "pending"
+  () => {
+    console.log("Got ", fetchResult.value)
+  }
+)
 
-    // or a mobx-react component..
-    const myComponent = observer(({ fetchResult }) => {
-      switch(fetchResult.state) {
-         case "pending": return <div>Loading...</div>
-         case "rejected": return <div>Ooops... {fetchResult.value}</div>
-         case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
-      }
-    })
+// or a mobx-react component..
+const myComponent = observer(({ fetchResult }) => {
+  switch(fetchResult.state) {
+     case "pending": return <div>Loading...</div>
+     case "rejected": return <div>Ooops... {fetchResult.value}</div>
+     case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
+  }
+})
 
-    // or using the case method instead of switch:
+// or using the case method instead of switch:
 
-    const myComponent = observer(({ fetchResult }) =>
-      fetchResult.case({
-        pending:   () => <div>Loading...</div>
-        rejected:  error => <div>Ooops.. {error}</div>
-        fulfilled: value => <div>Gotcha: {value}</div>
-      }))
-    ```
-````
+const myComponent = observer(({ fetchResult }) =>
+  fetchResult.case({
+    pending:   () => <div>Loading...</div>
+    rejected:  error => <div>Ooops.. {error}</div>
+    fulfilled: value => <div>Gotcha: {value}</div>
+  }))
+```
 
 Returns **IPromiseBasedObservable&lt;T>** 
 
@@ -106,8 +104,8 @@ so make sure that you don't dereference to early.
 
 **Parameters**
 
--   `initialValue` **T?** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
 -   `fetch`  
+-   `initialValue` **T** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
 -   `modifier`  
 
 **Examples**
@@ -151,9 +149,9 @@ which comes from an imaginary database and notifies when it has changed.
 
 **Parameters**
 
--   `unsubscriber` **IDisposer?**  (optional, default `NOOP`)
--   `initialValue` **T?** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
 -   `subscriber`  
+-   `unsubscriber` **IDisposer**  (optional, default `NOOP`)
+-   `initialValue` **T** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
 
 **Examples**
 
@@ -217,6 +215,8 @@ Rx.Observable
 
 Returns **IObservableStream&lt;T>** 
 
+## StreamListener
+
 ## fromStream
 
 Converts an subscribable, observable stream (TC 39 observable / RxJS stream)
@@ -241,6 +241,8 @@ autorun(() => {
     console.log("distance moved", debouncedClickDelta.current)
 })
 ```
+
+## ViewModel
 
 ## createViewModel
 
@@ -297,10 +299,10 @@ Like normal `when`, except that this `when` will automatically dispose if the co
 
 **Parameters**
 
--   `timeout` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** maximum amount when spends waiting before giving up (optional, default `10000`)
--   `onTimeout` **any?** the ontimeout handler will be called if the condition wasn't met within the given time (optional, default `()`)
 -   `expr`  
 -   `action`  
+-   `timeout` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount when spends waiting before giving up (optional, default `10000`)
+-   `onTimeout` **any** the ontimeout handler will be called if the condition wasn't met within the given time (optional, default `()`)
 
 **Examples**
 
@@ -329,9 +331,9 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 **Parameters**
 
--   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
 -   `_1`  
 -   `_2`  
+-   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
 
 **Examples**
 
@@ -354,10 +356,10 @@ and lazily re-evaluates the expression if needed outside a reaction while not in
 
 **Parameters**
 
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** an object that has a computed property, created by `@computed` or `extendObservable`
--   `property` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the property to keep alive
 -   `_1`  
 -   `_2`  
+-   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** an object that has a computed property, created by `@computed` or `extendObservable`
+-   `property` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the property to keep alive
 
 **Examples**
 
@@ -379,8 +381,8 @@ once for each item added to the observable array, optionally deboucing the actio
 **Parameters**
 
 -   `observableArray` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
--   `debounce` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
 -   `processor`  
+-   `debounce` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
 
 **Examples**
 
@@ -408,9 +410,9 @@ chunks and/or single items into reasonable chunks of work.
 **Parameters**
 
 -   `observableArray` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
--   `debounce` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
--   `maxChunkSize` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** optionally do not call on full array but smaller chunks. With 0 it will process the full array. (optional, default `0`)
 -   `processor`  
+-   `debounce` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
+-   `maxChunkSize` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** optionally do not call on full array but smaller chunks. With 0 it will process the full array. (optional, default `0`)
 
 **Examples**
 
@@ -444,7 +446,7 @@ Countdown example: <https://jsfiddle.net/mweststrate/na0qdmkw/>
 
 **Parameters**
 
--   `interval` **([number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) \| `"frame"`)?** interval in milliseconds about how often the interval should update (optional, default `1000`)
+-   `interval` **([number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) \| `"frame"`)** interval in milliseconds about how often the interval should update (optional, default `1000`)
 
 **Examples**
 
