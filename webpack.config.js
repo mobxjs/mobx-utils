@@ -9,7 +9,7 @@ module.exports = {
         filename: 'mobx-utils.umd.js'
     },
     resolve: {
-        extensions: ['', '.js'],
+        extensions: ['.js'],
     },
     externals: {
         mobx: 'mobx'
