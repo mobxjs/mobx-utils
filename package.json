@@ -1,9 +1,11 @@
 {
   "name": "mobx-utils",
-  "version": "3.2.0-rc.3",
+  "version": "3.2.0",
   "description": "Utility functions and common patterns for MobX",
   "main": "mobx-utils.umd.js",
   "module": "mobx-utils.module.js",
+  "jsnext:main": "mobx-utils.module.js",
+  "react-native": "mobx-utils.module.js",
   "typings": "lib/mobx-utils.d.ts",
   "scripts": {
     "build": "tsc -p src && rollup lib/mobx-utils.js -e mobx -g mobx:mobx -o mobx-utils.umd.js -f umd --name mobxUtils && rollup lib/mobx-utils.js -e mobx -o mobx-utils.module.js -f es",
