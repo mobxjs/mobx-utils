@@ -1,6 +1,6 @@
 # 3.2.0
 
-* Switched to rollup for bundling, bundle non-minified and include a `.mjs` modern build. See [#81](https://github.com/mobxjs/mobx-utils/pull/81) by [@mijay](https://github.com/mijay)
+* Switched to rollup for bundling, bundle non-minified and include a es module based build. See [#81](https://github.com/mobxjs/mobx-utils/pull/81) by [@mijay](https://github.com/mijay)
 
 # 3.1.1
 * Introduced `whenAsync`, which is like normal `when`, except that this `when` will return a promise that resolves when the expression becomes truthy. See #66 and #68, by @daedalus28

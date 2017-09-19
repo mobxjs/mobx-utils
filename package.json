@@ -1,12 +1,12 @@
 {
   "name": "mobx-utils",
-  "version": "3.1.1",
+  "version": "3.2.0-rc.3",
   "description": "Utility functions and common patterns for MobX",
   "main": "mobx-utils.umd.js",
-  "module": "mobx-utils.mjs",
+  "module": "mobx-utils.module.js",
   "typings": "lib/mobx-utils.d.ts",
   "scripts": {
-    "build": "tsc -p src && rollup lib/mobx-utils.js -e mobx -g mobx:mobx -o mobx-utils.umd.js -f umd --name mobxUtils && rollup lib/mobx-utils.js -e mobx -o mobx-utils.mjs -f es",
+    "build": "tsc -p src && rollup lib/mobx-utils.js -e mobx -g mobx:mobx -o mobx-utils.umd.js -f umd --name mobxUtils && rollup lib/mobx-utils.js -e mobx -o mobx-utils.module.js -f es",
     "test": "npm run build && tsc -p test && tape test/*.js .test-ts/*.js | faucet",
     "lint:js": "eslint ./test",
     "lint:ts": "tslint ./src/*.ts",
@@ -26,7 +26,8 @@
   },
   "files": [
     "lib/",
-    "mobx-utils.umd.js"
+    "mobx-utils.umd.js",
+    "mobx-utils.module.js"
   ],
   "devDependencies": {
     "@types/tape": "^4.2.30",
