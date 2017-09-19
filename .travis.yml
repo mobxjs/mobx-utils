@@ -1,6 +1,8 @@
 language: node_js
-script: npm run coverage
+install:
+    - yarn install
+script: yarn run coverage
 after_success:
   - cat ./coverage/lcov.info|./node_modules/coveralls/bin/coveralls.js
 node_js:
-  - "4.0.0"
+  - 6
