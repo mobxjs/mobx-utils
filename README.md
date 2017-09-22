@@ -38,7 +38,7 @@ Note that the status strings are available as constants:
 
 Observable promises can be created immediately in a certain state using
 `fromPromise.reject(reason)` or `fromPromise.resolve(value?)`.
-The mean advantagate of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
+The main advantage of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
 
 It is possible to directly create a promise using a resolve, reject function:
 `fromPromise((resolve, reject) => setTimeout(() => resolve(true), 1000))`
