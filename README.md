@@ -29,9 +29,12 @@ the status of the promise. The returned object has the following observable prop
 
 -   `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference
 -   `state`: one of `"pending"`, `"fulfilled"` or `"rejected"`
--   `promise`: (not observable) the original promise object
-    and the following method:
+    
+And the following methods:
 -   `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
+-   `then((value: TValue) => TResult1 | PromiseLike<TResult1>, [(rejectReason: any) => any])`: chains additional handlers to the provided `promise`.
+
+The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`.
 
 Note that the status strings are available as constants:
 `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
@@ -77,6 +80,15 @@ const myComponent = observer(({ fetchResult }) =>
     rejected:  error => <div>Ooops.. {error}</div>
     fulfilled: value => <div>Gotcha: {value}</div>
   }))
+  
+// chain additional handler(s) to the resolve/reject:
+
+fetchResult.then(
+    (result) =>  doSomeTransformation(result),
+    (rejectReason) => console.error('fetchResult was rejected, reason: ' + rejectReason)
+).then(
+    (transformedResult) => console.log('transformed fetchResult: ' + transformedResult)
+)
 ```
 
 Returns **IPromiseBasedObservable&lt;T>** 
