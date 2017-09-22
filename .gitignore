@@ -6,3 +6,6 @@ mobx-utils.module.js
 mobx-utils.umd.js
 .idea
 /.test-ts/
+*.iml
+*.ipr
+*.iws
