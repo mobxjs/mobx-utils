@@ -1,3 +1,8 @@
+# 3.2.1
+
+* Fixed issue where `whenAsync` was not exposed correctly.
+* Added `timeout` parameter to `whenAsync`
+
 # 3.2.0
 
 * Switched to rollup for bundling, bundle non-minified and include a es module based build. See [#81](https://github.com/mobxjs/mobx-utils/pull/81) by [@mijay](https://github.com/mijay)
