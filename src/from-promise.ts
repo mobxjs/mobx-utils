@@ -86,7 +86,6 @@ function createObservablePromise(origPromise: any) {
  * the status of the promise. The returned object has the following observable properties:
  *  - `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference
  *  - `state`: one of `"pending"`, `"fulfilled"` or `"rejected"`
- *  - `promise`: (not observable) the original promise object
  * 
  * And the following methods:
  * - `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
