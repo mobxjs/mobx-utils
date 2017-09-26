@@ -10,3 +10,4 @@ export * from "./chunk-processor";
 export * from "./now";
 export * from "./utils";
 export * from "./async-action";
+export * from "./when-async";
