@@ -38,7 +38,7 @@ Note that the status strings are available as constants:
 
 Observable promises can be created immediately in a certain state using
 `fromPromise.reject(reason)` or `fromPromise.resolve(value?)`.
-The main advantage of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
+The mean advantagate of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
 
 It is possible to directly create a promise using a resolve, reject function:
 `fromPromise((resolve, reject) => setTimeout(() => resolve(true), 1000))`
@@ -329,6 +329,27 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
+**Parameters**
+
+-   `_1`  
+-   `_2`  
+-   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
+
+**Examples**
+
+```javascript
+const number = observable(3)
+const doubler = computed(() => number.get() * 2)
+const stop = keepAlive(doubler)
+// doubler will now stay in sync reactively even when there are no further observers
+stop()
+// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
+```
+
+Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
+
+## keepAlive
+
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
 `keepAlive` marks a computed value as always in use, meaning that it will always fresh, but never disposed automatically.
@@ -348,27 +369,6 @@ const obj = observable({
   doubler: function() { return this.number * 2 }
 })
 const stop = keepAlive(obj, "doubler")
-```
-
-Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
-
-## keepAlive
-
-**Parameters**
-
--   `_1`  
--   `_2`  
--   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
-
-**Examples**
-
-```javascript
-const number = observable(3)
-const doubler = computed(() => number.get() * 2)
-const stop = keepAlive(doubler)
-// doubler will now stay in sync reactively even when there are no further observers
-stop()
-// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
 ```
 
 Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
@@ -530,3 +530,20 @@ class Store {
 ```
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
+
+## whenAsync
+
+Like normal `when`, except that this `when` will return a promise that resolves when the expression becomes truthy
+
+**Parameters**
+
+-   `fn`  
+-   `timeout` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount of time to wait, before the promise rejects
+
+**Examples**
+
+```javascript
+await whenAsync(() => !state.someBoolean)
+```
+
+Returns **any** Promise for when an observable eventually matches some condition. Rejects if timeout is provided and has expired
