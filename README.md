@@ -538,7 +538,6 @@ Like normal `when`, except that this `when` will return a promise that resolves 
 **Parameters**
 
 -   `fn`  
--   `timeout` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount of time to wait, before the promise rejects
 
 **Examples**
 
@@ -546,4 +545,4 @@ Like normal `when`, except that this `when` will return a promise that resolves 
 await whenAsync(() => !state.someBoolean)
 ```
 
-Returns **any** Promise for when an observable eventually matches some condition. Rejects if timeout is provided and has expired
+Returns **any** Promise for when an observable eventually matches some condition

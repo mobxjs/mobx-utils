@@ -1,4 +1,4 @@
-import {fromPromise, FULFILLED} from "..";
+import {fromPromise, FULFILLED} from "../";
 
 {
     // test typings of fromPromise
