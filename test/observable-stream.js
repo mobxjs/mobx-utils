@@ -6,7 +6,7 @@ const test = require('tape');
 const Rx = require("rxjs");
 
 
-test("to observable", t => {
+test("to observable - should push the initial value by default", t => {
   const user = mobx.observable({
     firstName: "C.S",
     lastName: "Lewis"
@@ -18,6 +18,41 @@ test("to observable", t => {
 
   const sub = Rx.Observable
     .from(utils.toStream(() => user.firstName + user.lastName))
+    .map(x => x.toUpperCase())
+    .subscribe(v => values.push(v))
+
+  user.firstName = "John"
+
+  mobx.runInAction(() => {
+    user.firstName = "Jane";
+    user.lastName = "Jack";
+  })
+
+  sub.unsubscribe();
+
+  user.firstName = "error";
+
+  t.deepEqual(values, [
+    "C.SLEWIS",
+    "JOHNLEWIS",
+    "JANEJACK"
+  ]);
+
+  t.end();
+})
+
+test("to observable - should not push the initial value", t => {
+  const user = mobx.observable({
+    firstName: "C.S",
+    lastName: "Lewis"
+  })
+
+  mobx.useStrict(false);
+
+  let values = []
+
+  const sub = Rx.Observable
+    .from(utils.toStream(() => user.firstName + user.lastName, false))
     .map(x => x.toUpperCase())
     .subscribe(v => values.push(v))
 
