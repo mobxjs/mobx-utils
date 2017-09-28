@@ -27,18 +27,22 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 `fromPromise` takes a Promise and returns an object with 3 observable properties that track
 the status of the promise. The returned object has the following observable properties:
 
--   `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference
+-   `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference.
 -   `state`: one of `"pending"`, `"fulfilled"` or `"rejected"`
--   `promise`: (not observable) the original promise object
-    and the following method:
+
+And the following methods:
+
 -   `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
+-   `then((value: TValue) => TResult1 | PromiseLike<TResult1>, [(rejectReason: any) => any])`: chains additional handlers to the provided promise.
+
+The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`.
 
 Note that the status strings are available as constants:
 `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
 
 Observable promises can be created immediately in a certain state using
 `fromPromise.reject(reason)` or `fromPromise.resolve(value?)`.
-The mean advantagate of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
+The main advantage of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
 
 It is possible to directly create a promise using a resolve, reject function:
 `fromPromise((resolve, reject) => setTimeout(() => resolve(true), 1000))`
@@ -77,6 +81,15 @@ const myComponent = observer(({ fetchResult }) =>
     rejected:  error => <div>Ooops.. {error}</div>
     fulfilled: value => <div>Gotcha: {value}</div>
   }))
+
+// chain additional handler(s) to the resolve/reject:
+
+fetchResult.then(
+  (result) =>  doSomeTransformation(result),
+  (rejectReason) => console.error('fetchResult was rejected, reason: ' + rejectReason)
+).then(
+  (transformedResult) => console.log('transformed fetchResult: ' + transformedResult)
+)
 ```
 
 Returns **IPromiseBasedObservable&lt;T>** 
@@ -538,7 +551,6 @@ Like normal `when`, except that this `when` will return a promise that resolves 
 **Parameters**
 
 -   `fn`  
--   `timeout` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount of time to wait, before the promise rejects
 
 **Examples**
 
@@ -546,4 +558,4 @@ Like normal `when`, except that this `when` will return a promise that resolves 
 await whenAsync(() => !state.someBoolean)
 ```
 
-Returns **any** Promise for when an observable eventually matches some condition. Rejects if timeout is provided and has expired
+Returns **any** Promise for when an observable eventually matches some condition
