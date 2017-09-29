@@ -1,11 +1,9 @@
-import {extras} from "mobx";
-import {fromResource, IResource} from "./from-resource";
+import { extras } from "mobx"
+import { fromResource, IResource } from "./from-resource"
 
-const tickers:
-    {
-        [interval: string]: IResource<number>
-    }
-    = ({});
+const tickers: {
+    [interval: string]: IResource<number>
+} = {}
 
 /**
  * Returns the current date time as epoch number.
@@ -36,48 +34,42 @@ const tickers:
 export function now(interval: number | "frame" = 1000) {
     if (!extras.isComputingDerivation()) {
         // See #40
-        return Date.now();
+        return Date.now()
     }
     if (!tickers[interval]) {
-        if (typeof interval === "number")
-            tickers[interval] = createIntervalTicker(interval);
-        else
-            tickers[interval] = createAnimationFrameTicker();
+        if (typeof interval === "number") tickers[interval] = createIntervalTicker(interval)
+        else tickers[interval] = createAnimationFrameTicker()
     }
-    return tickers[interval].current();
+    return tickers[interval].current()
 }
 
 function createIntervalTicker(interval: number): IResource<number> {
-    let subscriptionHandle: any;
+    let subscriptionHandle: any
     return fromResource<number>(
         sink => {
-            subscriptionHandle = setInterval(
-                () => sink(Date.now()),
-                interval
-            );
+            subscriptionHandle = setInterval(() => sink(Date.now()), interval)
         },
         () => {
-            clearInterval(subscriptionHandle);
+            clearInterval(subscriptionHandle)
         },
         Date.now()
-    );
+    )
 }
 
 function createAnimationFrameTicker(): IResource<number> {
-    let subscriptionHandle: number;
+    let subscriptionHandle: number
     const frameBasedTicker = fromResource<number>(
         sink => {
             function scheduleTick() {
                 window.requestAnimationFrame(() => {
-                    sink(Date.now());
-                    if (frameBasedTicker.isAlive())
-                        scheduleTick();
-                });
+                    sink(Date.now())
+                    if (frameBasedTicker.isAlive()) scheduleTick()
+                })
             }
-            scheduleTick();
+            scheduleTick()
         },
-        () => { },
+        () => {},
         Date.now()
-    );
-    return frameBasedTicker;
+    )
+    return frameBasedTicker
 }

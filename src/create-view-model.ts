@@ -1,73 +1,85 @@
-import {action, ObservableMap, observable, isObservableObject, isObservableArray, isObservableMap, computed} from "mobx";
-import {invariant} from "./utils";
+import {
+    action,
+    ObservableMap,
+    observable,
+    isObservableObject,
+    isObservableArray,
+    isObservableMap,
+    computed
+} from "mobx"
+import { invariant } from "./utils"
 
 export interface IViewModel<T> {
-    model: T;
-    reset(): void;
-    submit(): void;
-    isDirty: boolean;
-    isPropertyDirty(key: string): boolean;
+    model: T
+    reset(): void
+    submit(): void
+    isDirty: boolean
+    isPropertyDirty(key: string): boolean
 }
 
-const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty"];
+const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty"]
 
 class ViewModel<T> implements IViewModel<T> {
-    localValues: ObservableMap<any> = observable.map({});
+    localValues: ObservableMap<any> = observable.map({})
 
-    @computed get isDirty() {
-        return this.localValues.size > 0;
+    @computed
+    get isDirty() {
+        return this.localValues.size > 0
     }
 
     constructor(public model: T) {
-        invariant(isObservableObject(model), "createViewModel expects an observable object");
+        invariant(isObservableObject(model), "createViewModel expects an observable object")
         Object.keys(model).forEach(key => {
-            invariant(RESERVED_NAMES.indexOf(key) === -1, `The propertyname ${key} is reserved and cannot be used with viewModels`);
+            invariant(
+                RESERVED_NAMES.indexOf(key) === -1,
+                `The propertyname ${key} is reserved and cannot be used with viewModels`
+            )
             Object.defineProperty(this, key, {
                 enumerable: true,
                 configurable: true,
                 get: () => {
-                    if (this.isPropertyDirty(key))
-                        return this.localValues.get(key);
-                    else
-                        return (this.model as any)[key];
+                    if (this.isPropertyDirty(key)) return this.localValues.get(key)
+                    else return (this.model as any)[key]
                 },
                 set: action((value: any) => {
                     if (this.isPropertyDirty(key) || value !== (this.model as any)[key]) {
-                        this.localValues.set(key, value);
+                        this.localValues.set(key, value)
                     }
                 })
-            });
-        });
+            })
+        })
     }
 
     isPropertyDirty = (key: string): boolean => {
-        return this.localValues.has(key);
+        return this.localValues.has(key)
     }
 
-    @action.bound submit() {
-        this.localValues.keys().forEach((key) => {
-            const source = this.localValues.get(key);
-            const destination = (this.model as any)[key];
+    @action.bound
+    submit() {
+        this.localValues.keys().forEach(key => {
+            const source = this.localValues.get(key)
+            const destination = (this.model as any)[key]
             if (isObservableArray(destination)) {
-                destination.replace(source);
+                destination.replace(source)
             } else if (isObservableMap(destination)) {
-                destination.clear();
-                destination.merge(source);
+                destination.clear()
+                destination.merge(source)
             } else {
-                (this.model as any)[key] = source;
+                ;(this.model as any)[key] = source
             }
-        });
-        this.localValues.clear();
+        })
+        this.localValues.clear()
     }
 
-    @action.bound reset() {
-        this.localValues.clear();
+    @action.bound
+    reset() {
+        this.localValues.clear()
     }
 
-    @action.bound resetProperty(key: string) {
-        this.localValues.delete(key);
+    @action.bound
+    resetProperty(key: string) {
+        this.localValues.delete(key)
     }
-
 }
 
 /**
@@ -114,5 +126,5 @@ class ViewModel<T> implements IViewModel<T> {
  * ```
  */
 export function createViewModel<T>(model: T): T & IViewModel<T> {
-    return new ViewModel(model) as any;
+    return new ViewModel(model) as any
 }

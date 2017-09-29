@@ -1,4 +1,4 @@
-import {when} from "mobx";
+import { when } from "mobx"
 
 /**
  * Like normal `when`, except that this `when` will return a promise that resolves when the expression becomes truthy
@@ -13,16 +13,15 @@ import {when} from "mobx";
  */
 export function whenAsync(fn: () => boolean, timeout: number = 0): Promise<void> {
     return new Promise((resolve, reject) => {
-        let timeoutHandle: number;
+        let timeoutHandle: number
         const disposer = when(fn, () => {
-            if (timeout > 0)
-                clearTimeout(timeoutHandle);
-            resolve();
-        });
+            if (timeout > 0) clearTimeout(timeoutHandle)
+            resolve()
+        })
         if (timeout > 0)
             setTimeout(() => {
-                disposer();
-                reject(new Error("TIMEOUT"));
-            }, timeout);
-    });
+                disposer()
+                reject(new Error("TIMEOUT"))
+            }, timeout)
+    })
 }

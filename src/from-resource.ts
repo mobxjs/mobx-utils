@@ -1,10 +1,10 @@
-import {Atom, extras} from "mobx";
-import {NOOP, IDisposer, invariant} from "./utils";
+import { Atom, extras } from "mobx"
+import { NOOP, IDisposer, invariant } from "./utils"
 
 export interface IResource<T> {
-    current(): T;
-    dispose(): void;
-    isAlive(): boolean;
+    current(): T
+    dispose(): void
+    isAlive(): boolean
 }
 
 /**
@@ -76,44 +76,46 @@ export function fromResource<T>(
     unsubscriber: IDisposer = NOOP,
     initialValue: T = undefined
 ): IResource<T> {
-    let isActive = false;
-    let isDisposed = false;
-    let value = initialValue;
+    let isActive = false
+    let isDisposed = false
+    let value = initialValue
 
     const suspender = () => {
         if (isActive) {
-            isActive = false;
-            unsubscriber();
+            isActive = false
+            unsubscriber()
         }
-    };
+    }
 
     const atom = new Atom(
         "ResourceBasedObservable",
         () => {
-            invariant(!isActive && !isDisposed);
-            isActive = true;
+            invariant(!isActive && !isDisposed)
+            isActive = true
             subscriber((newValue: T) => {
                 extras.allowStateChanges(true, () => {
-                    value = newValue;
-                    atom.reportChanged();
-                });
-            });
+                    value = newValue
+                    atom.reportChanged()
+                })
+            })
         },
         suspender
-    );
+    )
 
     return {
         current: () => {
-            invariant(!isDisposed, "subscribingObservable has already been disposed");
-            const isBeingTracked = atom.reportObserved();
+            invariant(!isDisposed, "subscribingObservable has already been disposed")
+            const isBeingTracked = atom.reportObserved()
             if (!isBeingTracked && !isActive)
-                console.warn("Called `get` of an subscribingObservable outside a reaction. Current value will be returned but no new subscription has started");
-            return value;
+                console.warn(
+                    "Called `get` of an subscribingObservable outside a reaction. Current value will be returned but no new subscription has started"
+                )
+            return value
         },
         dispose: () => {
-            isDisposed = true;
-            suspender();
+            isDisposed = true
+            suspender()
         },
         isAlive: () => isActive
-    };
+    }
 }

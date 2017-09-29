@@ -1,5 +1,5 @@
-import {when} from "mobx";
-import {IDisposer} from "./utils";
+import { when } from "mobx"
+import { IDisposer } from "./utils"
 
 /**
  * Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
@@ -30,21 +30,26 @@ import {IDisposer} from "./utils";
  * @param {any} [onTimeout=() => {}] the ontimeout handler will be called if the condition wasn't met within the given time
  * @returns {IDisposer} disposer function that can be used to cancel the when prematurely. Neither action or onTimeout will be fired if disposed
  */
-export function whenWithTimeout(expr: () => boolean, action: () => void, timeout: number = 10000, onTimeout = () => {}): IDisposer {
-    let done = false;
+export function whenWithTimeout(
+    expr: () => boolean,
+    action: () => void,
+    timeout: number = 10000,
+    onTimeout = () => {}
+): IDisposer {
+    let done = false
     const handle = setTimeout(() => {
         if (!done) {
-            disposer();
-            onTimeout();
+            disposer()
+            onTimeout()
         }
-    }, timeout);
-    const disposer = when(expr,  () => {
-       done = true;
-       clearTimeout(handle);
-       action();
-    });
+    }, timeout)
+    const disposer = when(expr, () => {
+        done = true
+        clearTimeout(handle)
+        action()
+    })
     return () => {
-        clearTimeout(handle);
-        disposer();
-    };
+        clearTimeout(handle)
+        disposer()
+    }
 }
