@@ -1,3 +1,7 @@
+# 3.2.2
+
+* `toStream` now accepts a second argument, `fireImmediately=false`, which, when `true`, immediately pushes the current value to the stream. Fixes [#82](https://github.com/mobxjs/mobx-utils/issues/82)
+
 # 3.2.1
 
 * Fixed issue where `whenAsync` was not exposed correctly.

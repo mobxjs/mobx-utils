@@ -113,7 +113,7 @@ current value of the lazyObservable. It is allowed to call `sink` multiple times
 to keep the lazyObservable up to date with some external resource.
 
 Note that it is the `current()` call itself which is being tracked by MobX,
-so make sure that you don't dereference too early.
+so make sure that you don't dereference to early.
 
 **Parameters**
 
@@ -211,6 +211,7 @@ emitting when new values become available. The expressions respect (trans)action
 **Parameters**
 
 -   `expression`  
+-   `fireImmediately` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** (by default false)
 
 **Examples**
 
