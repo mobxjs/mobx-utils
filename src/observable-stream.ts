@@ -1,28 +1,28 @@
-import {computed, observable, IObservableValue, action, runInAction} from "mobx";
+import { computed, observable, IObservableValue, action, runInAction } from "mobx"
 
-declare var Symbol: any;
+declare var Symbol: any
 
 function observableSymbol() {
-	return (typeof Symbol === "function" && Symbol.observable) || "@@observable";
+    return (typeof Symbol === "function" && Symbol.observable) || "@@observable"
 }
 
 function self() {
-    return this;
+    return this
 }
 
 export interface IStreamObserver<T> {
-    next(value: T): void;
-    error(error: any): void;
-    complete(): void;
+    next(value: T): void
+    error(error: any): void
+    complete(): void
 }
 
 export interface ISubscription {
-    unsubscribe(): void;
+    unsubscribe(): void
 }
 
 export interface IObservableStream<T> {
-    subscribe(observer: (value: T) => void): ISubscription;
-    subscribe(observer: IStreamObserver<T>): ISubscription;
+    subscribe(observer: (value: T) => void): ISubscription
+    subscribe(observer: IStreamObserver<T>): ISubscription
     //   [Symbol.observable](): IObservable;
 }
 
@@ -62,37 +62,40 @@ export function toStream<T>(expression: () => T, fireImmediately: boolean = true
             };
         },
         [observableSymbol()]: self
-    };
+    }
 }
 
 class StreamListener<T> implements IStreamObserver<T> {
-    @observable.ref current: T = undefined;
-    subscription: ISubscription;
+    @observable.ref current: T = undefined
+    subscription: ISubscription
 
     constructor(observable: IObservableStream<T>, initialValue: T) {
         runInAction(() => {
-            this.current = initialValue;
-            this.subscription = observable.subscribe(this);
-        });
+            this.current = initialValue
+            this.subscription = observable.subscribe(this)
+        })
     }
 
     dispose() {
         if (this.subscription) {
-            this.subscription.unsubscribe();
+            this.subscription.unsubscribe()
         }
     }
 
-    @action next(value: T) {
-        this.current = value;
+    @action
+    next(value: T) {
+        this.current = value
     }
 
-    @action complete() {
-        this.dispose();
+    @action
+    complete() {
+        this.dispose()
     }
 
-    @action error(value: T) {
-        this.current = value;
-        this.dispose();
+    @action
+    error(value: T) {
+        this.current = value
+        this.dispose()
     }
 }
 
@@ -121,9 +124,12 @@ class StreamListener<T> implements IStreamObserver<T> {
  *     dispose(): void;
  * }}
  */
-export function fromStream<T>(observable: IObservableStream<T>, initialValue: T = undefined): {
-    current: T;
-    dispose(): void;
+export function fromStream<T>(
+    observable: IObservableStream<T>,
+    initialValue: T = undefined
+): {
+    current: T
+    dispose(): void
 } {
-    return new StreamListener(observable, initialValue);
+    return new StreamListener(observable, initialValue)
 }

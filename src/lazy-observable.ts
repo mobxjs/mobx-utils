@@ -1,10 +1,10 @@
-import {IDENTITY} from "./utils";
-import {observable, extras, action} from "mobx";
+import { IDENTITY } from "./utils"
+import { observable, extras, action } from "mobx"
 
 export interface ILazyObservable<T> {
-    current(): T;
-    refresh(): T;
-    reset(): T;
+    current(): T
+    refresh(): T
+    reset(): T
 }
 
 /**
@@ -46,35 +46,35 @@ export function lazyObservable<T>(
     initialValue: T = undefined,
     modifier = IDENTITY
 ): ILazyObservable<T> {
-    let started = false;
-    const value = observable.shallowBox(modifier(initialValue));
+    let started = false
+    const value = observable.shallowBox(modifier(initialValue))
     let currentFnc = () => {
         if (!started) {
-            started = true;
+            started = true
             fetch((newValue: T) => {
                 extras.allowStateChanges(true, () => {
-                    value.set(newValue);
-                });
-            });
+                    value.set(newValue)
+                })
+            })
         }
-        return value.get();
-    };
+        return value.get()
+    }
     let resetFnc = action("lazyObservable-reset", () => {
-      value.set(initialValue);
-      return value.get();
-    });
+        value.set(initialValue)
+        return value.get()
+    })
     return {
         current: currentFnc,
         refresh: () => {
             if (started) {
-                started = false;
-                return currentFnc();
+                started = false
+                return currentFnc()
             } else {
-                return value.get();
+                return value.get()
             }
         },
         reset: () => {
-            return resetFnc();
+            return resetFnc()
         }
-    };
+    }
 }
