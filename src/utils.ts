@@ -1,18 +1,16 @@
-export type IDisposer = () => void;
+export type IDisposer = () => void
 
-export const NOOP = () => {};
+export const NOOP = () => {}
 
-export const IDENTITY = (_: any) => _;
+export const IDENTITY = (_: any) => _
 
 export function invariant(cond: boolean, message = "Illegal state") {
-    if (!cond)
-        throw new Error("[mobx-utils] " + message);
+    if (!cond) throw new Error("[mobx-utils] " + message)
 }
 
-const deprecatedMessages: string[] = [];
+const deprecatedMessages: string[] = []
 export function deprecated(msg: string) {
-    if (deprecatedMessages.indexOf(msg) !== -1)
-        return;
-    deprecatedMessages.push(msg);
-    console.error("[mobx-utils] Deprecated: " + msg);
+    if (deprecatedMessages.indexOf(msg) !== -1) return
+    deprecatedMessages.push(msg)
+    console.error("[mobx-utils] Deprecated: " + msg)
 }

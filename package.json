@@ -8,6 +8,7 @@
   "react-native": "mobx-utils.module.js",
   "typings": "lib/mobx-utils.d.ts",
   "scripts": {
+    "prettier": "prettier --write --print-width 100 --tab-width 4 --no-semi \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
     "build": "tsc -p src && rollup lib/mobx-utils.js -e mobx -g mobx:mobx -o mobx-utils.umd.js -f umd --name mobxUtils && rollup lib/mobx-utils.js -e mobx -o mobx-utils.module.js -f es",
     "test": "npm run build && tsc -p test && tape test/*.js .test-ts/*.js | faucet",
     "lint:js": "eslint ./test",
@@ -39,7 +40,9 @@
     "eslint": "^3.10.1",
     "faucet": "0.0.1",
     "istanbul": "^0.3.21",
+    "lint-staged": "^4.2.3",
     "mobx": "^3.0.0",
+    "prettier": "^1.7.2",
     "rollup": "^0.50.0",
     "rxjs": "^5.0.2",
     "tape": "^4.2.2",
