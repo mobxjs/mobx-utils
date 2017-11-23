@@ -46,20 +46,24 @@ export interface IObservableStream<T> {
  * @export
  * @template T
  * @param {() => T} expression
- * @param {boolean} fireImmediately
+ * @param {boolean} fireImmediately (by default false)
  * @returns {IObservableStream<T>}
  */
-export function toStream<T>(expression: () => T, fireImmediately: boolean = true): IObservableStream<T> {
-    const computedValue = computed(expression);
+export function toStream<T>(
+    expression: () => T,
+    fireImmediately: boolean = false
+): IObservableStream<T> {
+    const computedValue = computed(expression)
     return {
         subscribe(observer: any): ISubscription {
             return {
                 unsubscribe: computedValue.observe(
                     typeof observer === "function"
-                        ? ( {newValue}: { newValue: T } ) => observer(newValue)
-                        : ( {newValue}: { newValue: T } ) => observer.next(newValue)
-                , fireImmediately)
-            };
+                        ? ({ newValue }: { newValue: T }) => observer(newValue)
+                        : ({ newValue }: { newValue: T }) => observer.next(newValue),
+                    fireImmediately
+                )
+            }
         },
         [observableSymbol()]: self
     }
