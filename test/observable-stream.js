@@ -5,18 +5,18 @@ const mobx = require("mobx")
 const test = require("tape")
 const Rx = require("rxjs")
 
-test("to observable", t => {
-    const user = mobx.observable({
-        firstName: "C.S",
-        lastName: "Lewis"
-    })
+test("to observable - should push the initial value by default", t => {
+  const user = mobx.observable({
+    firstName: "C.S",
+    lastName: "Lewis"
+  })
 
     mobx.useStrict(false)
 
     let values = []
 
     const sub = Rx.Observable
-        .from(utils.toStream(() => user.firstName + user.lastName))
+        .from(utils.toStream(() => user.firstName + user.lastName, true))
         .map(x => x.toUpperCase())
         .subscribe(v => values.push(v))
 
@@ -31,7 +31,45 @@ test("to observable", t => {
 
     user.firstName = "error"
 
-    t.deepEqual(values, ["JOHNLEWIS", "JANEJACK"])
+  t.deepEqual(values, [
+    "C.SLEWIS",
+    "JOHNLEWIS",
+    "JANEJACK"
+  ]);
+
+  t.end();
+})
+
+test("to observable - should not push the initial value", t => {
+  const user = mobx.observable({
+    firstName: "C.S",
+    lastName: "Lewis"
+  })
+
+  mobx.useStrict(false);
+
+  let values = []
+
+  const sub = Rx.Observable
+    .from(utils.toStream(() => user.firstName + user.lastName))
+    .map(x => x.toUpperCase())
+    .subscribe(v => values.push(v))
+
+  user.firstName = "John"
+
+  mobx.runInAction(() => {
+    user.firstName = "Jane";
+    user.lastName = "Jack";
+  })
+
+  sub.unsubscribe();
+
+  user.firstName = "error";
+
+  t.deepEqual(values, [
+    "JOHNLEWIS",
+    "JANEJACK"
+  ]);
 
     t.end()
 })
