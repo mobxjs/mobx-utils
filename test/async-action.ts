@@ -214,7 +214,7 @@ test("it should support logging", t => {
     }, 10)
 })
 
-test("it should support asyncActionWithCancel(cb, type) as decorator", t => {
+test("it should support asyncActionWithCancel(cb, type) as decorator for have-value variable", t => {
     const values: any[] = []
 
     mobx.useStrict(true)
@@ -251,7 +251,74 @@ test("it should support asyncActionWithCancel(cb, type) as decorator", t => {
     }, 10)
 })
 
-test("it should support cancel prev the same kinds of async generator actions in 'takeLatest' type", t => {
+test("it should support asyncActionWithCancel(cb, type) as decorator for no-value variable", t => {
+    const values: any[] = []
+
+    mobx.useStrict(true)
+
+    class X {
+        @mobx.observable a = 1;
+
+        @utils.asyncActionWithCancel(() => {}, 'takeLatest')
+        noValueParam
+    }
+
+    const x = new X()
+    x.noValueParam = function *(initial: number) {
+        this.a = initial // this runs in action
+        try {
+            this.a = yield delay(100, 5, true) // and this as well!
+            yield delay(100, 0)
+            this.a = 4
+        } catch (e) {
+            this.a = e
+        }
+        return this.a
+    }
+
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
+    setTimeout(() => {
+        // TODO: mweh on any cast...
+        ;(x.noValueParam(/*test binding*/ 2) as any).then((v: number) => {
+            // note: ideally, type of v should be inferred..
+            t.is(v, 5)
+            t.deepEqual(values, [1, 2, 5])
+            t.is(x.a, 5) // correct instance modified?
+            t.end()
+        })
+    }, 10)
+})
+
+test("it should support canceling the effects when call canceler", t => {
+    mobx.useStrict(true)
+    const values: any[] = []
+    const x = mobx.observable({ a: 1 })
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
+    let canceler
+    const f = utils.asyncActionWithCancel(cancel => canceler = cancel)(function*(initial: number) {
+        x.a = initial // this runs in action
+        try {
+            x.a = yield delay(1000, 5, true) // and this as well!
+        } catch (e) {
+            x.a = e
+        }
+        return x.a
+    })
+
+    setTimeout(() => {
+        f(2)
+        setTimeout(() => {
+            canceler()
+            t.is(x.a, 2)
+            t.deepEqual(values, [1, 2])
+            t.end()
+        }, 150)
+    }, 10)
+})
+
+test("it should support canceling prev the same kinds of async generator actions in 'takeLatest' type", t => {
     mobx.useStrict(true)
     const values: any[] = []
     const x = mobx.observable({ a: 1 })
@@ -277,7 +344,7 @@ test("it should support cancel prev the same kinds of async generator actions in
     }, 10)
 })
 
-test("it should support cancel current async generator actions in 'takeLatest' type", t => {
+test("it should support canceling current async generator actions in 'takeLatest' type", t => {
     mobx.useStrict(true)
     const values: any[] = []
     const x = mobx.observable({ a: 1 })
@@ -305,14 +372,14 @@ test("it should support cancel current async generator actions in 'takeLatest' t
     }, 10)
 })
 
-test("it should support cancel all the same kinds of async generator actions in 'takeEvery' type", t => {
+test("it should support canceling all the same kinds of async generator actions in 'takeEvery' type", t => {
     mobx.useStrict(true)
     const values: any[] = []
     const x = mobx.observable({ a: 1 })
     mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
 
     let canceler
-    const f = utils.asyncActionWithCancel(cancel => canceler = cancel, 'takeLatest')(function*(initial: number) {
+    const f = utils.asyncActionWithCancel(cancel => canceler = cancel, 'takeEvery')(function*(initial: number) {
         x.a = initial // this runs in action
         x.a = yield delay(100, 3) // and this as well!
         yield delay(100, 0)
