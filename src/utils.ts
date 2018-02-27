@@ -14,3 +14,12 @@ export function deprecated(msg: string) {
     deprecatedMessages.push(msg)
     console.error("[mobx-utils] Deprecated: " + msg)
 }
+
+export function addHiddenProp(object: any, propName: string, value: any) {
+    Object.defineProperty(object, propName, {
+        enumerable: false,
+        writable: true,
+        configurable: true,
+        value
+    })
+}

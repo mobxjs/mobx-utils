@@ -41,6 +41,7 @@
     "faucet": "0.0.1",
     "istanbul": "^0.3.21",
     "lint-staged": "^4.2.3",
+    "lodash.intersection": "^4.4.0",
     "mobx": "^3.0.0",
     "prettier": "^1.7.2",
     "rollup": "^0.50.0",
