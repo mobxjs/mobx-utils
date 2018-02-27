@@ -31,7 +31,7 @@
       true,
       "double"
     ],
-    "semicolon": true,
+    "semicolon": false,
     "trailing-comma": [
       true,
       {
