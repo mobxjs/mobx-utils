@@ -1,4 +1,4 @@
-import { extras } from "mobx"
+import { _isComputingDerivation } from "mobx"
 import { fromResource, IResource } from "./from-resource"
 
 const tickers: {
@@ -32,7 +32,7 @@ const tickers: {
  * @returns
  */
 export function now(interval: number | "frame" = 1000) {
-    if (!extras.isComputingDerivation()) {
+    if (!_isComputingDerivation()) {
         // See #40
         return Date.now()
     }

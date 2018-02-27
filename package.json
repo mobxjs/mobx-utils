@@ -52,7 +52,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "mobx": "^3.0.0"
+    "mobx": "^4.0.0"
   },
   "keywords": [
     "mobx",

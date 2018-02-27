@@ -148,62 +148,66 @@ test("it should support logging", t => {
         f(2).then(() => {
             t.deepEqual(stripEvents(events), [
                 {
-                    arguments: [2],
+                    type: "action",
                     name: "myaction - runid: 6 - init",
-                    spyReportStart: true,
-                    type: "action"
+                    arguments: [2],
+                    spyReportStart: true
                 },
                 { spyReportEnd: true },
                 {
-                    arguments: [undefined],
+                    type: "action",
                     name: "myaction - runid: 6 - yield 0",
-                    spyReportStart: true,
-                    type: "action"
+                    arguments: [undefined],
+                    spyReportStart: true
                 },
                 {
-                    name: "a",
-                    newValue: 2,
+                    type: "update",
                     oldValue: 1,
-                    spyReportStart: true,
-                    type: "update"
+                    name: "ObservableObject@74",
+                    newValue: 2,
+                    key: "a",
+                    spyReportStart: true
                 },
                 { spyReportEnd: true },
                 { spyReportEnd: true },
                 {
-                    arguments: [5],
+                    type: "action",
                     name: "myaction - runid: 6 - yield 1",
-                    spyReportStart: true,
-                    type: "action"
+                    arguments: [5],
+                    spyReportStart: true
                 },
                 {
-                    name: "a",
-                    newValue: 5,
+                    type: "update",
                     oldValue: 2,
-                    spyReportStart: true,
-                    type: "update"
+                    name: "ObservableObject@74",
+                    newValue: 5,
+                    key: "a",
+                    spyReportStart: true
                 },
                 { spyReportEnd: true },
                 {
-                    name: "a",
-                    newValue: 4,
+                    type: "update",
                     oldValue: 5,
-                    spyReportStart: true,
-                    type: "update"
+                    name: "ObservableObject@74",
+                    newValue: 4,
+                    key: "a",
+                    spyReportStart: true
                 },
                 { spyReportEnd: true },
                 { spyReportEnd: true },
                 {
-                    arguments: [3],
+                    type: "action",
                     name: "myaction - runid: 6 - yield 2",
-                    spyReportStart: true,
-                    type: "action"
+                    arguments: [3],
+                    spyReportStart: true
                 },
                 {
-                    name: "a",
-                    newValue: 3,
+                    type: "update",
                     oldValue: 4,
-                    spyReportStart: true,
-                    type: "update"
+                    name: "ObservableObject@74",
+                    newValue: 3,
+                    key: "a",
+                    spyReportStart: true
                 },
                 { spyReportEnd: true },
                 { spyReportEnd: true }

@@ -5,7 +5,8 @@ import {
     isObservableObject,
     isObservableArray,
     isObservableMap,
-    computed
+    computed,
+    keys
 } from "mobx"
 import { invariant } from "./utils"
 
@@ -56,7 +57,7 @@ class ViewModel<T> implements IViewModel<T> {
 
     @action.bound
     submit() {
-        this.localValues.keys().forEach(key => {
+        keys(this.localValues).forEach((key: string) => {
             const source = this.localValues.get(key)
             const destination = (this.model as any)[key]
             if (isObservableArray(destination)) {

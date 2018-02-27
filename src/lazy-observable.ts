@@ -1,5 +1,5 @@
 import { IDENTITY } from "./utils"
-import { observable, extras, action } from "mobx"
+import { observable, action, _allowStateChanges } from "mobx"
 
 export interface ILazyObservable<T> {
     current(): T
@@ -52,7 +52,7 @@ export function lazyObservable<T>(
         if (!started) {
             started = true
             fetch((newValue: T) => {
-                extras.allowStateChanges(true, () => {
+                _allowStateChanges(true, () => {
                     value.set(newValue)
                 })
             })

@@ -1,4 +1,4 @@
-import { isAction, autorun, autorunAsync, action, isObservableArray, runInAction } from "mobx"
+import { isAction, autorun, action, isObservableArray, runInAction } from "mobx"
 import { IDisposer } from "./utils"
 
 /**
@@ -37,6 +37,6 @@ export function queueProcessor<T>(
         // fire processor
         items.forEach(processor)
     }
-    if (debounce > 0) return autorunAsync(runner, debounce)
+    if (debounce > 0) return autorun(runner, { delay: debounce })
     else return autorun(runner)
 }

@@ -7,7 +7,7 @@ const test = require("tape")
 mobx.useStrict(true)
 
 test("whenWithTimeout should operate normally", t => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
 
     utils.whenWithTimeout(() => a.get() === 2, () => t.end(), 500, () => t.fail())
 
@@ -15,7 +15,7 @@ test("whenWithTimeout should operate normally", t => {
 })
 
 test("whenWithTimeout should timeout", t => {
-    const a = mobx.observable(1)
+    const a = mobx.observable.box(1)
 
     utils.whenWithTimeout(() => a.get() === 2, () => t.fail("should have timed out"), 500, () =>
         t.end()
@@ -25,7 +25,7 @@ test("whenWithTimeout should timeout", t => {
 })
 
 test("whenWithTimeout should dispose", t => {
-    const a = mobx.observable(1)
+    const a = mobx.observable.box(1)
 
     const d1 = utils.whenWithTimeout(
         () => a.get() === 2,

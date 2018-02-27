@@ -7,7 +7,7 @@ const test = require("tape")
 mobx.useStrict(true)
 
 test("keep alive should work for computeds", t => {
-    const a = mobx.observable(1)
+    const a = mobx.observable.box(1)
     let calcs = 0
     const doubler = mobx.computed(() => {
         calcs++
