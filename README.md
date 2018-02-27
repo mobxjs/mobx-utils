@@ -287,7 +287,7 @@ Note that if you read a non-dirty property, viewmodel only proxies the read to t
 
 ```javascript
 class Todo {
-  \@observable title = "Test"
+  @observable title = "Test"
 }
 
 const model = new Todo()
