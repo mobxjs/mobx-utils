@@ -523,10 +523,10 @@ import {asyncAction} from "mobx-utils"
 mobx.useStrict(true) // don't allow state modifications outside actions
 
 class Store {
-	\@observable githubProjects = []
-	\@state = "pending" // "pending" / "done" / "error"
+	@observable githubProjects = []
+	@state = "pending" // "pending" / "done" / "error"
 
-	\@asyncAction
+	@asyncAction
 	*fetchProjects() { // <- note the star, this a generator function!
 		this.githubProjects = []
 		this.state = "pending"
