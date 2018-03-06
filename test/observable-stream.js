@@ -1,6 +1,6 @@
 "use strict"
 
-const utils = require("../")
+const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
 const Rx = require("rxjs")
 

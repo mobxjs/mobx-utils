@@ -5,14 +5,14 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "experimentalDecorators": true,
-        "outDir": "../.test-ts",
+        "noEmit": true,
         "rootDir": ".",
         "lib": [
             "dom", "es5", "scripthost", "es2015.promise", "es2015.generator", "es2015.iterable"
         ]
     },
     "include": [
-        "*.ts"
+        "**/*.ts"
     ],
     "exclude": [
         "../node_modules"

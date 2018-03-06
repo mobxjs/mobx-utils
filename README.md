@@ -24,7 +24,7 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 
 ## fromPromise
 
-`fromPromise` takes a Promise and returns an object with 3 observable properties that track
+`fromPromise` takes a Promise and returns a new Promise wrapping the original one. The returned Promise is also extended with 2 observable properties that track
 the status of the promise. The returned object has the following observable properties:
 
 -   `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference.
@@ -35,7 +35,7 @@ And the following methods:
 -   `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
 -   `then((value: TValue) => TResult1 | PromiseLike<TResult1>, [(rejectReason: any) => any])`: chains additional handlers to the provided promise.
 
-The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`.
+The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`. You may also use it with `await` in `async` functions.
 
 Note that the status strings are available as constants:
 `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
@@ -113,7 +113,7 @@ current value of the lazyObservable. It is allowed to call `sink` multiple times
 to keep the lazyObservable up to date with some external resource.
 
 Note that it is the `current()` call itself which is being tracked by MobX,
-so make sure that you don't dereference too early.
+so make sure that you don't dereference to early.
 
 **Parameters**
 
@@ -287,7 +287,7 @@ Note that if you read a non-dirty property, viewmodel only proxies the read to t
 
 ```javascript
 class Todo {
-  @observable title = "Test"
+  \@observable title = "Test"
 }
 
 const model = new Todo()
@@ -493,6 +493,8 @@ The `yield` number indicates the progress of the generator. `init` indicates spa
 
 `asyncActions` requires `Promise` and `generators` to be available on the target environment. Polyfill `Promise` if needed. Both TypeScript and Babel can compile generator functions down to ES5.
 
+ N.B. due to a [babel limitation](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy/issues/26), in Babel generatos cannot be combined with decorators. See also [#70](https://github.com/mobxjs/mobx-utils/issues/70)
+
 **Parameters**
 
 -   `arg1`  
@@ -523,10 +525,10 @@ import {asyncAction} from "mobx-utils"
 mobx.useStrict(true) // don't allow state modifications outside actions
 
 class Store {
-	@observable githubProjects = []
-	@state = "pending" // "pending" / "done" / "error"
+	\@observable githubProjects = []
+	\@state = "pending" // "pending" / "done" / "error"
 
-	@asyncAction
+	\@asyncAction
 	*fetchProjects() { // <- note the star, this a generator function!
 		this.githubProjects = []
 		this.state = "pending"
