@@ -24,7 +24,7 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 
 ## fromPromise
 
-`fromPromise` takes a Promise and returns an object with 3 observable properties that track
+`fromPromise` takes a Promise and returns a new Promise wrapping the original one. The returned Promise is also extended with 2 observable properties that track
 the status of the promise. The returned object has the following observable properties:
 
 -   `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference.
@@ -35,7 +35,7 @@ And the following methods:
 -   `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
 -   `then((value: TValue) => TResult1 | PromiseLike<TResult1>, [(rejectReason: any) => any])`: chains additional handlers to the provided promise.
 
-The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`.
+The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`. You may also use it with `await` in `async` functions.
 
 Note that the status strings are available as constants:
 `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
@@ -92,7 +92,7 @@ fetchResult.then(
 )
 ```
 
-Returns **IPromiseBasedObservable&lt;T>** 
+Returns **IPromiseBasedObservable&lt;T>**
 
 ## isPromiseBasedObservable
 
@@ -102,7 +102,7 @@ Returns true if the provided value is a promise-based observable.
 
 -   `value`  any
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
 
 ## lazyObservable
 
@@ -113,13 +113,13 @@ current value of the lazyObservable. It is allowed to call `sink` multiple times
 to keep the lazyObservable up to date with some external resource.
 
 Note that it is the `current()` call itself which is being tracked by MobX,
-so make sure that you don't dereference too early.
+so make sure that you don't dereference to early.
 
 **Parameters**
 
--   `fetch`  
+-   `fetch`
 -   `initialValue` **T** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
--   `modifier`  
+-   `modifier`
 
 **Examples**
 
@@ -162,7 +162,7 @@ which comes from an imaginary database and notifies when it has changed.
 
 **Parameters**
 
--   `subscriber`  
+-   `subscriber`
 -   `unsubscriber` **IDisposer**  (optional, default `NOOP`)
 -   `initialValue` **T** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
 
@@ -210,7 +210,7 @@ emitting when new values become available. The expressions respect (trans)action
 
 **Parameters**
 
--   `expression`  
+-   `expression`
 -   `fireImmediately` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** (by default false)
 
 **Examples**
@@ -227,7 +227,7 @@ Rx.Observable
   .subscribe(nameChanges => console.log("Changed name ", nameChanges, "times"))
 ```
 
-Returns **IObservableStream&lt;T>** 
+Returns **IObservableStream&lt;T>**
 
 ## StreamListener
 
@@ -239,8 +239,8 @@ Takes an initial value as second optional argument
 
 **Parameters**
 
--   `observable` **IObservableStream&lt;T>** 
--   `initialValue`  
+-   `observable` **IObservableStream&lt;T>**
+-   `initialValue`
 
 **Examples**
 
@@ -281,7 +281,7 @@ Note that if you read a non-dirty property, viewmodel only proxies the read to t
 
 **Parameters**
 
--   `model` **T** 
+-   `model` **T**
 
 **Examples**
 
@@ -313,8 +313,8 @@ Like normal `when`, except that this `when` will automatically dispose if the co
 
 **Parameters**
 
--   `expr`  
--   `action`  
+-   `expr`
+-   `action`
 -   `timeout` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount when spends waiting before giving up (optional, default `10000`)
 -   `onTimeout` **any** the ontimeout handler will be called if the condition wasn't met within the given time (optional, default `()`)
 
@@ -345,8 +345,8 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 **Parameters**
 
--   `_1`  
--   `_2`  
+-   `_1`
+-   `_2`
 -   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
 
 **Examples**
@@ -370,8 +370,8 @@ and lazily re-evaluates the expression if needed outside a reaction while not in
 
 **Parameters**
 
--   `_1`  
--   `_2`  
+-   `_1`
+-   `_2`
 -   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** an object that has a computed property, created by `@computed` or `extendObservable`
 -   `property` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the property to keep alive
 
@@ -395,7 +395,7 @@ once for each item added to the observable array, optionally deboucing the actio
 **Parameters**
 
 -   `observableArray` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
--   `processor`  
+-   `processor`
 -   `debounce` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
 
 **Examples**
@@ -424,7 +424,7 @@ chunks and/or single items into reasonable chunks of work.
 **Parameters**
 
 -   `observableArray` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
--   `processor`  
+-   `processor`
 -   `debounce` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
 -   `maxChunkSize` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** optionally do not call on full array but smaller chunks. With 0 it will process the full array. (optional, default `0`)
 
@@ -493,10 +493,12 @@ The `yield` number indicates the progress of the generator. `init` indicates spa
 
 `asyncActions` requires `Promise` and `generators` to be available on the target environment. Polyfill `Promise` if needed. Both TypeScript and Babel can compile generator functions down to ES5.
 
+ N.B. due to a [babel limitation](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy/issues/26), in Babel generatos cannot be combined with decorators. See also [#70](https://github.com/mobxjs/mobx-utils/issues/70)
+
 **Parameters**
 
--   `arg1`  
--   `arg2`  
+-   `arg1`
+-   `arg2`
 
 **Examples**
 
@@ -520,7 +522,7 @@ fetchUsers("http://users.com").then(time => {
 ```javascript
 import {asyncAction} from "mobx-utils"
 
-mobx.useStrict(true) // don't allow state modifications outside actions
+mobx.configure({ enforceActions: true }) // don't allow state modifications outside actions
 
 class Store {
 	\@observable githubProjects = []
@@ -543,7 +545,7 @@ class Store {
 }
 ```
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)**
 
 ## whenAsync
 
@@ -551,7 +553,7 @@ Like normal `when`, except that this `when` will return a promise that resolves 
 
 **Parameters**
 
--   `fn`  
+-   `fn`
 -   `timeout` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount of time to wait, before the promise rejects
 
 **Examples**

@@ -1,11 +1,10 @@
 "use strict"
 
-const utils = require("../")
+const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
-const test = require("tape")
 
-test("expr", function(t) {
-    mobx.useStrict(false)
+test("expr", function() {
+    mobx.configure({ enforceActions: false })
     try {
         let factor = mobx.observable.box(0)
         let price = mobx.observable.box(100)
@@ -39,17 +38,16 @@ test("expr", function(t) {
         factor.set(4) // triggers innerCalc twice
         price.set(20)
 
-        t.deepEqual(b, [100, 150, 450, 150, 20])
-        t.equal(innerCalcs, 9)
-        t.equal(totalCalcs, 5)
-        t.end()
+        expect(b).toEqual([100, 150, 450, 150, 20])
+        expect(innerCalcs).toBe(9)
+        expect(totalCalcs).toBe(5)
     } finally {
-        mobx.useStrict(true)
+        mobx.configure({ enforceActions: true })
     }
 })
 
-test("expr2", function(t) {
-    mobx.useStrict(false)
+test("expr2", function() {
+    mobx.configure({ enforceActions: false })
     try {
         let factor = mobx.observable.box(0)
         let price = mobx.observable.box(100)
@@ -83,11 +81,10 @@ test("expr2", function(t) {
         factor.set(4) // triggers innerCalc twice
         price.set(20)
 
-        t.deepEqual(b, [100, 150, 450, 150, 20])
-        t.equal(innerCalcs, 9)
-        t.equal(totalCalcs, 5)
-        t.end()
+        expect(b).toEqual([100, 150, 450, 150, 20])
+        expect(innerCalcs).toBe(9)
+        expect(totalCalcs).toBe(5)
     } finally {
-        mobx.useStrict(true)
+        mobx.configure({ enforceActions: true })
     }
 })

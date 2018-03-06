@@ -139,7 +139,7 @@ export function asyncAction<A1>(
  * @example
  * import {asyncAction} from "mobx-utils"
  *
- * mobx.useStrict(true) // don't allow state modifications outside actions
+ * mobx.configure({ enforceActions: true }) // don't allow state modifications outside actions
  *
  * class Store {
  * 	\@observable githubProjects = []

@@ -1,10 +1,9 @@
 "use strict"
 
-const utils = require("../")
+const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
-const test = require("tape")
 
-test("now should tick", t => {
+test("now should tick", done => {
     const values = []
     const d = mobx.autorun(() => {
         utils.now(100)
@@ -15,19 +14,19 @@ test("now should tick", t => {
     setTimeout(d, 250)
 
     setTimeout(() => {
-        t.deepEqual(values, ["x", "x", "x"])
-        t.end()
+        expect(values).toEqual(["x", "x", "x"])
+        done()
     }, 500)
 })
 
-test("now should be up to date outside reaction, #40", t => {
+test("now should be up to date outside reaction, #40", done => {
     const d1 = utils.now(1000)
-    t.true(typeof d1 === "number")
+    expect(typeof d1 === "number").toBeTruthy()
     setTimeout(() => {
         const d2 = utils.now(1000)
-        t.true(typeof d2 === "number")
-        t.notEqual(d1, d2)
-        t.true(d2 - d1 > 400)
-        t.end()
+        expect(typeof d2 === "number").toBeTruthy()
+        expect(d1).not.toBe(d2)
+        expect(d2 - d1 > 400).toBeTruthy()
+        done()
     }, 500)
 })

@@ -1,4 +1,4 @@
-import { computed, _isComputingDerivation } from "mobx";
+import { computed, _isComputingDerivation } from "mobx"
 
 /**
  * expr can be used to create temporarily views inside views.
@@ -16,8 +16,8 @@ import { computed, _isComputingDerivation } from "mobx";
  *
  */
 export function expr<T>(expr: () => T): T {
-  if (!_isComputingDerivation())
-    console.warn("'expr' should only be used inside other reactive functions.");
-  // optimization: would be more efficient if the expr itself wouldn't be evaluated first on the next change, but just a 'changed' signal would be fired
-  return computed(expr).get();
+    if (!_isComputingDerivation())
+        console.warn("'expr' should only be used inside other reactive functions.")
+    // optimization: would be more efficient if the expr itself wouldn't be evaluated first on the next change, but just a 'changed' signal would be fired
+    return computed(expr).get()
 }

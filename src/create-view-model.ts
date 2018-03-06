@@ -21,7 +21,7 @@ export interface IViewModel<T> {
 const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty"]
 
 class ViewModel<T> implements IViewModel<T> {
-    localValues: ObservableMap<any> = observable.map({})
+    localValues: ObservableMap<any, any> = observable.map({})
 
     @computed
     get isDirty() {

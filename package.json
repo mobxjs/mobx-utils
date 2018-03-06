@@ -10,12 +10,13 @@
   "scripts": {
     "prettier": "prettier --write --print-width 100 --tab-width 4 --no-semi \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
     "build": "tsc -p src && rollup lib/mobx-utils.js -e mobx -g mobx:mobx -o mobx-utils.umd.js -f umd --name mobxUtils && rollup lib/mobx-utils.js -e mobx -o mobx-utils.module.js -f es",
-    "test": "npm run build && tsc -p test && tape test/*.js .test-ts/*.js | faucet",
+    "watch": "yarn jest --watch",
+    "test": "yarn jest",
     "lint:js": "eslint ./test",
     "lint:ts": "tslint ./src/*.ts",
     "lint": "npm run lint:ts && npm run lint:js",
     "prepublish": "npm run build && npm run build-docs",
-    "coverage": "npm run build && tsc -p test && istanbul cover tape test/*.js .test-ts/*.js && cat ./coverage/lcov.info|coveralls",
+    "coverage": "yarn jest --coverage",
     "build-docs": "npm run build && documentation readme lib/mobx-utils.js --section API"
   },
   "repository": {
@@ -33,20 +34,21 @@
     "mobx-utils.module.js"
   ],
   "devDependencies": {
+    "@types/jest": "^22.2.0",
     "@types/tape": "^4.2.30",
     "babel-eslint": "^7.1.0",
     "coveralls": "^2.11.4",
     "documentation": "^4.0.0-beta.18",
     "eslint": "^3.10.1",
     "faucet": "0.0.1",
-    "istanbul": "^0.3.21",
+    "jest": "^22.4.2",
     "lint-staged": "^4.2.3",
     "lodash.intersection": "^4.4.0",
-    "mobx": "^3.0.0",
+    "mobx": "^4.0.0-beta.1",
     "prettier": "^1.7.2",
     "rollup": "^0.50.0",
     "rxjs": "^5.0.2",
-    "tape": "^4.2.2",
+    "ts-jest": "^22.4.1",
     "tslint": "^3.15.1",
     "tslint-eslint-rules": "^2.1.0",
     "typescript": "^2.4.2"
@@ -63,5 +65,27 @@
     "frp",
     "functional-reactive-programming",
     "state management"
-  ]
+  ],
+  "jest": {
+    "transform": {
+      "^.+\\.ts?$": "ts-jest"
+    },
+    "testRegex": "test/.*\\.(t|j)sx?$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/lib/",
+      "/coverage/",
+      "/\\./"
+    ],
+    "watchPathIgnorePatterns": [
+      "<rootDir>/node_modules/"
+    ]
+  }
 }

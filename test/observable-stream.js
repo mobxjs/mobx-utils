@@ -1,17 +1,16 @@
 "use strict"
 
-const utils = require("../")
+const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
-const test = require("tape")
 const Rx = require("rxjs")
 
-test("to observable - should push the initial value by default", t => {
-  const user = mobx.observable({
-    firstName: "C.S",
-    lastName: "Lewis"
-  })
+test("to observable - should push the initial value by default", () => {
+    const user = mobx.observable({
+        firstName: "C.S",
+        lastName: "Lewis"
+    })
 
-    mobx.useStrict(false)
+    mobx.configure({ enforceActions: false })
 
     let values = []
 
@@ -31,51 +30,40 @@ test("to observable - should push the initial value by default", t => {
 
     user.firstName = "error"
 
-  t.deepEqual(values, [
-    "C.SLEWIS",
-    "JOHNLEWIS",
-    "JANEJACK"
-  ]);
-
-  t.end();
+    expect(values).toEqual(["C.SLEWIS", "JOHNLEWIS", "JANEJACK"])
 })
 
-test("to observable - should not push the initial value", t => {
-  const user = mobx.observable({
-    firstName: "C.S",
-    lastName: "Lewis"
-  })
+test("to observable - should not push the initial value", () => {
+    const user = mobx.observable({
+        firstName: "C.S",
+        lastName: "Lewis"
+    })
 
-  mobx.useStrict(false);
+    mobx.configure({ enforceActions: false })
 
-  let values = []
+    let values = []
 
-  const sub = Rx.Observable
-    .from(utils.toStream(() => user.firstName + user.lastName))
-    .map(x => x.toUpperCase())
-    .subscribe(v => values.push(v))
+    const sub = Rx.Observable
+        .from(utils.toStream(() => user.firstName + user.lastName))
+        .map(x => x.toUpperCase())
+        .subscribe(v => values.push(v))
 
-  user.firstName = "John"
+    user.firstName = "John"
 
-  mobx.runInAction(() => {
-    user.firstName = "Jane";
-    user.lastName = "Jack";
-  })
+    mobx.runInAction(() => {
+        user.firstName = "Jane"
+        user.lastName = "Jack"
+    })
 
-  sub.unsubscribe();
+    sub.unsubscribe()
 
-  user.firstName = "error";
+    user.firstName = "error"
 
-  t.deepEqual(values, [
-    "JOHNLEWIS",
-    "JANEJACK"
-  ]);
-
-    t.end()
+    expect(values).toEqual(["JOHNLEWIS", "JANEJACK"])
 })
 
-test("from observable", t => {
-    mobx.useStrict(true)
+test("from observable", done => {
+    mobx.configure({ enforceActions: true })
     const fromStream = utils.fromStream(Rx.Observable.interval(100), -1)
     const values = []
     const d = mobx.autorun(() => {
@@ -83,20 +71,20 @@ test("from observable", t => {
     })
 
     setTimeout(() => {
-        t.equal(fromStream.current, -1)
+        expect(fromStream.current).toBe(-1)
     }, 50)
     setTimeout(() => {
-        t.equal(fromStream.current, 0)
+        expect(fromStream.current).toBe(0)
     }, 150)
     setTimeout(() => {
-        t.equal(fromStream.current, 1)
+        expect(fromStream.current).toBe(1)
         fromStream.dispose()
     }, 250)
     setTimeout(() => {
-        t.equal(fromStream.current, 1)
-        t.deepEqual(values, [-1, 0, 1])
+        expect(fromStream.current).toBe(1)
+        expect(values).toEqual([-1, 0, 1])
         d()
-        mobx.useStrict(false)
-        t.end()
+        mobx.configure({ enforceActions: false })
+        done()
     }, 350)
 })
