@@ -11,7 +11,6 @@ test("resolves", done => {
     const obs = utils.fromPromise(p)
     expect(obs.value).toBe(undefined)
     expect(obs.state).toBe("pending")
-    expect(obs.promise === p).toBeTruthy()
 
     mobx.when(
         () => {
@@ -30,7 +29,6 @@ test("resolves value", done => {
     const obs = utils.fromPromise(p)
     expect(obs.value).toBe(undefined)
     expect(obs.state).toBe("pending")
-    expect(obs.promise === p).toBeTruthy()
 
     mobx.when(
         () => obs.value === 7,
@@ -67,7 +65,6 @@ test("rejects with reason value", done => {
     const obs = utils.fromPromise(p)
     expect(obs.value).toBe(undefined)
     expect(obs.state).toBe("pending")
-    expect(obs.promise === p).toBeTruthy()
 
     mobx.when(
         () => obs.state !== utils.PENDING,
@@ -108,7 +105,6 @@ test("rejects when throwing", done => {
     const obs = utils.fromPromise(p)
     expect(obs.value).toBe(undefined)
     expect(obs.state).toBe("pending")
-    expect(obs.promise === p).toBeTruthy()
 
     mobx.when(
         () => obs.state !== "pending",

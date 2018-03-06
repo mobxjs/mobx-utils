@@ -84,16 +84,6 @@ function createObservablePromise(origPromise: any) {
         { deep: false }
     )
 
-    // TODO: remove in next major
-    Object.defineProperty(promise, "promise", {
-        get() {
-            deprecated(
-                "fromPromise().promise is deprecated. fromPromise now directly returns a promise"
-            )
-            return origPromise
-        }
-    })
-
     return promise
 }
 
