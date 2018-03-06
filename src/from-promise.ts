@@ -96,7 +96,7 @@ function createObservablePromise(origPromise: any) {
 }
 
 /**
- * `fromPromise` takes a Promise and returns an object with 3 observable properties that track
+ * `fromPromise` takes a Promise and returns a new Promise wrapping the original one. The returned Promise is also extended with 2 observable properties that track
  * the status of the promise. The returned object has the following observable properties:
  *  - `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference.
  *  - `state`: one of `"pending"`, `"fulfilled"` or `"rejected"`
@@ -105,7 +105,7 @@ function createObservablePromise(origPromise: any) {
  * - `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
  * - `then((value: TValue) => TResult1 | PromiseLike<TResult1>, [(rejectReason: any) => any])`: chains additional handlers to the provided promise.
  *
- * The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`.
+ * The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`. You may also use it with `await` in `async` functions.
  * 
  * Note that the status strings are available as constants:
  * `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
