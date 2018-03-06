@@ -43,11 +43,10 @@ export interface ILazyObservable<T> {
 
 export function lazyObservable<T>(
     fetch: (sink: (newValue: T) => void) => void,
-    initialValue: T = undefined,
-    modifier = IDENTITY
+    initialValue: T = undefined
 ): ILazyObservable<T> {
     let started = false
-    const value = observable.shallowBox(modifier(initialValue))
+    const value = observable.box(initialValue, { deep: false })
     let currentFnc = () => {
         if (!started) {
             started = true

@@ -86,17 +86,17 @@ class StreamListener<T> implements IStreamObserver<T> {
         }
     }
 
-    @action
+    @action.bound
     next(value: T) {
         this.current = value
     }
 
-    @action
+    @action.bound
     complete() {
         this.dispose()
     }
 
-    @action
+    @action.bound
     error(value: T) {
         this.current = value
         this.dispose()

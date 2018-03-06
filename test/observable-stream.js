@@ -62,7 +62,7 @@ test("to observable - should not push the initial value", () => {
     expect(values).toEqual(["JOHNLEWIS", "JANEJACK"])
 })
 
-test("from observable", done => {
+test.only("from observable", done => {
     mobx.configure({ enforceActions: true })
     const fromStream = utils.fromStream(Rx.Observable.interval(100), -1)
     const values = []
