@@ -77,9 +77,9 @@ const myComponent = observer(({ fetchResult }) => {
 
 const myComponent = observer(({ fetchResult }) =>
   fetchResult.case({
-    pending:   () => <div>Loading...</div>
-    rejected:  error => <div>Ooops.. {error}</div>
-    fulfilled: value => <div>Gotcha: {value}</div>
+    pending:   () => <div>Loading...</div>,
+    rejected:  error => <div>Ooops.. {error}</div>,
+    fulfilled: value => <div>Gotcha: {value}</div>,
   }))
 
 // chain additional handler(s) to the resolve/reject:
