@@ -131,9 +131,9 @@ function createObservablePromise(origPromise: any) {
  * // or a mobx-react component..
  * const myComponent = observer(({ fetchResult }) => {
  *   switch(fetchResult.state) {
- *      case "pending": return <div>Loading...</div>
- *      case "rejected": return <div>Ooops... {fetchResult.value}</div>
- *      case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
+ *      case "pending": return <div>Loading...</div>,
+ *      case "rejected": return <div>Ooops... {fetchResult.value}</div>,
+ *      case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>,
  *   }
  * })
  *
