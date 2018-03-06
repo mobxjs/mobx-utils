@@ -16,7 +16,7 @@
     "lint:ts": "tslint ./src/*.ts",
     "lint": "npm run lint:ts && npm run lint:js",
     "prepublish": "npm run build && npm run build-docs",
-    "coverage": "npm run build && tsc -p test && istanbul cover tape test/*.js .test-ts/*.js && cat ./coverage/lcov.info|coveralls",
+    "coverage": "yarn jest --coverage",
     "build-docs": "npm run build && documentation readme lib/mobx-utils.js --section API"
   },
   "repository": {
