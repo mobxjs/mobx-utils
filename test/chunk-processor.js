@@ -2,38 +2,37 @@
 
 const utils = require("../")
 const mobx = require("mobx")
-const test = require("tape")
 
 mobx.useStrict(true)
 
-test("sync processor should work with max", t => {
+test("sync processor should work with max", () => {
     const q = mobx.observable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     const res = []
 
     const stop = utils.chunkProcessor(q, v => res.push(v), 0, 3)
 
-    t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]])
-    t.equal(q.length, 0)
+    expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]])
+    expect(q.length).toBe(0)
 
     mobx.runInAction(() => q.push(1, 2, 3, 4, 5))
-    t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10], [1, 2, 3], [4, 5]])
-    t.equal(q.length, 0)
+    expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10], [1, 2, 3], [4, 5]])
+    expect(q.length).toBe(0)
 
     mobx.runInAction(() => q.push(3))
-    t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10], [1, 2, 3], [4, 5], [3]])
-    t.equal(q.length, 0)
+    expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10], [1, 2, 3], [4, 5], [3]])
+    expect(q.length).toBe(0)
 
     mobx.runInAction(() => q.push(8, 9))
-    t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10], [1, 2, 3], [4, 5], [3], [8, 9]])
-    t.equal(q.length, 0)
+    expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10], [1, 2, 3], [4, 5], [3], [8, 9]])
+    expect(q.length).toBe(0)
 
     mobx.runInAction(() => {
         q.unshift(6, 7)
-        t.equal(q.length, 2)
-        t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10], [1, 2, 3], [4, 5], [3], [8, 9]])
+        expect(q.length).toBe(2)
+        expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10], [1, 2, 3], [4, 5], [3], [8, 9]])
     })
-    t.equal(q.length, 0)
-    t.deepEqual(res, [
+    expect(q.length).toBe(0)
+    expect(res).toEqual([
         [1, 2, 3],
         [4, 5, 6],
         [7, 8, 9],
@@ -47,8 +46,8 @@ test("sync processor should work with max", t => {
 
     stop()
     mobx.runInAction(() => q.push(42))
-    t.equal(q.length, 1)
-    t.deepEqual(res, [
+    expect(q.length).toBe(1)
+    expect(res).toEqual([
         [1, 2, 3],
         [4, 5, 6],
         [7, 8, 9],
@@ -59,61 +58,57 @@ test("sync processor should work with max", t => {
         [8, 9],
         [6, 7]
     ])
-
-    t.end()
 })
 
-test("sync processor should work with default max", t => {
+test("sync processor should work with default max", () => {
     const q = mobx.observable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     const res = []
 
     utils.chunkProcessor(q, v => res.push(v))
 
-    t.deepEqual(res, [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
-    t.equal(q.length, 0)
+    expect(res).toEqual([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
+    expect(q.length).toBe(0)
 
     mobx.runInAction(() => q.push(1, 2, 3, 4, 5))
-    t.deepEqual(res, [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [1, 2, 3, 4, 5]])
-    t.equal(q.length, 0)
-
-    t.end()
+    expect(res).toEqual([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [1, 2, 3, 4, 5]])
+    expect(q.length).toBe(0)
 })
 
-test("async processor should work", t => {
+test("async processor should work", done => {
     const q = mobx.observable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     const res = []
 
     const stop = utils.chunkProcessor(q, v => res.push(v), 10, 3)
 
-    t.equal(res.length, 0)
-    t.equal(q.length, 10)
+    expect(res.length).toBe(0)
+    expect(q.length).toBe(10)
 
     setTimeout(() => {
-        t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]])
-        t.equal(q.length, 0)
+        expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]])
+        expect(q.length).toBe(0)
 
         mobx.runInAction(() => q.push(3))
-        t.equal(q.length, 1)
-        t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]])
+        expect(q.length).toBe(1)
+        expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]])
 
         setTimeout(() => {
-            t.equal(q.length, 0)
-            t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10], [3]])
+            expect(q.length).toBe(0)
+            expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10], [3]])
 
             stop()
-            t.end()
+            done()
         }, 50)
     }, 50)
 })
 
-test("async processor should combine smaller chunks to max size", t => {
+test("async processor should combine smaller chunks to max size", done => {
     const q = mobx.observable([1, 2])
     const res = []
 
     const stop = utils.chunkProcessor(q, v => res.push(v), 10, 3)
 
-    t.equal(res.length, 0)
-    t.equal(q.length, 2)
+    expect(res.length).toBe(0)
+    expect(q.length).toBe(2)
     mobx.runInAction(() => q.push(3))
     mobx.runInAction(() => q.push(4))
     mobx.runInAction(() => q.push(5))
@@ -121,30 +116,30 @@ test("async processor should combine smaller chunks to max size", t => {
     mobx.runInAction(() => q.push(7))
 
     setTimeout(() => {
-        t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7]])
-        t.equal(q.length, 0)
+        expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7]])
+        expect(q.length).toBe(0)
 
         mobx.runInAction(() => q.push(8, 9))
         setTimeout(() => {
             mobx.runInAction(() => q.push(10, 11))
-            t.equal(q.length, 4)
-            t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7]])
+            expect(q.length).toBe(4)
+            expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7]])
         }, 2)
         setTimeout(() => {
             mobx.runInAction(() => q.push(12, 13))
-            t.equal(q.length, 6)
-            t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7]])
+            expect(q.length).toBe(6)
+            expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7]])
         }, 4)
 
-        t.equal(q.length, 2)
-        t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7]])
+        expect(q.length).toBe(2)
+        expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7]])
 
         setTimeout(() => {
-            t.equal(q.length, 0)
-            t.deepEqual(res, [[1, 2, 3], [4, 5, 6], [7], [8, 9, 10], [11, 12, 13]])
+            expect(q.length).toBe(0)
+            expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7], [8, 9, 10], [11, 12, 13]])
 
             stop()
-            t.end()
+            done()
         }, 50)
     }, 50)
 })

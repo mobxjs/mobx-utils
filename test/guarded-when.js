@@ -2,43 +2,42 @@
 
 const utils = require("../")
 const mobx = require("mobx")
-const test = require("tape")
 
 mobx.useStrict(true)
 
-test("whenWithTimeout should operate normally", t => {
+test("whenWithTimeout should operate normally", done => {
     var a = mobx.observable(1)
 
-    utils.whenWithTimeout(() => a.get() === 2, () => t.end(), 500, () => t.fail())
+    utils.whenWithTimeout(() => a.get() === 2, () => done(), 500, () => done.fail())
 
     setTimeout(mobx.action(() => a.set(2)), 200)
 })
 
-test("whenWithTimeout should timeout", t => {
+test("whenWithTimeout should timeout", done => {
     const a = mobx.observable(1)
 
-    utils.whenWithTimeout(() => a.get() === 2, () => t.fail("should have timed out"), 500, () =>
-        t.end()
+    utils.whenWithTimeout(() => a.get() === 2, () => done.fail("should have timed out"), 500, () =>
+        done()
     )
 
     setTimeout(mobx.action(() => a.set(2)), 1000)
 })
 
-test("whenWithTimeout should dispose", t => {
+test("whenWithTimeout should dispose", done => {
     const a = mobx.observable(1)
 
     const d1 = utils.whenWithTimeout(
         () => a.get() === 2,
-        () => t.fail("1 should not finsih"),
+        () => done.fail("1 should not finsih"),
         100,
-        () => t.fail("1 should not timeout")
+        () => done.fail("1 should not timeout")
     )
 
     const d2 = utils.whenWithTimeout(
         () => a.get() === 2,
-        () => t.fail("2 should not finsih"),
+        () => done.fail("2 should not finsih"),
         200,
-        () => t.fail("2 should not timeout")
+        () => done.fail("2 should not timeout")
     )
 
     d1()
@@ -47,7 +46,7 @@ test("whenWithTimeout should dispose", t => {
     setTimeout(
         mobx.action(() => {
             a.set(2)
-            t.end()
+            done()
         }),
         150
     )

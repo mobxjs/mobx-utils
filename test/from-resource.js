@@ -2,11 +2,10 @@
 
 const utils = require("../")
 const mobx = require("mobx")
-const test = require("tape")
 
 mobx.useStrict(true)
 
-test("test from-resource", t => {
+test("test from-resource", done => {
     function Record(name) {
         this.data = { name: name }
         this.subscriptions = []
@@ -37,14 +36,14 @@ test("test from-resource", t => {
         )
     }
 
-    test("basics", t => {
+    test("basics", () => {
         let base = console.warn // eslint-disable-line no-console
         let warn = []
         console.warn = msg => warn.push(msg) // eslint-disable-line no-console
 
         var me = new Record("michel")
         var me$ = createObservable(me)
-        t.equal(me.subscriptions.length, 0)
+        expect(me.subscriptions.length).toBe(0)
 
         var currentName
         var calcs = 0
@@ -53,24 +52,24 @@ test("test from-resource", t => {
             currentName = me$.current().name
         })
 
-        t.equal(me.subscriptions.length, 1)
-        t.equal(currentName, "michel")
+        expect(me.subscriptions.length).toBe(1)
+        expect(currentName).toBe("michel")
         me.updateName("veria")
-        t.equal(currentName, "veria")
+        expect(currentName).toBe("veria")
         me.updateName("elise")
-        t.equal(currentName, "elise")
-        t.equal(calcs, 3)
+        expect(currentName).toBe("elise")
+        expect(calcs).toBe(3)
 
         disposer()
-        t.equal(me.subscriptions.length, 0)
+        expect(me.subscriptions.length).toBe(0)
 
         me.updateName("noa")
-        t.equal(currentName, "elise")
-        t.equal(calcs, 3)
+        expect(currentName).toBe("elise")
+        expect(calcs).toBe(3)
 
         // test warning
-        t.equal(me$.current().name, "noa") // happens to be visible through the data reference, but no autorun tragger
-        t.deepEqual(warn, [
+        expect(me$.current().name).toBe("noa") // happens to be visible through the data reference, but no autorun tragger
+        expect(warn).toEqual([
             "Called `get` of an subscribingObservable outside a reaction. Current value will be returned but no new subscription has started"
         ])
 
@@ -80,45 +79,42 @@ test("test from-resource", t => {
             currentName = me$.current().name
         })
 
-        t.equal(currentName, "noa")
-        t.equal(calcs, 4)
+        expect(currentName).toBe("noa")
+        expect(calcs).toBe(4)
 
         setTimeout(() => {
-            t.equal(me.subscriptions.length, 1)
+            expect(me.subscriptions.length).toBe(1)
             me.updateName("jan")
-            t.equal(calcs, 5)
+            expect(calcs).toBe(5)
 
             me$.dispose()
-            t.equal(me.subscriptions.length, 0)
-            t.throws(() => me$.current())
+            expect(me.subscriptions.length).toBe(0)
+            expect(() => me$.current()).toThrow()
 
             me.updateName("john")
-            t.equal(calcs, 5)
-            t.equal(currentName, "jan")
+            expect(calcs).toBe(5)
+            expect(currentName).toBe("jan")
 
             disposer() // autorun
 
-            t.equal(warn.length, 1)
+            expect(warn.length).toBe(1)
             console.warn = base // eslint-disable-line no-console
-            t.end()
+            done()
         }, 100)
     })
 
-    test("from computed, #32", t => {
+    test("from computed, #32", () => {
         var you = new Record("You")
         var you$ = createObservable(you)
 
         var computedName = mobx.computed(() => you$.current().name.toUpperCase())
         var name
         var d = mobx.autorun(() => (name = computedName.get()))
-        t.equal(name, "YOU")
+        expect(name).toBe("YOU")
         you.updateName("Me")
-        t.equal(name, "ME")
+        expect(name).toBe("ME")
         d()
         you.updateName("Hi")
-        t.equal(name, "ME")
-        t.end()
+        expect(name).toBe("ME")
     })
-
-    t.end()
 })

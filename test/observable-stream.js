@@ -2,45 +2,42 @@
 
 const utils = require("../")
 const mobx = require("mobx")
-const test = require("tape")
 const Rx = require("rxjs")
 
-test("to observable - should push the initial value by default", t => {
+test("to observable - should push the initial value by default", () => {
   const user = mobx.observable({
     firstName: "C.S",
     lastName: "Lewis"
   })
 
-    mobx.useStrict(false)
+  mobx.useStrict(false)
 
-    let values = []
+  let values = []
 
-    const sub = Rx.Observable
-        .from(utils.toStream(() => user.firstName + user.lastName, true))
-        .map(x => x.toUpperCase())
-        .subscribe(v => values.push(v))
+  const sub = Rx.Observable
+      .from(utils.toStream(() => user.firstName + user.lastName, true))
+      .map(x => x.toUpperCase())
+      .subscribe(v => values.push(v))
 
-    user.firstName = "John"
+  user.firstName = "John"
 
-    mobx.runInAction(() => {
-        user.firstName = "Jane"
-        user.lastName = "Jack"
-    })
+  mobx.runInAction(() => {
+      user.firstName = "Jane"
+      user.lastName = "Jack"
+  })
 
-    sub.unsubscribe()
+  sub.unsubscribe()
 
-    user.firstName = "error"
+  user.firstName = "error"
 
-  t.deepEqual(values, [
+  expect(values).toEqual([
     "C.SLEWIS",
     "JOHNLEWIS",
     "JANEJACK"
   ]);
-
-  t.end();
 })
 
-test("to observable - should not push the initial value", t => {
+test("to observable - should not push the initial value", () => {
   const user = mobx.observable({
     firstName: "C.S",
     lastName: "Lewis"
@@ -66,15 +63,13 @@ test("to observable - should not push the initial value", t => {
 
   user.firstName = "error";
 
-  t.deepEqual(values, [
+  expect(values).toEqual([
     "JOHNLEWIS",
     "JANEJACK"
   ]);
-
-    t.end()
 })
 
-test("from observable", t => {
+test("from observable", done => {
     mobx.useStrict(true)
     const fromStream = utils.fromStream(Rx.Observable.interval(100), -1)
     const values = []
@@ -83,20 +78,20 @@ test("from observable", t => {
     })
 
     setTimeout(() => {
-        t.equal(fromStream.current, -1)
+        expect(fromStream.current).toBe(-1)
     }, 50)
     setTimeout(() => {
-        t.equal(fromStream.current, 0)
+        expect(fromStream.current).toBe(0)
     }, 150)
     setTimeout(() => {
-        t.equal(fromStream.current, 1)
+        expect(fromStream.current).toBe(1)
         fromStream.dispose()
     }, 250)
     setTimeout(() => {
-        t.equal(fromStream.current, 1)
-        t.deepEqual(values, [-1, 0, 1])
+        expect(fromStream.current).toBe(1)
+        expect(values).toEqual([-1, 0, 1])
         d()
         mobx.useStrict(false)
-        t.end()
+        done()
     }, 350)
 })

@@ -2,11 +2,10 @@
 
 const utils = require("../")
 const mobx = require("mobx")
-const test = require("tape")
 
 mobx.useStrict(true)
 
-test("lazy observable should work", t => {
+test("lazy observable should work", done => {
     let started = false
     const lo = utils.lazyObservable(sink => {
         started = true
@@ -16,25 +15,25 @@ test("lazy observable should work", t => {
     }, 3)
 
     const values = []
-    t.equal(started, false)
+    expect(started).toBe(false)
 
     lo.refresh()
-    t.equal(started, false)
+    expect(started).toBe(false)
 
     mobx.autorun(() => values.push(lo.current()))
 
-    t.equal(started, true)
-    t.deepEqual(values, [3])
-    t.equal(lo.current(), 3)
+    expect(started).toBe(true)
+    expect(values).toEqual([3])
+    expect(lo.current()).toBe(3)
 
     setTimeout(() => {
-        t.equal(lo.current(), 6)
-        t.deepEqual(values, [3, 4, 5, 6])
-        t.end()
+        expect(lo.current()).toBe(6)
+        expect(values).toEqual([3, 4, 5, 6])
+        done()
     }, 200)
 })
 
-test("lazy observable refresh", t => {
+test("lazy observable refresh", done => {
     let started = 0
     let i = 10
 
@@ -53,21 +52,21 @@ test("lazy observable refresh", t => {
     let values = []
     mobx.autorun(() => values.push(lo.current()))
 
-    t.equal(started, 1)
-    t.deepEqual(values, [1])
-    t.equal(lo.current(), 1)
+    expect(started).toBe(1)
+    expect(values).toEqual([1])
+    expect(lo.current()).toBe(1)
 
     setTimeout(() => lo.refresh(), 50)
 
     setTimeout(() => {
-        t.equal(started, 2)
-        t.equal(lo.current(), 11)
-        t.deepEqual(values, [1, 10, 11])
-        t.end()
+        expect(started).toBe(2)
+        expect(lo.current()).toBe(11)
+        expect(values).toEqual([1, 10, 11])
+        done()
     }, 200)
 })
 
-test("lazy observable reset", t => {
+test("lazy observable reset", done => {
     const lo = utils.lazyObservable(
         sink =>
             new Promise(resolve => {
@@ -81,13 +80,13 @@ test("lazy observable reset", t => {
     lo.current()
 
     setTimeout(() => {
-        t.equal(lo.current(), 2)
+        expect(lo.current()).toBe(2)
     }, 50)
 
     setTimeout(() => lo.reset(), 150)
 
     setTimeout(() => {
-        t.equal(lo.current(), 1)
-        t.end()
+        expect(lo.current()).toBe(1)
+        done()
     }, 200)
 })
