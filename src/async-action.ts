@@ -196,13 +196,92 @@ export function asyncAction(arg1: any, arg2?: any): any {
     return createAsyncActionGenerator(name, generator)
 }
 
-let generatorId = 0
+export function asyncActionWithCancel(
+    callback: Function,
+    type?: string
+): Function
 
-export function createAsyncActionGenerator(name: string, generator: Function) {
+export function asyncActionWithCancel(callback: Function, type: string): any {
+    return function wrapActionWithCancel(arg1: any, arg2?: any) {
+        // decorator
+        if (typeof arguments[1] === "string") {
+            const name = arguments[1]
+            const descriptor: PropertyDescriptor = arguments[2]
+            if (descriptor && descriptor.value) {
+                return Object.assign({}, descriptor, {
+                    value: createAsyncActionGenerator(name, descriptor.value, callback, type)
+                })
+            } else {
+                return Object.assign({}, descriptor, {
+                    set(v: any) {
+                        Object.defineProperty(this, name, {
+                            ...descriptor,
+                            value: asyncAction(name, v)
+                        })
+                    }
+                })
+            }
+        }
+
+        // direct invocation
+        const generator = typeof arg1 === "string" ? arg2 : arg1
+        const name = typeof arg1 === "string" ? arg1 : generator.name || "<unnamed async action>"
+
+        invariant(
+            typeof generator === "function",
+            "asyncAction expects function as first arg, got: " + generator
+        )
+
+        return createAsyncActionGenerator(name, generator, callback, type)
+    }
+}
+
+let generatorId = 0
+const TAKE_LATEST = 'takeLatest'
+const TAKE_EVERY = 'takeEvery'
+const globalActionsWithCancel:{[key: string]: Array<Function>} = {}
+
+function addAction(name: string) {
+    if (!globalActionsWithCancel[name]) {
+        globalActionsWithCancel[name] = []
+    }
+}
+
+function wrappCanceler(name: string, canceler: Function, type: string):Function {
+    if (type == TAKE_LATEST) {
+        globalActionsWithCancel[name].map(fn => fn())
+        globalActionsWithCancel[name] = []
+    }
+
+    globalActionsWithCancel[name].push(canceler)
+
+    function cancelWithType() {
+        if (type == TAKE_LATEST) {
+            canceler()
+        } else {
+            globalActionsWithCancel[name].map(fn => fn())
+            globalActionsWithCancel[name] = []
+        }
+    }  
+    return cancelWithType 
+}
+
+export function createAsyncActionGenerator(name: string, generator: Function, callback?: Function, type?: string) {
+    callback && addAction(name)
     // Implementation based on https://github.com/tj/co/blob/master/index.js
-    return function() {
+    return function wrapperGen() {
         const ctx = this
         const args = arguments
+
+        const state = {
+            isCancel: false
+        }
+        function cancelCurrent() {
+            state.isCancel = true
+        }
+
+        callback && callback(wrappCanceler(name, cancelCurrent, type))
+
         return new Promise(function(resolve, reject) {
             const runId = ++generatorId
             let stepId = 0
@@ -211,6 +290,16 @@ export function createAsyncActionGenerator(name: string, generator: Function) {
 
             function onFulfilled(res: any) {
                 let ret
+                if (state.isCancel) {
+                    action(`${name} - runid: ${runId} - yield ${stepId++} onFulfilled cancel`, () => {}).call(
+                        gen,
+                        res
+                    )
+                    gen.return('cancel')
+                    ret = gen.next()
+                    next(ret)
+                    return null
+                }
                 try {
                     ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.next).call(
                         gen,
@@ -225,6 +314,16 @@ export function createAsyncActionGenerator(name: string, generator: Function) {
 
             function onRejected(err: any) {
                 let ret
+                if (state.isCancel) {
+                    action(`${name} - runid: ${runId} - yield ${stepId++} REJECT cancel`, () => {}).call(
+                        gen,
+                        err
+                    )
+                    gen.return('cancel')
+                    ret = gen.next()
+                    next(ret)
+                    return null
+                }
                 try {
                     ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.throw).call(
                         gen,
@@ -237,7 +336,10 @@ export function createAsyncActionGenerator(name: string, generator: Function) {
             }
 
             function next(ret: any) {
-                if (ret.done) return resolve(ret.value)
+                if (ret.done) {
+                    state.isCancel = false
+                    return resolve(ret.value)
+                }
                 // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
                 invariant(
                     ret.value && typeof ret.value.then === "function",
