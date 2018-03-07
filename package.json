@@ -1,6 +1,6 @@
 {
   "name": "mobx-utils",
-  "version": "3.2.2",
+  "version": "4.0.0-beta.2",
   "description": "Utility functions and common patterns for MobX",
   "main": "mobx-utils.umd.js",
   "module": "mobx-utils.module.js",
@@ -55,7 +55,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "mobx": "^4.0.0"
+    "mobx": "4.0.0-beta.2"
   },
   "keywords": [
     "mobx",
