@@ -1,4 +1,4 @@
-import { Atom, extras } from "mobx"
+import { createAtom, _allowStateChanges } from "mobx"
 import { NOOP, IDisposer, invariant } from "./utils"
 
 export interface IResource<T> {
@@ -87,13 +87,13 @@ export function fromResource<T>(
         }
     }
 
-    const atom = new Atom(
+    const atom = createAtom(
         "ResourceBasedObservable",
         () => {
             invariant(!isActive && !isDisposed)
             isActive = true
             subscriber((newValue: T) => {
-                extras.allowStateChanges(true, () => {
+                _allowStateChanges(true, () => {
                     value = newValue
                     atom.reportChanged()
                 })

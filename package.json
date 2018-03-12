@@ -1,6 +1,6 @@
 {
   "name": "mobx-utils",
-  "version": "3.2.2",
+  "version": "4.0.0",
   "description": "Utility functions and common patterns for MobX",
   "main": "mobx-utils.umd.js",
   "module": "mobx-utils.module.js",
@@ -43,7 +43,8 @@
     "faucet": "0.0.1",
     "jest": "^22.4.2",
     "lint-staged": "^4.2.3",
-    "mobx": "^3.0.0",
+    "lodash.intersection": "^4.4.0",
+    "mobx": "^4.0.0",
     "prettier": "^1.7.2",
     "rollup": "^0.50.0",
     "rxjs": "^5.0.2",
@@ -54,7 +55,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "mobx": "^3.0.0"
+    "mobx": "4.0.0"
   },
   "keywords": [
     "mobx",

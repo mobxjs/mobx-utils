@@ -3,10 +3,10 @@
 const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
 
-mobx.useStrict(true)
+mobx.configure({ enforceActions: true })
 
 test("whenWithTimeout should operate normally", done => {
-    var a = mobx.observable(1)
+    var a = mobx.observable.box(1)
 
     utils.whenWithTimeout(() => a.get() === 2, () => done(), 500, () => done.fail())
 
@@ -14,7 +14,7 @@ test("whenWithTimeout should operate normally", done => {
 })
 
 test("whenWithTimeout should timeout", done => {
-    const a = mobx.observable(1)
+    const a = mobx.observable.box(1)
 
     utils.whenWithTimeout(() => a.get() === 2, () => done.fail("should have timed out"), 500, () =>
         done()
@@ -24,7 +24,7 @@ test("whenWithTimeout should timeout", done => {
 })
 
 test("whenWithTimeout should dispose", done => {
-    const a = mobx.observable(1)
+    const a = mobx.observable.box(1)
 
     const d1 = utils.whenWithTimeout(
         () => a.get() === 2,

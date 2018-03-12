@@ -1,5 +1,5 @@
-import { IObservableValue, extendShallowObservable, action } from "mobx"
-import { IDENTITY, deprecated, invariant } from "./utils"
+import { IObservableValue, action, extendObservable } from "mobx"
+import { IDENTITY, invariant } from "./utils"
 
 export type PromiseState = "pending" | "fulfilled" | "rejected"
 
@@ -60,37 +60,29 @@ function createObservablePromise(origPromise: any) {
         origPromise = new Promise(origPromise as any)
     }
 
-    const promise = new Promise((resolve, reject) => {
-        origPromise.then(
-            action("observableFromPromise-resolve", (value: any) => {
-                promise.value = value
-                promise.state = FULFILLED
-                resolve(value)
-            }),
-            action("observableFromPromise-reject", (reason: any) => {
-                promise.value = reason
-                promise.state = REJECTED
-                reject(reason)
-            })
-        )
-    }) as any
+    const promise = origPromise as any
+    origPromise.then(
+        action("observableFromPromise-resolve", (value: any) => {
+            promise.value = value
+            promise.state = FULFILLED
+        }),
+        action("observableFromPromise-reject", (reason: any) => {
+            promise.value = reason
+            promise.state = REJECTED
+        })
+    )
 
     promise.isPromiseBasedObservable = true
     promise.case = caseImpl
-    extendShallowObservable(promise, {
-        value: undefined,
-        state: PENDING
-    })
-
-    // TODO: remove in next major
-    Object.defineProperty(promise, "promise", {
-        get() {
-            deprecated(
-                "fromPromise().promise is deprecated. fromPromise now directly returns a promise"
-            )
-            return origPromise
-        }
-    })
+    extendObservable(
+        promise,
+        {
+            value: undefined,
+            state: PENDING
+        },
+        {},
+        { deep: false }
+    )
 
     return promise
 }
@@ -100,13 +92,13 @@ function createObservablePromise(origPromise: any) {
  * the status of the promise. The returned object has the following observable properties:
  *  - `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference.
  *  - `state`: one of `"pending"`, `"fulfilled"` or `"rejected"`
- * 
+ *
  * And the following methods:
  * - `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
  * - `then((value: TValue) => TResult1 | PromiseLike<TResult1>, [(rejectReason: any) => any])`: chains additional handlers to the provided promise.
  *
  * The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`. You may also use it with `await` in `async` functions.
- * 
+ *
  * Note that the status strings are available as constants:
  * `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
  *
@@ -145,9 +137,9 @@ function createObservablePromise(origPromise: any) {
  *     rejected:  error => <div>Ooops.. {error}</div>,
  *     fulfilled: value => <div>Gotcha: {value}</div>,
  *   }))
- * 
+ *
  * // chain additional handler(s) to the resolve/reject:
- * 
+ *
  * fetchResult.then(
  *   (result) =>  doSomeTransformation(result),
  *   (rejectReason) => console.error('fetchResult was rejected, reason: ' + rejectReason)

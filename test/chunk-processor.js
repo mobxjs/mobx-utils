@@ -3,7 +3,7 @@
 const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
 
-mobx.useStrict(true)
+mobx.configure({ enforceActions: true })
 
 test("sync processor should work with max", () => {
     const q = mobx.observable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])

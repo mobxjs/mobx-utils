@@ -3,7 +3,7 @@
 const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
 
-mobx.useStrict(true)
+mobx.configure({ enforceActions: true })
 
 test("sync processor should work", () => {
     const q = mobx.observable([1, 2])

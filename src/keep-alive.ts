@@ -1,4 +1,4 @@
-import { extras, IComputedValue } from "mobx"
+import { IComputedValue, getAtom } from "mobx"
 import { IDisposer } from "./utils"
 
 export function keepAlive(target: Object, property: string): IDisposer
@@ -32,7 +32,7 @@ export function keepAlive(computedValue: IComputedValue<any>): IDisposer
  * @returns {IDisposer} stops this keep alive so that the computed value goes back to normal behavior
  */
 export function keepAlive(_1: any, _2?: string) {
-    const computed = (extras.getAtom(_1, _2) as any) as IComputedValue<any>
+    const computed = (getAtom(_1, _2) as any) as IComputedValue<any>
     if (!computed)
         throw new Error(
             "No computed provided, please provide an object created with `computed(() => expr)` or an object + property name"

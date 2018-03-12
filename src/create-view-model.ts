@@ -5,7 +5,8 @@ import {
     isObservableObject,
     isObservableArray,
     isObservableMap,
-    computed
+    computed,
+    keys
 } from "mobx"
 import { invariant } from "./utils"
 
@@ -20,7 +21,7 @@ export interface IViewModel<T> {
 const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty"]
 
 class ViewModel<T> implements IViewModel<T> {
-    localValues: ObservableMap<any> = observable.map({})
+    localValues: ObservableMap<any, any> = observable.map({})
 
     @computed
     get isDirty() {
@@ -56,7 +57,7 @@ class ViewModel<T> implements IViewModel<T> {
 
     @action.bound
     submit() {
-        this.localValues.keys().forEach(key => {
+        keys(this.localValues).forEach((key: string) => {
             const source = this.localValues.get(key)
             const destination = (this.model as any)[key]
             if (isObservableArray(destination)) {

@@ -1,7 +1,5 @@
-import { runInAction, action } from "mobx"
-import { invariant } from "./utils"
-
-// TODO: move async-action to mobx-core?
+import { flow } from "mobx"
+import { deprecated } from "./utils"
 
 // method decorator:
 export function asyncAction(
@@ -100,6 +98,10 @@ export function asyncAction<A1>(
 ): (a1: A1) => Promise<any>
 
 /**
+ * _deprecated_ this functionality can now be found as `flow` in the mobx package. However, `flow` is not applicable as decorator, where `asyncAction` still is.
+ *
+ *
+ *
  * `asyncAction` takes a generator function and automatically wraps all parts of the process in actions. See the examples below.
  * `asyncAction` can be used both as decorator or to wrap functions.
  *
@@ -120,6 +122,7 @@ export function asyncAction<A1>(
  *
  *  N.B. due to a [babel limitation](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy/issues/26), in Babel generatos cannot be combined with decorators. See also [#70](https://github.com/mobxjs/mobx-utils/issues/70)
  *
+ *
  * @example
  * import {asyncAction} from "mobx-utils"
  *
@@ -139,7 +142,7 @@ export function asyncAction<A1>(
  * @example
  * import {asyncAction} from "mobx-utils"
  *
- * mobx.useStrict(true) // don't allow state modifications outside actions
+ * mobx.configure({ enforceActions: true }) // don't allow state modifications outside actions
  *
  * class Store {
  * 	\@observable githubProjects = []
@@ -164,6 +167,7 @@ export function asyncAction<A1>(
  * @export
  * @returns {Promise}
  */
+
 export function asyncAction(arg1: any, arg2?: any): any {
     // decorator
     if (typeof arguments[1] === "string") {
@@ -171,14 +175,14 @@ export function asyncAction(arg1: any, arg2?: any): any {
         const descriptor: PropertyDescriptor = arguments[2]
         if (descriptor && descriptor.value) {
             return Object.assign({}, descriptor, {
-                value: createAsyncActionGenerator(name, descriptor.value)
+                value: flow(descriptor.value)
             })
         } else {
             return Object.assign({}, descriptor, {
                 set(v: any) {
                     Object.defineProperty(this, name, {
                         ...descriptor,
-                        value: asyncAction(name, v)
+                        value: flow(v)
                     })
                 }
             })
@@ -188,63 +192,7 @@ export function asyncAction(arg1: any, arg2?: any): any {
     // direct invocation
     const generator = typeof arg1 === "string" ? arg2 : arg1
     const name = typeof arg1 === "string" ? arg1 : generator.name || "<unnamed async action>"
-
-    invariant(
-        typeof generator === "function",
-        "asyncAction expects function as first arg, got: " + generator
-    )
-    return createAsyncActionGenerator(name, generator)
+    deprecated("asyncAction is deprecated. use mobx.flow instead")
+    return flow(generator) // name get's dropped..
 }
 
-let generatorId = 0
-
-export function createAsyncActionGenerator(name: string, generator: Function) {
-    // Implementation based on https://github.com/tj/co/blob/master/index.js
-    return function() {
-        const ctx = this
-        const args = arguments
-        return new Promise(function(resolve, reject) {
-            const runId = ++generatorId
-            let stepId = 0
-            const gen = action(`${name} - runid: ${runId} - init`, generator).apply(ctx, args)
-            onFulfilled(undefined) // kick off the process
-
-            function onFulfilled(res: any) {
-                let ret
-                try {
-                    ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.next).call(
-                        gen,
-                        res
-                    )
-                } catch (e) {
-                    return reject(e)
-                }
-                next(ret)
-                return null
-            }
-
-            function onRejected(err: any) {
-                let ret
-                try {
-                    ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.throw).call(
-                        gen,
-                        err
-                    )
-                } catch (e) {
-                    return reject(e)
-                }
-                next(ret)
-            }
-
-            function next(ret: any) {
-                if (ret.done) return resolve(ret.value)
-                // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
-                invariant(
-                    ret.value && typeof ret.value.then === "function",
-                    "Only promises can be yielded to asyncAction, got: " + ret
-                )
-                return ret.value.then(onFulfilled, onRejected)
-            }
-        })
-    }
-}

@@ -1,5 +1,5 @@
 import { IDENTITY } from "./utils"
-import { observable, extras, action } from "mobx"
+import { observable, action, _allowStateChanges } from "mobx"
 
 export interface ILazyObservable<T> {
     current(): T
@@ -43,16 +43,15 @@ export interface ILazyObservable<T> {
 
 export function lazyObservable<T>(
     fetch: (sink: (newValue: T) => void) => void,
-    initialValue: T = undefined,
-    modifier = IDENTITY
+    initialValue: T = undefined
 ): ILazyObservable<T> {
     let started = false
-    const value = observable.shallowBox(modifier(initialValue))
+    const value = observable.box(initialValue, { deep: false })
     let currentFnc = () => {
         if (!started) {
             started = true
             fetch((newValue: T) => {
-                extras.allowStateChanges(true, () => {
+                _allowStateChanges(true, () => {
                     value.set(newValue)
                 })
             })

@@ -5,72 +5,65 @@ const mobx = require("mobx")
 const Rx = require("rxjs")
 
 test("to observable - should push the initial value by default", () => {
-  const user = mobx.observable({
-    firstName: "C.S",
-    lastName: "Lewis"
-  })
+    const user = mobx.observable({
+        firstName: "C.S",
+        lastName: "Lewis"
+    })
 
-  mobx.useStrict(false)
+    mobx.configure({ enforceActions: false })
 
-  let values = []
+    let values = []
 
-  const sub = Rx.Observable
-      .from(utils.toStream(() => user.firstName + user.lastName, true))
-      .map(x => x.toUpperCase())
-      .subscribe(v => values.push(v))
+    const sub = Rx.Observable
+        .from(utils.toStream(() => user.firstName + user.lastName, true))
+        .map(x => x.toUpperCase())
+        .subscribe(v => values.push(v))
 
-  user.firstName = "John"
+    user.firstName = "John"
 
-  mobx.runInAction(() => {
-      user.firstName = "Jane"
-      user.lastName = "Jack"
-  })
+    mobx.runInAction(() => {
+        user.firstName = "Jane"
+        user.lastName = "Jack"
+    })
 
-  sub.unsubscribe()
+    sub.unsubscribe()
 
-  user.firstName = "error"
+    user.firstName = "error"
 
-  expect(values).toEqual([
-    "C.SLEWIS",
-    "JOHNLEWIS",
-    "JANEJACK"
-  ]);
+    expect(values).toEqual(["C.SLEWIS", "JOHNLEWIS", "JANEJACK"])
 })
 
 test("to observable - should not push the initial value", () => {
-  const user = mobx.observable({
-    firstName: "C.S",
-    lastName: "Lewis"
-  })
+    const user = mobx.observable({
+        firstName: "C.S",
+        lastName: "Lewis"
+    })
 
-  mobx.useStrict(false);
+    mobx.configure({ enforceActions: false })
 
-  let values = []
+    let values = []
 
-  const sub = Rx.Observable
-    .from(utils.toStream(() => user.firstName + user.lastName))
-    .map(x => x.toUpperCase())
-    .subscribe(v => values.push(v))
+    const sub = Rx.Observable
+        .from(utils.toStream(() => user.firstName + user.lastName))
+        .map(x => x.toUpperCase())
+        .subscribe(v => values.push(v))
 
-  user.firstName = "John"
+    user.firstName = "John"
 
-  mobx.runInAction(() => {
-    user.firstName = "Jane";
-    user.lastName = "Jack";
-  })
+    mobx.runInAction(() => {
+        user.firstName = "Jane"
+        user.lastName = "Jack"
+    })
 
-  sub.unsubscribe();
+    sub.unsubscribe()
 
-  user.firstName = "error";
+    user.firstName = "error"
 
-  expect(values).toEqual([
-    "JOHNLEWIS",
-    "JANEJACK"
-  ]);
+    expect(values).toEqual(["JOHNLEWIS", "JANEJACK"])
 })
 
-test("from observable", done => {
-    mobx.useStrict(true)
+test.only("from observable", done => {
+    mobx.configure({ enforceActions: true })
     const fromStream = utils.fromStream(Rx.Observable.interval(100), -1)
     const values = []
     const d = mobx.autorun(() => {
@@ -91,7 +84,7 @@ test("from observable", done => {
         expect(fromStream.current).toBe(1)
         expect(values).toEqual([-1, 0, 1])
         d()
-        mobx.useStrict(false)
+        mobx.configure({ enforceActions: false })
         done()
     }, 350)
 })

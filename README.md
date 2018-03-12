@@ -119,7 +119,6 @@ so make sure that you don't dereference to early.
 
 -   `fetch`  
 -   `initialValue` **T** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
--   `modifier`  
 
 **Examples**
 
@@ -522,7 +521,7 @@ fetchUsers("http://users.com").then(time => {
 ```javascript
 import {asyncAction} from "mobx-utils"
 
-mobx.useStrict(true) // don't allow state modifications outside actions
+mobx.configure({ enforceActions: true }) // don't allow state modifications outside actions
 
 class Store {
 	\@observable githubProjects = []
@@ -563,3 +562,37 @@ await whenAsync(() => !state.someBoolean)
 ```
 
 Returns **any** Promise for when an observable eventually matches some condition. Rejects if timeout is provided and has expired
+
+## expr
+
+expr can be used to create temporarily views inside views.
+This can be improved to improve performance if a value changes often, but usually doesn't affect the outcome of an expression.
+
+In the following example the expression prevents that a component is rerender _each time_ the selection changes;
+instead it will only rerenders when the current todo is (de)selected.
+
+**Parameters**
+
+-   `expr`  
+
+**Examples**
+
+```javascript
+const Todo = observer((props) => {
+    const todo = props.todo;
+    const isSelected = mobxUtils.expr(() => props.viewState.selection === todo);
+    return <div className={isSelected ? "todo todo-selected" : "todo"}>{todo.title}</div>
+});
+```
+
+## createTransformer
+
+Creates a function that maps an object to a view.
+The mapping is memoized.
+
+See: <https://mobx.js.org/refguide/create-transformer.html>
+
+**Parameters**
+
+-   `transformer`  
+-   `onCleanup`  
