@@ -77,9 +77,9 @@ const myComponent = observer(({ fetchResult }) => {
 
 const myComponent = observer(({ fetchResult }) =>
   fetchResult.case({
-    pending:   () => <div>Loading...</div>
-    rejected:  error => <div>Ooops.. {error}</div>
-    fulfilled: value => <div>Gotcha: {value}</div>
+    pending:   () => <div>Loading...</div>,
+    rejected:  error => <div>Ooops.. {error}</div>,
+    fulfilled: value => <div>Gotcha: {value}</div>,
   }))
 
 // chain additional handler(s) to the resolve/reject:
@@ -472,6 +472,8 @@ autorun(() => {
 ```
 
 ## asyncAction
+
+_deprecated_ this functionality can now be found as `flow` in the mobx package. However, `flow` is not applicable as decorator, where `asyncAction` still is.
 
 `asyncAction` takes a generator function and automatically wraps all parts of the process in actions. See the examples below.
 `asyncAction` can be used both as decorator or to wrap functions.
