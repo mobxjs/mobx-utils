@@ -98,6 +98,10 @@ export function asyncAction<A1>(
 ): (a1: A1) => Promise<any>
 
 /**
+ * _deprecated_ this functionality can now be found as `flow` in the mobx package. However, `flow` is not applicable as decorator, where `asyncAction` still is.
+ *
+ *
+ *
  * `asyncAction` takes a generator function and automatically wraps all parts of the process in actions. See the examples below.
  * `asyncAction` can be used both as decorator or to wrap functions.
  *
@@ -117,6 +121,7 @@ export function asyncAction<A1>(
  * `asyncActions` requires `Promise` and `generators` to be available on the target environment. Polyfill `Promise` if needed. Both TypeScript and Babel can compile generator functions down to ES5.
  *
  *  N.B. due to a [babel limitation](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy/issues/26), in Babel generatos cannot be combined with decorators. See also [#70](https://github.com/mobxjs/mobx-utils/issues/70)
+ *
  *
  * @example
  * import {asyncAction} from "mobx-utils"
@@ -162,7 +167,32 @@ export function asyncAction<A1>(
  * @export
  * @returns {Promise}
  */
+
 export function asyncAction(arg1: any, arg2?: any): any {
+    // decorator
+    if (typeof arguments[1] === "string") {
+        const name = arguments[1]
+        const descriptor: PropertyDescriptor = arguments[2]
+        if (descriptor && descriptor.value) {
+            return Object.assign({}, descriptor, {
+                value: flow(descriptor.value)
+            })
+        } else {
+            return Object.assign({}, descriptor, {
+                set(v: any) {
+                    Object.defineProperty(this, name, {
+                        ...descriptor,
+                        value: flow(v)
+                    })
+                }
+            })
+        }
+    }
+
+    // direct invocation
+    const generator = typeof arg1 === "string" ? arg2 : arg1
+    const name = typeof arg1 === "string" ? arg1 : generator.name || "<unnamed async action>"
     deprecated("asyncAction is deprecated. use mobx.flow instead")
-    return flow.apply(null, arguments)
+    return flow(generator) // name get's dropped..
 }
+

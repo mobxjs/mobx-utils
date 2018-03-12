@@ -134,7 +134,7 @@ test("it should support logging", done => {
     const events: any[] = []
     const x = mobx.observable({ a: 1 })
 
-    const f = utils.asyncAction("myaction", function*(initial: number) {
+    const f = utils.asyncAction(function *myaction(initial: number) {
         x.a = initial
         x.a = yield delay(100, 5)
         x.a = 4
