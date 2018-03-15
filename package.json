@@ -55,7 +55,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "mobx": "4.0.0"
+    "mobx": "^4.0.0"
   },
   "keywords": [
     "mobx",
