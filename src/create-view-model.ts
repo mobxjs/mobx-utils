@@ -16,9 +16,10 @@ export interface IViewModel<T> {
     submit(): void
     isDirty: boolean
     isPropertyDirty(key: string): boolean
+    resetProperty(key: string): void
 }
 
-const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty"]
+const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty", "resetProperty"]
 
 class ViewModel<T> implements IViewModel<T> {
     localValues: ObservableMap<any, any> = observable.map({})
