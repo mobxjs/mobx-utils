@@ -1,4 +1,5 @@
 export * from "./from-promise"
+export * from "./array"
 export * from "./lazy-observable"
 export * from "./from-resource"
 export * from "./observable-stream"

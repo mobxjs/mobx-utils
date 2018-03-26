@@ -104,6 +104,26 @@ Returns true if the provided value is a promise-based observable.
 
 Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
 
+## moveItem
+
+Moves an item from one position to another, checking that the indexes given are within bounds.
+
+**Parameters**
+
+-   `target` **ObservableArray&lt;T>** 
+-   `fromIndex` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
+-   `toIndex` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
+
+**Examples**
+
+```javascript
+const source = observable([1, 2, 3])
+moveItem(source, 0, 1)
+console.log(source.map(x => x)) // [2, 1, 3]
+```
+
+Returns **ObservableArray&lt;T>** 
+
 ## lazyObservable
 
 `lazyObservable` creates an observable around a `fetch` method that will not be invoked
