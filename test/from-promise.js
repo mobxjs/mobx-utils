@@ -279,3 +279,9 @@ test("it can construct new promises from function, #45", () => {
         expect(x).toEqual([2, 3])
     })
 })
+
+test("it can construct a fromPromise from a fromPromise, #119", () => {
+    expect(() => {
+        utils.fromPromise(utils.fromPromise(Promise.resolve(3)))
+    }).not.toThrow()
+})

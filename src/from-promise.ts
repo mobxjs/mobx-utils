@@ -54,6 +54,7 @@ function createObservablePromise(origPromise: any) {
                 typeof origPromise.then === "function"),
         "Please pass a promise or function to fromPromise"
     )
+    if (origPromise.isPromiseBasedObservable === true) return origPromise
 
     if (typeof origPromise === "function") {
         // If it is a (reject, resolve function, wrap it)
