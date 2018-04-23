@@ -1,6 +1,6 @@
 {
   "name": "mobx-utils",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Utility functions and common patterns for MobX",
   "main": "mobx-utils.umd.js",
   "module": "mobx-utils.module.js",
