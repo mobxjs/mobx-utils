@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`it throws when index is out of bounds 1`] = `"[mobx.array] Index out of bounds: -1 is negative"`;
+
+exports[`it throws when index is out of bounds 2`] = `"[mobx.array] Index out of bounds: 3 is not smaller than 3"`;
