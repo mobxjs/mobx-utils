@@ -1,3 +1,10 @@
+# 3.2.3
+
+* passing a `fromPromise` based promise to `fromPromise` no longer throws an exception. Fixes [#119](https://github.com/mobxjs/mobx-utils/issues/119)
+* added viewModel `resetProperty` to typescript typings, fixes [#117](https://github.com/mobxjs/mobx-utils/issues/117) through [#118](https://github.com/mobxjs/mobx-utils/pull/118) by @navidjh
+* Added `moveItem(array, fromIndex, toIndex)` utility, as replacement for the dropped `ObservableArray.move` in MobX 4. Trough [#121](https://github.com/mobxjs/mobx-utils/pull/121) by @jeffijoe
+* Fixed incorrect peer dependency, [#115](https://github.com/mobxjs/mobx-utils/pull/115) by @xaviergonz
+
 # 3.2.2
 
 * `toStream` now accepts a second argument, `fireImmediately=false`, which, when `true`, immediately pushes the current value to the stream. Fixes [#82](https://github.com/mobxjs/mobx-utils/issues/82)
