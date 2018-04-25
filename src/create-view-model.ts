@@ -5,8 +5,11 @@ import {
     isObservableObject,
     isObservableArray,
     isObservableMap,
+    isComputedProp,
+    isComputed,
     computed,
-    keys
+    keys,
+    _getAdministration
 } from "mobx"
 import { invariant } from "./utils"
 
@@ -23,6 +26,7 @@ const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty"
 
 export class ViewModel<T> implements IViewModel<T> {
     localValues: ObservableMap<any, any> = observable.map({})
+    localComputedValues: ObservableMap<any, any> = observable.map({})
 
     @computed
     get isDirty() {
@@ -31,15 +35,24 @@ export class ViewModel<T> implements IViewModel<T> {
 
     constructor(public model: T) {
         invariant(isObservableObject(model), "createViewModel expects an observable object")
-        Object.keys(model).forEach(key => {
+
+        Object.getOwnPropertyNames(model).forEach(key => {
+            if (key === "$mobx" || key === "__mobxDidRunLazyInitializers") {
+                return
+            }
             invariant(
                 RESERVED_NAMES.indexOf(key) === -1,
                 `The propertyname ${key} is reserved and cannot be used with viewModels`
             )
+            if (isComputedProp(model, key)) {
+                const derivation = _getAdministration(model).values[key].derivation
+                this.localComputedValues.set(key, computed(derivation.bind(this)))
+            }
             Object.defineProperty(this, key, {
                 enumerable: true,
                 configurable: true,
                 get: () => {
+                    if (isComputedProp(model, key)) return this.localComputedValues.get(key).get()
                     if (this.isPropertyDirty(key)) return this.localValues.get(key)
                     else return (this.model as any)[key]
                 },
@@ -66,7 +79,7 @@ export class ViewModel<T> implements IViewModel<T> {
             } else if (isObservableMap(destination)) {
                 destination.clear()
                 destination.merge(source)
-            } else {
+            } else if (!isComputed(source)) {
                 ;(this.model as any)[key] = source
             }
         })
