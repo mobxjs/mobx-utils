@@ -10,7 +10,10 @@ test("create view model", () => {
         mobx.extendObservable(this, {
             title: title,
             done: done,
-            usersInterested: usersInterested
+            usersInterested: usersInterested,
+            get usersCount() {
+                return this.usersInterested.length
+            }
         })
     }
 
@@ -26,7 +29,9 @@ test("create view model", () => {
             ":" +
             model.done +
             ",interested:" +
-            model.usersInterested.slice().toString()
+            model.usersInterested.slice().toString() +
+            ",usersCount:" +
+            model.usersCount
     })
     // view model rendering
     const d2 = mobx.autorun(() => {
@@ -35,42 +40,46 @@ test("create view model", () => {
             ":" +
             viewModel.done +
             ",interested:" +
-            viewModel.usersInterested.slice().toString()
+            viewModel.usersInterested.slice().toString() +
+            ",usersCount:" +
+            viewModel.usersCount
     })
 
-    expect(tr).toBe("coffee:false,interested:Vader,Madonna")
-    expect(vr).toBe("coffee:false,interested:Vader,Madonna")
+    expect(tr).toBe("coffee:false,interested:Vader,Madonna,usersCount:2")
+    expect(vr).toBe("coffee:false,interested:Vader,Madonna,usersCount:2")
 
     mobx.runInAction(() => (model.title = "tea"))
-    expect(tr).toBe("tea:false,interested:Vader,Madonna")
-    expect(vr).toBe("tea:false,interested:Vader,Madonna") // change reflected in view model
+    expect(tr).toBe("tea:false,interested:Vader,Madonna,usersCount:2")
+    expect(vr).toBe("tea:false,interested:Vader,Madonna,usersCount:2") // change reflected in view model
     expect(viewModel.isDirty).toBe(false)
 
     mobx.runInAction(() => model.usersInterested.push("Tarzan"))
-    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan")
-    expect(vr).toBe("tea:false,interested:Vader,Madonna,Tarzan") // change reflected in view model
+    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,usersCount:3")
+    expect(vr).toBe("tea:false,interested:Vader,Madonna,Tarzan,usersCount:3") // change reflected in view model
     expect(viewModel.isDirty).toBe(false)
 
     mobx.runInAction(() => (viewModel.done = true))
-    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan")
-    expect(vr).toBe("tea:true,interested:Vader,Madonna,Tarzan")
+    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,usersCount:3")
+    expect(vr).toBe("tea:true,interested:Vader,Madonna,Tarzan,usersCount:3")
     expect(viewModel.isDirty).toBe(true)
     expect(viewModel.isPropertyDirty("title")).toBe(false)
     expect(viewModel.isPropertyDirty("done")).toBe(true)
     expect(viewModel.isPropertyDirty("usersInterested")).toBe(false)
+    expect(viewModel.isPropertyDirty("usersCount")).toBe(false)
 
     const newUsers = ["Putin", "Madonna", "Tarzan"]
     mobx.runInAction(() => (viewModel.usersInterested = newUsers))
-    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan")
-    expect(vr).toBe("tea:true,interested:Putin,Madonna,Tarzan")
+    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,usersCount:3")
+    expect(vr).toBe("tea:true,interested:Putin,Madonna,Tarzan,usersCount:3")
     expect(viewModel.isDirty).toBe(true)
     expect(viewModel.isPropertyDirty("title")).toBe(false)
     expect(viewModel.isPropertyDirty("done")).toBe(true)
     expect(viewModel.isPropertyDirty("usersInterested")).toBe(true)
+    expect(viewModel.isPropertyDirty("usersCount")).toBe(false)
 
     mobx.runInAction(() => model.usersInterested.push("Cersei"))
-    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei")
-    expect(vr).toBe("tea:true,interested:Putin,Madonna,Tarzan") // change NOT reflected in view model bcs users are dirty
+    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei,usersCount:4")
+    expect(vr).toBe("tea:true,interested:Putin,Madonna,Tarzan,usersCount:3") // change NOT reflected in view model bcs users are dirty
     expect(viewModel.isDirty).toBe(true)
     expect(viewModel.isPropertyDirty("title")).toBe(false)
     expect(viewModel.isPropertyDirty("done")).toBe(true)
@@ -78,24 +87,24 @@ test("create view model", () => {
 
     // should reset
     viewModel.reset()
-    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei")
-    expect(vr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei")
+    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei,usersCount:4")
+    expect(vr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei,usersCount:4")
     expect(viewModel.isDirty).toBe(false)
     expect(viewModel.isPropertyDirty("title")).toBe(false)
     expect(viewModel.isPropertyDirty("done")).toBe(false)
     expect(viewModel.isPropertyDirty("usersInterested")).toBe(false)
 
     mobx.runInAction(() => (viewModel.title = "beer"))
-    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei")
-    expect(vr).toBe("beer:false,interested:Vader,Madonna,Tarzan,Cersei")
+    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei,usersCount:4")
+    expect(vr).toBe("beer:false,interested:Vader,Madonna,Tarzan,Cersei,usersCount:4")
     expect(viewModel.isDirty).toBe(true)
     expect(viewModel.isPropertyDirty("title")).toBe(true)
     expect(viewModel.isPropertyDirty("done")).toBe(false)
     expect(viewModel.isPropertyDirty("usersInterested")).toBe(false)
 
     mobx.runInAction(() => viewModel.resetProperty("title"))
-    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei")
-    expect(vr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei")
+    expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei,usersCount:4")
+    expect(vr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei,usersCount:4")
     expect(viewModel.isDirty).toBe(false)
     expect(viewModel.isPropertyDirty("title")).toBe(false)
     expect(viewModel.isPropertyDirty("done")).toBe(false)
@@ -105,8 +114,8 @@ test("create view model", () => {
         model.usersInterested.pop()
         model.usersInterested.pop()
     })
-    expect(tr).toBe("tea:false,interested:Vader,Madonna")
-    expect(vr).toBe("tea:false,interested:Vader,Madonna")
+    expect(tr).toBe("tea:false,interested:Vader,Madonna,usersCount:2")
+    expect(vr).toBe("tea:false,interested:Vader,Madonna,usersCount:2")
     expect(viewModel.isDirty).toBe(false)
     expect(viewModel.isPropertyDirty("title")).toBe(false)
     expect(viewModel.isPropertyDirty("done")).toBe(false)
@@ -116,8 +125,8 @@ test("create view model", () => {
         viewModel.title = "cola"
         viewModel.usersInterested = newUsers
     })
-    expect(tr).toBe("tea:false,interested:Vader,Madonna")
-    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan")
+    expect(tr).toBe("tea:false,interested:Vader,Madonna,usersCount:2")
+    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan,usersCount:3")
     expect(viewModel.isDirty).toBe(true)
     expect(viewModel.isPropertyDirty("done")).toBe(false)
     expect(viewModel.isPropertyDirty("title")).toBe(true)
@@ -125,12 +134,12 @@ test("create view model", () => {
 
     // model changes should not update view model which is dirty
     mobx.runInAction(() => (model.title = "coffee"))
-    expect(tr).toBe("coffee:false,interested:Vader,Madonna")
-    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan")
+    expect(tr).toBe("coffee:false,interested:Vader,Madonna,usersCount:2")
+    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan,usersCount:3")
 
     viewModel.submit()
-    expect(tr).toBe("cola:false,interested:Putin,Madonna,Tarzan")
-    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan")
+    expect(tr).toBe("cola:false,interested:Putin,Madonna,Tarzan,usersCount:3")
+    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan,usersCount:3")
     expect(viewModel.isDirty).toBe(false)
     expect(viewModel.isPropertyDirty("done")).toBe(false)
     expect(viewModel.isPropertyDirty("title")).toBe(false)
