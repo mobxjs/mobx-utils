@@ -62,8 +62,8 @@ test("transform1", () => {
     expect(unloaded.length).toBe(1)
     expect(unloaded[0][0]).toBe(tea)
     expect(unloaded[0][1]).toBe("TEA")
-    expect((tea as any).$mobx.values.title.observers.length).toBe(0)
-    expect((state.todos[0] as any).$mobx.values.title.observers.length).toBe(1)
+    expect((tea as any)[m.$mobx].values.get("title").observers.size).toBe(0)
+    expect((state.todos[0] as any)[m.$mobx].values.get("title").observers.size).toBe(1)
 
     tea.title = "mint"
     expect(mapped).toBe("johnBISCUIT")

@@ -9,7 +9,8 @@ import {
     isComputed,
     computed,
     keys,
-    _getAdministration
+    _getAdministration,
+    $mobx
 } from "mobx"
 import { invariant } from "./utils"
 
@@ -37,7 +38,7 @@ export class ViewModel<T> implements IViewModel<T> {
         invariant(isObservableObject(model), "createViewModel expects an observable object")
 
         Object.getOwnPropertyNames(model).forEach(key => {
-            if (key === "$mobx" || key === "__mobxDidRunLazyInitializers") {
+            if (key === ($mobx as any) || key === "__mobxDidRunLazyInitializers") {
                 return
             }
             invariant(
@@ -45,7 +46,7 @@ export class ViewModel<T> implements IViewModel<T> {
                 `The propertyname ${key} is reserved and cannot be used with viewModels`
             )
             if (isComputedProp(model, key)) {
-                const derivation = _getAdministration(model).values[key].derivation
+                const derivation = _getAdministration(model, key).derivation // Fixme: there is no clear api to get the derivation
                 this.localComputedValues.set(key, computed(derivation.bind(this)))
             }
             Object.defineProperty(this, key, {

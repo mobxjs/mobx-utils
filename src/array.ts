@@ -1,17 +1,17 @@
-import { IObservableArray } from "mobx/lib/types/observablearray"
+import { IObservableArray, $mobx } from "mobx"
 
 /**
  * Moves an item from one position to another, checking that the indexes given are within bounds.
- * 
+ *
  * @example
  * const source = observable([1, 2, 3])
  * moveItem(source, 0, 1)
  * console.log(source.map(x => x)) // [2, 1, 3]
- * 
+ *
  * @export
- * @param {ObservableArray<T>} target 
- * @param {number} fromIndex 
- * @param {number} toIndex 
+ * @param {ObservableArray<T>} target
+ * @param {number} fromIndex
+ * @param {number} toIndex
  * @returns {ObservableArray<T>}
  */
 export function moveItem<T>(target: IObservableArray<T>, fromIndex: number, toIndex: number) {
@@ -20,7 +20,7 @@ export function moveItem<T>(target: IObservableArray<T>, fromIndex: number, toIn
     if (fromIndex === toIndex) {
         return
     }
-    const oldItems = (target as any).$mobx.values
+    const oldItems = (target as any)[$mobx].values
     let newItems: T[]
     if (fromIndex < toIndex) {
         newItems = [
@@ -44,16 +44,16 @@ export function moveItem<T>(target: IObservableArray<T>, fromIndex: number, toIn
 
 /**
  * Checks whether the specified index is within bounds. Throws if not.
- * 
+ *
  * @private
- * @param {ObservableArray<any>} target 
- * @param {number }index 
+ * @param {ObservableArray<any>} target
+ * @param {number }index
  */
 function checkIndex(target: IObservableArray<any>, index: number) {
     if (index < 0) {
         throw new Error(`[mobx.array] Index out of bounds: ${index} is negative`)
     }
-    const length = (target as any).$mobx.values.length
+    const length = (target as any)[$mobx].values.length
     if (index >= length) {
         throw new Error(`[mobx.array] Index out of bounds: ${index} is not smaller than ${length}`)
     }
