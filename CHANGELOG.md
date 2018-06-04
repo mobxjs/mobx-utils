@@ -1,3 +1,8 @@
+# 5.0.0
+
+* Added MobX 5 compatibility. The package is also compatible with MobX 4.3.1+.
+* `createViewModel` now also copies computed properties to the view Model. Implements [#100].(https://github.com/mobxjs/mobx-utils/issues/100). Implemented through [#126](https://github.com/mobxjs/mobx-utils/pull/126) by [@RafalFilipek](https://github.com/RafalFilipek).
+
 # 4.0.1
 
 * passing a `fromPromise` based promise to `fromPromise` no longer throws an exception. Fixes [#119](https://github.com/mobxjs/mobx-utils/issues/119)
