@@ -52,14 +52,15 @@ export function createTransformer<A, B>(
 }
 
 function getMemoizationId(object: any) {
-    if (typeof object === "string" || typeof object === "number") return object
+    if (typeof object === "string") return `string:${object}`
+    if (typeof object === "number") return `number:${object}`
     if (object === null || typeof object !== "object")
         throw new Error(
             "[mobx-utils] transform expected an object, string or number, got: " + object
         )
     let tid = object.$transformId
     if (tid === undefined) {
-        tid = ++memoizationId
+        tid = `memoizationId:${++memoizationId}`
         addHiddenProp(object, "$transformId", tid)
     }
     return tid
