@@ -195,4 +195,3 @@ export function asyncAction(arg1: any, arg2?: any): any {
     deprecated("asyncAction is deprecated. use mobx.flow instead")
     return flow(generator) // name get's dropped..
 }
-
