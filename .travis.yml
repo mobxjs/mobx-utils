@@ -1,8 +1,13 @@
 language: node_js
+node_js:
+  - 8
+cache:
+  directories:
+    - node_modules
 install:
-    - yarn install
-script: yarn run coverage
+  - yarn install
+script:
+  - npm run lint
+  - yarn run coverage
 after_success:
   - cat ./coverage/lcov.info|./node_modules/coveralls/bin/coveralls.js
-node_js:
-  - 6
