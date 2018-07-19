@@ -1,3 +1,7 @@
+# 5.0.1
+
+* Add `sideEffects: false` field in package.json to enable maximal tree shaking for webpack.
+
 # 5.0.0
 
 * Added MobX 5 compatibility. The package is also compatible with MobX 4.3.1+.
