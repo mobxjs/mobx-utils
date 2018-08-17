@@ -2,6 +2,7 @@
 
 * Add `sideEffects: false` field in package.json to enable maximal tree shaking for webpack.
 * Fixed #134, prevent primitive key id collisions in createTransformer
+* Fixed typing issue where the `.value` field is not available without having a type assertion of the state first
 
 # 5.0.0
 
