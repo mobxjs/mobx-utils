@@ -1,3 +1,7 @@
+# next
+
+* Fixed #134, prevent primitive key id collisions in createTransformer
+
 # 5.0.0
 
 * Added MobX 5 compatibility. The package is also compatible with MobX 4.3.1+.
