@@ -14,7 +14,7 @@ export type IBasePromiseBasedObservable<T> = {
 
 export type IPendingPromise = {
     readonly state: "pending"
-    readonly reason: any
+    readonly value: any // can be error, T or nothing at this point
 }
 
 export type IFulfilledPromise<T> = {
