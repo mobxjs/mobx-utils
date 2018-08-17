@@ -1,5 +1,6 @@
-# next
+# 5.0.1
 
+* Add `sideEffects: false` field in package.json to enable maximal tree shaking for webpack.
 * Fixed #134, prevent primitive key id collisions in createTransformer
 
 # 5.0.0

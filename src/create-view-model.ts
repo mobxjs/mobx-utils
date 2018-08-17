@@ -81,7 +81,7 @@ export class ViewModel<T> implements IViewModel<T> {
                 destination.clear()
                 destination.merge(source)
             } else if (!isComputed(source)) {
-                ;(this.model as any)[key] = source
+                ; (this.model as any)[key] = source
             }
         })
         this.localValues.clear()

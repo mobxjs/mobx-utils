@@ -1,6 +1,6 @@
 {
   "name": "mobx-utils",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Utility functions and common patterns for MobX",
   "main": "mobx-utils.umd.js",
   "module": "mobx-utils.module.js",
@@ -16,7 +16,7 @@
     "lint:js": "eslint ./test",
     "lint:ts": "tslint ./src/*.ts",
     "lint": "npm run lint:ts && npm run lint:js",
-    "prepublish": "npm run build && npm run build-docs",
+    "prepublishOnly": "npm run build && npm run build-docs",
     "coverage": "yarn jest --coverage",
     "build-docs": "npm run build && documentation readme lib/mobx-utils.js --section API"
   },
