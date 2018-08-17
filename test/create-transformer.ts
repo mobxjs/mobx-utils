@@ -1165,6 +1165,20 @@ test("transform with primitive key", () => {
     expect(bobs[0].name).not.toEqual(bobs[1].name)
 })
 
+// https://github.com/mobxjs/mobx-utils/issues/134
+test("transform with mixed key types", () => {
+    const identityTransformer = createTransformer(a => a)
+
+    let transformedStringKey
+    let transformedNumberKey
+    m.autorun(() => {
+        transformedStringKey = identityTransformer("1")
+        transformedNumberKey = identityTransformer(1)
+    })
+
+    expect(transformedStringKey).not.toEqual(transformedNumberKey)
+})
+
 const intersection = require("lodash.intersection")
 
 function pluckFn(key) {
