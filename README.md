@@ -241,7 +241,7 @@ const user = observable({
 })
 
 Rx.Observable
-  .from(mobxUtils.toStream(() => user.firstname + user.lastName))
+  .from(mobxUtils.toStream(() => user.firstName + user.lastName))
   .scan(nameChanges => nameChanges + 1, 0)
   .subscribe(nameChanges => console.log("Changed name ", nameChanges, "times"))
 ```
