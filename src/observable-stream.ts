@@ -21,8 +21,8 @@ export interface ISubscription {
 }
 
 export interface IObservableStream<T> {
-    subscribe(observer: (value: T) => void): ISubscription
     subscribe(observer: IStreamObserver<T>): ISubscription
+    subscribe(observer: (value: T) => void): ISubscription
     //   [Symbol.observable](): IObservable;
 }
 
