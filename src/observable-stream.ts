@@ -131,9 +131,11 @@ class StreamListener<T> implements IStreamObserver<T> {
 export function fromStream<T>(
     observable: IObservableStream<T>,
     initialValue: T = undefined
-): {
+): IStreamListener<T> {
+    return new StreamListener(observable, initialValue)
+}
+
+export interface IStreamListener<T> {
     current: T
     dispose(): void
-} {
-    return new StreamListener(observable, initialValue)
 }

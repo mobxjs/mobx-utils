@@ -1,3 +1,8 @@
+# 5.0.2
+
+* Improved typings of `toStream`, by [@pelotom](https://github.com/pelotom) through [#147](https://github.com/mobxjs/mobx-utils/pull/147)
+* Improved typings of `fromStream`, `IStreamListener` is now an explicit interface. Fixes [#143](https://github.com/mobxjs/mobx-utils/issues/143)
+
 # 5.0.1
 
 * Add `sideEffects: false` field in package.json to enable maximal tree shaking for webpack.
