@@ -100,7 +100,7 @@ export class ViewModel<T> implements IViewModel<T> {
 
 /**
  * `createViewModel` takes an object with observable properties (model)
- * and wraps a viewmodel around it. The viewmodel proxies all enumerable property of the original model with the following behavior:
+ * and wraps a viewmodel around it. The viewmodel proxies all enumerable properties of the original model with the following behavior:
  *  - as long as no new value has been assigned to the viewmodel property, the original property will be returned.
  *  - any future change in the model will be visible in the viewmodel as well unless the viewmodel property was dirty at the time of the attempted change.
  *  - once a new value has been assigned to a property of the viewmodel, that value will be returned during a read of that property in the future. However, the original model remain untouched until `submit()` is called.
