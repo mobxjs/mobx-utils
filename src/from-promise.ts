@@ -115,7 +115,7 @@ function createObservablePromise(origPromise: any) {
  *
  * // combine with when..
  * when(
- *   () => fetchResult.state !== "pending"
+ *   () => fetchResult.state !== "pending",
  *   () => {
  *     console.log("Got ", fetchResult.value)
  *   }
