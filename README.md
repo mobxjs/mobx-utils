@@ -252,7 +252,7 @@ Returns **IObservableStream&lt;T>**
 
 ## fromStream
 
-Converts an subscribable, observable stream (TC 39 observable / RxJS stream)
+Converts a subscribable, observable stream (TC 39 observable / RxJS stream)
 into an object which stores the current value (as `current`). The subscription can be cancelled through the `dispose` method.
 Takes an initial value as second optional argument
 
@@ -280,7 +280,7 @@ autorun(() => {
 ## createViewModel
 
 `createViewModel` takes an object with observable properties (model)
-and wraps a viewmodel around it. The viewmodel proxies all enumerable property of the original model with the following behavior:
+and wraps a viewmodel around it. The viewmodel proxies all enumerable properties of the original model with the following behavior:
 
 -   as long as no new value has been assigned to the viewmodel property, the original property will be returned.
 -   any future change in the model will be visible in the viewmodel as well unless the viewmodel property was dirty at the time of the attempted change.

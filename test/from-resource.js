@@ -69,7 +69,7 @@ test("basics", () => {
   // test warning
   expect(me$.current().name).toBe("noa"); // happens to be visible through the data reference, but no autorun tragger
   expect(warn).toEqual([
-    "Called `get` of an subscribingObservable outside a reaction. Current value will be returned but no new subscription has started"
+    "Called `get` of a subscribingObservable outside a reaction. Current value will be returned but no new subscription has started"
   ]);
 
   // resubscribe

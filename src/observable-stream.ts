@@ -105,7 +105,7 @@ class StreamListener<T> implements IStreamObserver<T> {
 
 /**
  *
- * Converts an subscribable, observable stream (TC 39 observable / RxJS stream)
+ * Converts a subscribable, observable stream (TC 39 observable / RxJS stream)
  * into an object which stores the current value (as `current`). The subscription can be cancelled through the `dispose` method.
  * Takes an initial value as second optional argument
  *

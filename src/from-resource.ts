@@ -108,7 +108,7 @@ export function fromResource<T>(
             const isBeingTracked = atom.reportObserved()
             if (!isBeingTracked && !isActive)
                 console.warn(
-                    "Called `get` of an subscribingObservable outside a reaction. Current value will be returned but no new subscription has started"
+                    "Called `get` of a subscribingObservable outside a reaction. Current value will be returned but no new subscription has started"
                 )
             return value
         },
