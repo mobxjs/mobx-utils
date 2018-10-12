@@ -60,8 +60,8 @@ export function deepObserve(
                 change.removed.map(unobserveRecursively)
                 change.added.forEach((value, idx) => observeRecursively(value, parent, "" + (change.index + idx)))
                 // update paths
-                for (let i = change.index + change.addedCount + 1; i < change.object.length; i++) {
-                    const entry = entrySet.get("" + i)
+                for (let i = change.index + change.addedCount; i < change.object.length; i++) {
+                    const entry = entrySet.get(change.object[i])
                     if (entry) entry.path = "" + i
                 }
                 break

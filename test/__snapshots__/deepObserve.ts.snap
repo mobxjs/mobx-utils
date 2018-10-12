@@ -14,6 +14,113 @@ Array [
 ]
 `;
 
+exports[`array 1`] = `
+Array [
+  Array [
+    "",
+    Object {
+      "added": Array [
+        Object {
+          "x": 1,
+          Symbol(mobx administration): null,
+        },
+        Object {
+          "x": 2,
+          Symbol(mobx administration): null,
+        },
+      ],
+      "addedCount": 2,
+      "index": 1,
+      "object": null,
+      "removed": Array [
+        2,
+      ],
+      "removedCount": 1,
+      "type": "splice",
+    },
+  ],
+  Array [
+    "1",
+    Object {
+      "name": "x",
+      "newValue": "a",
+      "object": null,
+      "oldValue": 1,
+      "type": "update",
+    },
+  ],
+  Array [
+    "2",
+    Object {
+      "name": "x",
+      "newValue": "b",
+      "object": null,
+      "oldValue": 2,
+      "type": "update",
+    },
+  ],
+  Array [
+    "3",
+    Object {
+      "name": "x",
+      "newValue": "c",
+      "object": null,
+      "oldValue": 3,
+      "type": "update",
+    },
+  ],
+  Array [
+    "",
+    Object {
+      "added": Array [],
+      "addedCount": 0,
+      "index": 0,
+      "object": null,
+      "removed": Array [
+        1,
+        Object {
+          "x": "a",
+          Symbol(mobx administration): null,
+        },
+        Object {
+          "x": "b",
+          Symbol(mobx administration): null,
+        },
+      ],
+      "removedCount": 3,
+      "type": "splice",
+    },
+  ],
+  Array [
+    "",
+    Object {
+      "added": Array [
+        Object {
+          "x": "B",
+          Symbol(mobx administration): null,
+        },
+      ],
+      "addedCount": 1,
+      "index": 1,
+      "object": null,
+      "removed": Array [],
+      "removedCount": 0,
+      "type": "splice",
+    },
+  ],
+  Array [
+    "0",
+    Object {
+      "name": "x",
+      "newValue": "A",
+      "object": null,
+      "oldValue": "c",
+      "type": "update",
+    },
+  ],
+]
+`;
+
 exports[`basic & dispose 1`] = `
 Array [
   Array [
