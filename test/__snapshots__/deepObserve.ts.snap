@@ -216,3 +216,61 @@ Array [
   ],
 ]
 `;
+
+exports[`map 1`] = `
+Array [
+  Array [
+    "",
+    Object {
+      "name": "x",
+      "newValue": Object {},
+      "object": null,
+      "type": "add",
+    },
+  ],
+  Array [
+    "x",
+    Object {
+      "name": "a",
+      "newValue": Object {
+        "a": 1,
+        Symbol(mobx administration): null,
+      },
+      "object": null,
+      "type": "add",
+    },
+  ],
+  Array [
+    "x/a",
+    Object {
+      "name": "a",
+      "newValue": 2,
+      "object": null,
+      "oldValue": 1,
+      "type": "update",
+    },
+  ],
+  Array [
+    "x",
+    Object {
+      "name": "a",
+      "newValue": 3,
+      "object": null,
+      "oldValue": Object {
+        "a": 2,
+        Symbol(mobx administration): null,
+      },
+      "type": "update",
+    },
+  ],
+  Array [
+    "x",
+    Object {
+      "name": "a",
+      "object": null,
+      "oldValue": 3,
+      "type": "delete",
+    },
+  ],
+]
+`;

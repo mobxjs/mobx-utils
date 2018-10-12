@@ -1,5 +1,5 @@
 import { deepObserve } from "../src/mobx-utils"
-import { observable, $mobx, toJS } from "mobx"
+import { observable, $mobx } from "mobx"
 import * as cloneDeepWith from "lodash.clonedeepwith"
 
 function cleanChange(change, includeObject = true) {
@@ -54,7 +54,7 @@ test("deep", () => {
 })
 
 test("add", () => {
-    assertChanges({}, x => {
+    assertChanges({}, (x: any) => {
         x.a = 3
     })
 })
@@ -108,5 +108,16 @@ test("array", () => {
         ar.splice(0, 3)
         ar.push({x: "B"})
         ar[0].x = "A"
+    })
+})
+
+test("map", () => {
+    assertChanges({}, (o: any) => {
+        const x = observable.map({})
+        o.x = x
+        x.set("a", { a: 1 })
+        x.get("a").a = 2
+        x.set("a", 3)
+        x.delete("a")
     })
 })

@@ -29,6 +29,22 @@ function buildPath(entry: Entry): string {
     return res.reverse().join("/")
 }
 
+/**
+ * Given an object, deeply observes the given object.
+ * It is like `observe` from mobx, but applied recursively, including all future children
+ *
+ * Note that the given object cannot ever contain cycles and should be a tree.
+ *
+ * As benefit: path and root will be provided in the callback, so the signature of the listener is
+ * (change, path, root) => void
+ *
+ * The returned disposer can be invoked to clean up the listner
+ *
+ * @example
+ * const disposer = deepObserve(target, (change, path) => {
+ *    console.dir(change)
+ * })
+ */
 export function deepObserve(
     target: any,
     listener: (change: IChange, path: string) => void
