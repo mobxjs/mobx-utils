@@ -1,16 +1,8 @@
 import { deepObserve } from "../src/mobx-utils"
-import { observable, $mobx } from "mobx"
+import { observable, $mobx, toJS } from "mobx"
 
 function cleanChange(change) {
-    if (change.object) {
-        return {
-            ...change,
-            object: {
-                ...change.object,
-                [$mobx]: undefined
-            }
-        }
-    }
+    return toJS(change, { recurseEverything: true }) // work around to make sure jest doesn't diff the mobx administration
 }
 
 function assertChanges(target: any, fn: () => void) {
