@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`add 1`] = `
+Array [
+  Array [
+    "",
+    Object {
+      "name": "a",
+      "newValue": 3,
+      "object": null,
+      "type": "add",
+    },
+  ],
+]
+`;
+
 exports[`basic & dispose 1`] = `
 Array [
   Array [
@@ -8,152 +22,12 @@ Array [
       "name": "a",
       "newValue": 2,
       "object": Object {
-        "a": 3,
+        "a": 2,
         "b": Object {
-          "z": 5,
-          Symbol(mobx administration): ObservableObjectAdministration$$1 {
-            "changeListeners": Array [],
-            "defaultEnhancer": [Function],
-            "keysAtom": Atom$$1 {
-              "diffValue": 0,
-              "isBeingObserved": false,
-              "isPendingUnobservation": false,
-              "lastAccessedBy": 0,
-              "lowestObserverState": 2,
-              "name": "ObservableObject@1.b.keys",
-              "observers": Set {},
-            },
-            "name": "ObservableObject@1.b",
-            "pendingKeys": Map {
-              "isMobXAtom" => false,
-              "isMobXComputedValue" => false,
-              "isMobXReaction" => false,
-              "isMobXObservableMap" => false,
-              "$$typeof" => false,
-              "nodeType" => false,
-              "@@__IMMUTABLE_ITERABLE__@@" => false,
-              "@@__IMMUTABLE_RECORD__@@" => false,
-              "_isMockFunction" => false,
-              "toJSON" => false,
-            },
-            "proxy": [Circular],
-            "target": Object {
-              "z": 5,
-              Symbol(mobx administration): [Circular],
-            },
-            "values": Map {
-              "z" => 5,
-            },
-          },
+          "z": 3,
+          Symbol(mobx administration): null,
         },
-        Symbol(mobx administration): ObservableObjectAdministration$$1 {
-          "changeListeners": Array [],
-          "defaultEnhancer": [Function],
-          "keysAtom": Atom$$1 {
-            "diffValue": 0,
-            "isBeingObserved": false,
-            "isPendingUnobservation": false,
-            "lastAccessedBy": 0,
-            "lowestObserverState": 2,
-            "name": "ObservableObject@1.keys",
-            "observers": Set {},
-          },
-          "name": "ObservableObject@1",
-          "pendingKeys": Map {
-            "isMobXAtom" => false,
-            "isMobXComputedValue" => false,
-            "isMobXReaction" => false,
-            "isMobXObservableMap" => false,
-            "$$typeof" => false,
-            "nodeType" => false,
-            "@@__IMMUTABLE_ITERABLE__@@" => false,
-            "@@__IMMUTABLE_RECORD__@@" => false,
-            "_isMockFunction" => false,
-            "toJSON" => false,
-          },
-          "proxy": [Circular],
-          "target": Object {
-            "a": 3,
-            "b": Object {
-              "z": 5,
-              Symbol(mobx administration): ObservableObjectAdministration$$1 {
-                "changeListeners": Array [],
-                "defaultEnhancer": [Function],
-                "keysAtom": Atom$$1 {
-                  "diffValue": 0,
-                  "isBeingObserved": false,
-                  "isPendingUnobservation": false,
-                  "lastAccessedBy": 0,
-                  "lowestObserverState": 2,
-                  "name": "ObservableObject@1.b.keys",
-                  "observers": Set {},
-                },
-                "name": "ObservableObject@1.b",
-                "pendingKeys": Map {
-                  "isMobXAtom" => false,
-                  "isMobXComputedValue" => false,
-                  "isMobXReaction" => false,
-                  "isMobXObservableMap" => false,
-                  "$$typeof" => false,
-                  "nodeType" => false,
-                  "@@__IMMUTABLE_ITERABLE__@@" => false,
-                  "@@__IMMUTABLE_RECORD__@@" => false,
-                  "_isMockFunction" => false,
-                  "toJSON" => false,
-                },
-                "proxy": [Circular],
-                "target": Object {
-                  "z": 5,
-                  Symbol(mobx administration): [Circular],
-                },
-                "values": Map {
-                  "z" => 5,
-                },
-              },
-            },
-            Symbol(mobx administration): [Circular],
-          },
-          "values": Map {
-            "a" => 3,
-            "b" => Object {
-              "z": 5,
-              Symbol(mobx administration): ObservableObjectAdministration$$1 {
-                "changeListeners": Array [],
-                "defaultEnhancer": [Function],
-                "keysAtom": Atom$$1 {
-                  "diffValue": 0,
-                  "isBeingObserved": false,
-                  "isPendingUnobservation": false,
-                  "lastAccessedBy": 0,
-                  "lowestObserverState": 2,
-                  "name": "ObservableObject@1.b.keys",
-                  "observers": Set {},
-                },
-                "name": "ObservableObject@1.b",
-                "pendingKeys": Map {
-                  "isMobXAtom" => false,
-                  "isMobXComputedValue" => false,
-                  "isMobXReaction" => false,
-                  "isMobXObservableMap" => false,
-                  "$$typeof" => false,
-                  "nodeType" => false,
-                  "@@__IMMUTABLE_ITERABLE__@@" => false,
-                  "@@__IMMUTABLE_RECORD__@@" => false,
-                  "_isMockFunction" => false,
-                  "toJSON" => false,
-                },
-                "proxy": [Circular],
-                "target": Object {
-                  "z": 5,
-                  Symbol(mobx administration): [Circular],
-                },
-                "values": Map {
-                  "z" => 5,
-                },
-              },
-            },
-          },
-        },
+        Symbol(mobx administration): null,
       },
       "oldValue": 1,
       "type": "update",
@@ -165,44 +39,72 @@ Array [
       "name": "z",
       "newValue": 4,
       "object": Object {
-        "z": 5,
-        Symbol(mobx administration): ObservableObjectAdministration$$1 {
-          "changeListeners": Array [],
-          "defaultEnhancer": [Function],
-          "keysAtom": Atom$$1 {
-            "diffValue": 0,
-            "isBeingObserved": false,
-            "isPendingUnobservation": false,
-            "lastAccessedBy": 0,
-            "lowestObserverState": 2,
-            "name": "ObservableObject@1.b.keys",
-            "observers": Set {},
-          },
-          "name": "ObservableObject@1.b",
-          "pendingKeys": Map {
-            "isMobXAtom" => false,
-            "isMobXComputedValue" => false,
-            "isMobXReaction" => false,
-            "isMobXObservableMap" => false,
-            "$$typeof" => false,
-            "nodeType" => false,
-            "@@__IMMUTABLE_ITERABLE__@@" => false,
-            "@@__IMMUTABLE_RECORD__@@" => false,
-            "_isMockFunction" => false,
-            "toJSON" => false,
-          },
-          "proxy": [Circular],
-          "target": Object {
-            "z": 5,
-            Symbol(mobx administration): [Circular],
-          },
-          "values": Map {
-            "z" => 5,
-          },
-        },
+        "z": 4,
+        Symbol(mobx administration): null,
       },
       "oldValue": 3,
       "type": "update",
+    },
+  ],
+]
+`;
+
+exports[`cleanup 1`] = `
+Array [
+  Array [
+    "a",
+    Object {
+      "name": "b",
+      "newValue": 2,
+      "object": Object {
+        "b": 2,
+        Symbol(mobx administration): null,
+      },
+      "oldValue": 1,
+      "type": "update",
+    },
+  ],
+  Array [
+    "",
+    Object {
+      "name": "a",
+      "object": Object {
+        Symbol(mobx administration): null,
+      },
+      "oldValue": Object {
+        "b": 2,
+        Symbol(mobx administration): null,
+      },
+      "type": "remove",
+    },
+  ],
+]
+`;
+
+exports[`deep 1`] = `
+Array [
+  Array [
+    "a/b",
+    Object {
+      "name": "c",
+      "newValue": 4,
+      "object": null,
+      "oldValue": 3,
+      "type": "update",
+    },
+  ],
+]
+`;
+
+exports[`delete 1`] = `
+Array [
+  Array [
+    "",
+    Object {
+      "name": "x",
+      "object": null,
+      "oldValue": 1,
+      "type": "remove",
     },
   ],
 ]

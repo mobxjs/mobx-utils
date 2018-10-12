@@ -71,11 +71,10 @@ export function deepObserve(
     function observeRecursively(target: any, parent: Entry, path: string) {
         if (isObservableObject(target) || isObservableArray(target) || isObservableMap(target)) {
             if (entrySet.has(target)) {
-                if (entrySet.get(target).parent !== parent)
+                const entry = entrySet.get(target)
+                if (entry.parent !== parent || entry.path !== path)
                     throw new Error(
-                        `The same observable object cannot appear twice in the same tree, trying to assign it to '${buildPath(parent)}', but it already exists at '${buildPath(entrySet.get(
-                            target
-                        ).parent)}'`
+                        `The same observable object cannot appear twice in the same tree, trying to assign it to '${buildPath(parent)}/${path}', but it already exists at '${buildPath(entry.parent)}/${entry.path}'`
                     )
             } else {
                 const entry = {
