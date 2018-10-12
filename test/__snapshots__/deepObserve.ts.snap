@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`basic & dispose 1`] = `
+Array [
+  Array [
+    "",
+    Object {
+      "name": "a",
+      "newValue": 2,
+      "object": Object {
+        "a": 2,
+        "b": Object {
+          "z": 5,
+          Symbol(mobx administration): ObservableObjectAdministration$$1 {
+            "changeListeners": Array [],
+            "defaultEnhancer": [Function],
+            "keysAtom": Atom$$1 {
+              "diffValue": 0,
+              "isBeingObserved": false,
+              "isPendingUnobservation": false,
+              "lastAccessedBy": 0,
+              "lowestObserverState": 2,
+              "name": "ObservableObject@1.b.keys",
+              "observers": Set {},
+            },
+            "name": "ObservableObject@1.b",
+            "pendingKeys": Map {
+              "isMobXAtom" => false,
+              "isMobXComputedValue" => false,
+              "isMobXReaction" => false,
+              "isMobXObservableMap" => false,
+              "$$typeof" => false,
+              "nodeType" => false,
+              "@@__IMMUTABLE_ITERABLE__@@" => false,
+              "@@__IMMUTABLE_RECORD__@@" => false,
+              "_isMockFunction" => false,
+              "toJSON" => false,
+            },
+            "proxy": [Circular],
+            "target": Object {
+              "z": 5,
+              Symbol(mobx administration): [Circular],
+            },
+            "values": Map {
+              "z" => 5,
+            },
+          },
+        },
+        Symbol(mobx administration): undefined,
+      },
+      "oldValue": 1,
+      "type": "update",
+    },
+  ],
+  Array [
+    "b",
+    Object {
+      "name": "z",
+      "newValue": 4,
+      "object": Object {
+        "z": 4,
+        Symbol(mobx administration): undefined,
+      },
+      "oldValue": 3,
+      "type": "update",
+    },
+  ],
+]
+`;
