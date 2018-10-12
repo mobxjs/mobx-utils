@@ -3941,9 +3941,9 @@ mixin-deep@^1.2.0:
   dependencies:
     minimist "0.0.8"
 
-mobx@^5.0.0-beta.5:
-  version "5.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/mobx/-/mobx-5.0.0-beta.6.tgz#778f3a1d1c7d64562ba2b7575ee49be0eeaeb8da"
+mobx@^5.5.0:
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/mobx/-/mobx-5.5.0.tgz#a29f6a7526eed28edcd3f0e921a1edaa8bb22575"
 
 module-deps-sortable@4.0.6:
   version "4.0.6"
