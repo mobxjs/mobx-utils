@@ -570,6 +570,8 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ## whenAsync
 
+_deprecated_ whenAsync is deprecated, use mobx.when without effect instead.
+
 Like normal `when`, except that this `when` will return a promise that resolves when the expression becomes truthy
 
 **Parameters**
