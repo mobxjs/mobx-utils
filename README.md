@@ -58,7 +58,7 @@ const fetchResult = fromPromise(fetch("http://someurl"))
 
 // combine with when..
 when(
-  () => fetchResult.state !== "pending"
+  () => fetchResult.state !== "pending",
   () => {
     console.log("Got ", fetchResult.value)
   }
@@ -128,8 +128,8 @@ Returns **ObservableArray&lt;T>**
 
 `lazyObservable` creates an observable around a `fetch` method that will not be invoked
 until the observable is needed the first time.
-The fetch method receives a `sync` callback which can be used to replace the
-current value of the lazyObservable. It is allowed to call `sync` multiple times
+The fetch method receives a `sink` callback which can be used to replace the
+current value of the lazyObservable. It is allowed to call `sink` multiple times
 to keep the lazyObservable up to date with some external resource.
 
 Note that it is the `current()` call itself which is being tracked by MobX,
@@ -138,13 +138,13 @@ so make sure that you don't dereference to early.
 **Parameters**
 
 -   `fetch`  
--   `initialValue` **T** optional initialValue that will be returned from `current` as long as the `sync` has not been called at least once (optional, default `undefined`)
+-   `initialValue` **T** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
 
 **Examples**
 
 ```javascript
 const userProfile = lazyObservable(
-  sync => fetch("/myprofile").then(profile => sync(profile))
+  sink => fetch("/myprofile").then(profile => sink(profile))
 )
 
 // use the userProfile in a React component:
@@ -165,10 +165,10 @@ and which can be kept in sync with some external datasource that can be subscrib
 
 The created observable will only subscribe to the datasource if it is in use somewhere,
 (un)subscribing when needed. To enable `fromResource` to do that two callbacks need to be provided,
-one to subscribe, and one to unsubscribe. The subscribe callback itself will receive a `sync` callback, which can be used
+one to subscribe, and one to unsubscribe. The subscribe callback itself will receive a `sink` callback, which can be used
 to update the current state of the observable, allowing observes to react.
 
-Whatever is passed to `sync` will be returned by `current()`. The values passed to the sync will not be converted to
+Whatever is passed to `sink` will be returned by `current()`. The values passed to the sink will not be converted to
 observables automatically, but feel free to do so.
 It is the `current()` call itself which is being tracked,
 so make sure that you don't dereference to early.
@@ -183,7 +183,7 @@ which comes from an imaginary database and notifies when it has changed.
 
 -   `subscriber`  
 -   `unsubscriber` **IDisposer**  (optional, default `NOOP`)
--   `initialValue` **T** the data that will be returned by `get()` until the `sync` has emitted its first data (optional, default `undefined`)
+-   `initialValue` **T** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
 
 **Examples**
 
@@ -191,12 +191,12 @@ which comes from an imaginary database and notifies when it has changed.
 function createObservableUser(dbUserRecord) {
   let currentSubscription;
   return fromResource(
-    (sync) => {
-      // sync the current state
-      sync(dbUserRecord.fields)
-      // subscribe to the record, invoke the sync callback whenever new data arrives
+    (sink) => {
+      // sink the current state
+      sink(dbUserRecord.fields)
+      // subscribe to the record, invoke the sink callback whenever new data arrives
       currentSubscription = dbUserRecord.onUpdated(() => {
-        sync(dbUserRecord.fields)
+        sink(dbUserRecord.fields)
       })
     },
     () => {
@@ -241,7 +241,7 @@ const user = observable({
 })
 
 Rx.Observable
-  .from(mobxUtils.toStream(() => user.firstName + user.lastName))
+  .from(mobxUtils.toStream(() => user.firstname + user.lastName))
   .scan(nameChanges => nameChanges + 1, 0)
   .subscribe(nameChanges => console.log("Changed name ", nameChanges, "times"))
 ```
@@ -620,3 +620,28 @@ See: <https://mobx.js.org/refguide/create-transformer.html>
 
 -   `transformer`  
 -   `onCleanup`  
+
+## deepObserve
+
+Given an object, deeply observes the given object.
+It is like `observe` from mobx, but applied recursively, including all future children
+
+Note that the given object cannot ever contain cycles and should be a tree.
+
+As benefit: path and root will be provided in the callback, so the signature of the listener is
+(change, path, root) => void
+
+The returned disposer can be invoked to clean up the listner
+
+**Parameters**
+
+-   `target`  
+-   `listener`  
+
+**Examples**
+
+```javascript
+const disposer = deepObserve(target, (change, path) => {
+   console.dir(change)
+})
+```
