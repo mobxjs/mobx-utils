@@ -13,9 +13,6 @@
     "build": "tsc -p src && rollup lib/mobx-utils.js -e mobx -g mobx:mobx -o mobx-utils.umd.js -f umd --name mobxUtils && rollup lib/mobx-utils.js -e mobx -o mobx-utils.module.js -f es",
     "watch": "yarn jest --watch",
     "test": "yarn jest",
-    "lint:js": "eslint ./test",
-    "lint:ts": "tslint ./src/*.ts",
-    "lint": "npm run lint:ts && npm run lint:js",
     "prepublishOnly": "npm run build && npm run build-docs",
     "coverage": "yarn jest --coverage",
     "build-docs": "npm run build && documentation readme lib/mobx-utils.js --section API"
@@ -37,13 +34,10 @@
   "devDependencies": {
     "@types/jest": "^22.2.0",
     "@types/tape": "^4.2.30",
-    "babel-eslint": "^7.1.0",
     "coveralls": "^2.11.4",
     "documentation": "^4.0.0-beta.18",
-    "eslint": "^3.10.1",
     "faucet": "0.0.1",
     "jest": "^22.4.2",
-    "lint-staged": "^4.2.3",
     "lodash.clonedeep": "^4.5.0",
     "lodash.clonedeepwith": "^4.5.0",
     "lodash.intersection": "^4.4.0",
@@ -52,8 +46,6 @@
     "rollup": "^0.50.0",
     "rxjs": "^5.0.2",
     "ts-jest": "^22.4.1",
-    "tslint": "^3.15.1",
-    "tslint-eslint-rules": "^2.1.0",
     "typescript": "^2.9.0"
   },
   "dependencies": {},
