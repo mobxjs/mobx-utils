@@ -7,7 +7,6 @@ cache:
 install:
   - yarn install
 script:
-  - npm run lint:ts
   - yarn run coverage
 after_success:
   - cat ./coverage/lcov.info|./node_modules/coveralls/bin/coveralls.js

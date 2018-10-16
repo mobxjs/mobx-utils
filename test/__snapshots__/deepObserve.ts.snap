@@ -1,0 +1,276 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`add 1`] = `
+Array [
+  Array [
+    "",
+    Object {
+      "name": "a",
+      "newValue": 3,
+      "object": null,
+      "type": "add",
+    },
+  ],
+]
+`;
+
+exports[`array 1`] = `
+Array [
+  Array [
+    "",
+    Object {
+      "added": Array [
+        Object {
+          "x": 1,
+          Symbol(mobx administration): null,
+        },
+        Object {
+          "x": 2,
+          Symbol(mobx administration): null,
+        },
+      ],
+      "addedCount": 2,
+      "index": 1,
+      "object": null,
+      "removed": Array [
+        2,
+      ],
+      "removedCount": 1,
+      "type": "splice",
+    },
+  ],
+  Array [
+    "1",
+    Object {
+      "name": "x",
+      "newValue": "a",
+      "object": null,
+      "oldValue": 1,
+      "type": "update",
+    },
+  ],
+  Array [
+    "2",
+    Object {
+      "name": "x",
+      "newValue": "b",
+      "object": null,
+      "oldValue": 2,
+      "type": "update",
+    },
+  ],
+  Array [
+    "3",
+    Object {
+      "name": "x",
+      "newValue": "c",
+      "object": null,
+      "oldValue": 3,
+      "type": "update",
+    },
+  ],
+  Array [
+    "",
+    Object {
+      "added": Array [],
+      "addedCount": 0,
+      "index": 0,
+      "object": null,
+      "removed": Array [
+        1,
+        Object {
+          "x": "a",
+          Symbol(mobx administration): null,
+        },
+        Object {
+          "x": "b",
+          Symbol(mobx administration): null,
+        },
+      ],
+      "removedCount": 3,
+      "type": "splice",
+    },
+  ],
+  Array [
+    "",
+    Object {
+      "added": Array [
+        Object {
+          "x": "B",
+          Symbol(mobx administration): null,
+        },
+      ],
+      "addedCount": 1,
+      "index": 1,
+      "object": null,
+      "removed": Array [],
+      "removedCount": 0,
+      "type": "splice",
+    },
+  ],
+  Array [
+    "0",
+    Object {
+      "name": "x",
+      "newValue": "A",
+      "object": null,
+      "oldValue": "c",
+      "type": "update",
+    },
+  ],
+]
+`;
+
+exports[`basic & dispose 1`] = `
+Array [
+  Array [
+    "",
+    Object {
+      "name": "a",
+      "newValue": 2,
+      "object": Object {
+        "a": 2,
+        "b": Object {
+          "z": 3,
+          Symbol(mobx administration): null,
+        },
+        Symbol(mobx administration): null,
+      },
+      "oldValue": 1,
+      "type": "update",
+    },
+  ],
+  Array [
+    "b",
+    Object {
+      "name": "z",
+      "newValue": 4,
+      "object": Object {
+        "z": 4,
+        Symbol(mobx administration): null,
+      },
+      "oldValue": 3,
+      "type": "update",
+    },
+  ],
+]
+`;
+
+exports[`cleanup 1`] = `
+Array [
+  Array [
+    "a",
+    Object {
+      "name": "b",
+      "newValue": 2,
+      "object": Object {
+        "b": 2,
+        Symbol(mobx administration): null,
+      },
+      "oldValue": 1,
+      "type": "update",
+    },
+  ],
+  Array [
+    "",
+    Object {
+      "name": "a",
+      "object": Object {
+        Symbol(mobx administration): null,
+      },
+      "oldValue": Object {
+        "b": 2,
+        Symbol(mobx administration): null,
+      },
+      "type": "remove",
+    },
+  ],
+]
+`;
+
+exports[`deep 1`] = `
+Array [
+  Array [
+    "a/b",
+    Object {
+      "name": "c",
+      "newValue": 4,
+      "object": null,
+      "oldValue": 3,
+      "type": "update",
+    },
+  ],
+]
+`;
+
+exports[`delete 1`] = `
+Array [
+  Array [
+    "",
+    Object {
+      "name": "x",
+      "object": null,
+      "oldValue": 1,
+      "type": "remove",
+    },
+  ],
+]
+`;
+
+exports[`map 1`] = `
+Array [
+  Array [
+    "",
+    Object {
+      "name": "x",
+      "newValue": Object {},
+      "object": null,
+      "type": "add",
+    },
+  ],
+  Array [
+    "x",
+    Object {
+      "name": "a",
+      "newValue": Object {
+        "a": 1,
+        Symbol(mobx administration): null,
+      },
+      "object": null,
+      "type": "add",
+    },
+  ],
+  Array [
+    "x/a",
+    Object {
+      "name": "a",
+      "newValue": 2,
+      "object": null,
+      "oldValue": 1,
+      "type": "update",
+    },
+  ],
+  Array [
+    "x",
+    Object {
+      "name": "a",
+      "newValue": 3,
+      "object": null,
+      "oldValue": Object {
+        "a": 2,
+        Symbol(mobx administration): null,
+      },
+      "type": "update",
+    },
+  ],
+  Array [
+    "x",
+    Object {
+      "name": "a",
+      "object": null,
+      "oldValue": 3,
+      "type": "delete",
+    },
+  ],
+]
+`;

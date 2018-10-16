@@ -1,3 +1,7 @@
+# 5.0.3
+
+* Introduced `deepObserve` utility, through [#154](https://github.com/mobxjs/mobx-utils/pull/154)
+
 # 5.0.2
 
 * Improved typings of `toStream`, by [@pelotom](https://github.com/pelotom) through [#147](https://github.com/mobxjs/mobx-utils/pull/147)
