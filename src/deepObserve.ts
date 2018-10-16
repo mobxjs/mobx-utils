@@ -45,27 +45,31 @@ function buildPath(entry: Entry): string {
  *    console.dir(change)
  * })
  */
-export function deepObserve(
-    target: any,
-    listener: (change: IChange, path: string) => void
+export function deepObserve<T = any>(
+    target: T,
+    listener: (change: IChange, path: string, root: T) => void
 ): IDisposer {
     const entrySet = new WeakMap<any, Entry>()
 
     function genericListener(change: IChange) {
         const entry = entrySet.get(change.object)
         processChange(change, entry)
-        listener(change, buildPath(entry))
+        listener(change, buildPath(entry), target)
     }
 
     function processChange(change: IChange, parent: Entry) {
-        switch(change.type) {
+        switch (change.type) {
             // Object changes
             case "add": // also for map
                 observeRecursively(change.newValue, parent, change.name)
                 break
             case "update": // also for array and map
                 unobserveRecursively(change.oldValue)
-                observeRecursively(change.newValue, parent, (change as any).name || ("" + (change as any).index))
+                observeRecursively(
+                    change.newValue,
+                    parent,
+                    (change as any).name || "" + (change as any).index
+                )
                 break
             case "remove": // object
             case "delete": // map
@@ -74,7 +78,9 @@ export function deepObserve(
             // Array changes
             case "splice":
                 change.removed.map(unobserveRecursively)
-                change.added.forEach((value, idx) => observeRecursively(value, parent, "" + (change.index + idx)))
+                change.added.forEach((value, idx) =>
+                    observeRecursively(value, parent, "" + (change.index + idx))
+                )
                 // update paths
                 for (let i = change.index + change.addedCount; i < change.object.length; i++) {
                     const entry = entrySet.get(change.object[i])
@@ -84,32 +90,36 @@ export function deepObserve(
         }
     }
 
-    function observeRecursively(target: any, parent: Entry, path: string) {
-        if (isObservableObject(target) || isObservableArray(target) || isObservableMap(target)) {
-            if (entrySet.has(target)) {
-                const entry = entrySet.get(target)
+    function observeRecursively(thing: any, parent: Entry, path: string) {
+        if (isObservableObject(thing) || isObservableArray(thing) || isObservableMap(thing)) {
+            if (entrySet.has(thing)) {
+                const entry = entrySet.get(thing)
                 if (entry.parent !== parent || entry.path !== path)
                     throw new Error(
-                        `The same observable object cannot appear twice in the same tree, trying to assign it to '${buildPath(parent)}/${path}', but it already exists at '${buildPath(entry.parent)}/${entry.path}'`
+                        `The same observable object cannot appear twice in the same tree, trying to assign it to '${buildPath(
+                            parent
+                        )}/${path}', but it already exists at '${buildPath(
+                            entry.parent
+                        )}/${entry.path}'`
                     )
             } else {
                 const entry = {
                     parent,
                     path,
-                    dispose: observe(target, genericListener)
+                    dispose: observe(thing, genericListener)
                 }
-                entrySet.set(target, entry)
-                entries(target).forEach(([key, value]) => observeRecursively(value, entry, key))
+                entrySet.set(thing, entry)
+                entries(thing).forEach(([key, value]) => observeRecursively(value, entry, key))
             }
         }
     }
 
-    function unobserveRecursively(target: any) {
-        const entry = entrySet.get(target)
+    function unobserveRecursively(thing: any) {
+        const entry = entrySet.get(thing)
         if (!entry) return
-        entrySet.delete(target)
+        entrySet.delete(thing)
         entry.dispose()
-        values(target).forEach(unobserveRecursively)
+        values(thing).forEach(unobserveRecursively)
     }
 
     observeRecursively(target, undefined, "")
