@@ -95,6 +95,9 @@ export function deepObserve<T = any>(
             if (entrySet.has(thing)) {
                 const entry = entrySet.get(thing)
                 if (entry.parent !== parent || entry.path !== path)
+                    // MWE: this constraint is artificial, and this tool could be made to work with cycles,
+                    // but it increases administration complexity, has tricky edge cases and the meaning of 'path'
+                    // would become less clear. So doesn't seem to be needed for now
                     throw new Error(
                         `The same observable object cannot appear twice in the same tree, trying to assign it to '${buildPath(
                             parent
