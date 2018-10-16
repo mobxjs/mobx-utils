@@ -623,7 +623,7 @@ See: <https://mobx.js.org/refguide/create-transformer.html>
 
 ## deepObserve
 
-Deeply observes a given an object, array or map.
+Deeply observes a given object, array or map.
 It is like `observe` from mobx, but applied recursively, including all future children.
 
 Note that the given object cannot ever contain cycles and should be a tree.
