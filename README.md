@@ -624,7 +624,7 @@ See: <https://mobx.js.org/refguide/create-transformer.html>
 ## deepObserve
 
 Deeply observes a given object, array or map.
-It is like `observe` from mobx, but applied recursively, including all future children.
+Like MobX's `observe`, but applied recursively, including all its future children.
 
 Note that the given object cannot ever contain cycles and should be a tree.
 
