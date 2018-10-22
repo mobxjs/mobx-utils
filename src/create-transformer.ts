@@ -52,9 +52,10 @@ export function createTransformer<A, B>(
 }
 
 function getMemoizationId(object: any) {
-    if (typeof object === "string") return `string:${object}`
-    if (typeof object === "number") return `number:${object}`
-    if (object === null || typeof object !== "object")
+    const objectType = typeof object;
+    if (objectType === "string") return `string:${object}`
+    if (objectType === "number") return `number:${object}`
+    if (object === null || (objectType !== "object" && objectType !== "function"))
         throw new Error(
             "[mobx-utils] transform expected an object, string or number, got: " + object
         )
