@@ -1,3 +1,7 @@
+# 5.0.4
+
+* Fixed [#158](https://github.com/mobxjs/mobx-utils/issues/158), `deepObserve` not being published
+
 # 5.0.3
 
 * Introduced `deepObserve` utility, through [#154](https://github.com/mobxjs/mobx-utils/pull/154)
