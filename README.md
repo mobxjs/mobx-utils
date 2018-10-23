@@ -362,6 +362,27 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
+**Parameters**
+
+-   `_1`  
+-   `_2`  
+-   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
+
+**Examples**
+
+```javascript
+const number = observable(3)
+const doubler = computed(() => number.get() * 2)
+const stop = keepAlive(doubler)
+// doubler will now stay in sync reactively even when there are no further observers
+stop()
+// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
+```
+
+Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
+
+## keepAlive
+
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
 `keepAlive` marks a computed value as always in use, meaning that it will always fresh, but never disposed automatically.
@@ -381,27 +402,6 @@ const obj = observable({
   doubler: function() { return this.number * 2 }
 })
 const stop = keepAlive(obj, "doubler")
-```
-
-Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
-
-## keepAlive
-
-**Parameters**
-
--   `_1`  
--   `_2`  
--   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
-
-**Examples**
-
-```javascript
-const number = observable(3)
-const doubler = computed(() => number.get() * 2)
-const stop = keepAlive(doubler)
-// doubler will now stay in sync reactively even when there are no further observers
-stop()
-// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
 ```
 
 Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
@@ -623,8 +623,8 @@ See: <https://mobx.js.org/refguide/create-transformer.html>
 
 ## deepObserve
 
-Deeply observes a given object, array or map.
-Like MobX's `observe`, but applied recursively, including all its future children.
+Given an object, deeply observes the given object.
+It is like `observe` from mobx, but applied recursively, including all future children
 
 Note that the given object cannot ever contain cycles and should be a tree.
 
