@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should throw error when passed invalid param type 1`] = `"[mobx-utils] transform expected an object, function, string or number, got: null"`;
+
+exports[`should throw error when passed invalid param type 2`] = `"[mobx-utils] transform expected an object, function, string or number, got: undefined"`;
+
+exports[`should throw error when passed invalid param type 3`] = `"[mobx-utils] transform expected an object, function, string or number, got: Symbol(A)"`;
+
+exports[`should throw error when passed invalid param type 4`] = `"[mobx-utils] transform expected an object, function, string or number, got: true"`;

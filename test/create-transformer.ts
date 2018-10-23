@@ -1281,3 +1281,21 @@ function createTestSet(): any {
 
     return testSet
 }
+
+it("should throw error when passed invalid param type", () => {
+    const transformedFn = createTransformer((obj: any) => obj)
+    const validParams = [[], {}, jest.fn(), 1, "string"]
+    const invalidParams = [null, undefined, Symbol("A"), true]
+
+    validParams.forEach(obj => {
+        expect(() => {
+            transformedFn(obj)
+        }).not.toThrowError()
+    })
+
+    invalidParams.forEach(obj => {
+        expect(() => {
+            transformedFn(obj)
+        }).toThrowErrorMatchingSnapshot()
+    })
+})
