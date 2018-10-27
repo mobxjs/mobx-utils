@@ -65,7 +65,6 @@ test("delete", () => {
     })
 })
 
-
 test("cleanup", () => {
     const a = observable({ b: 1 })
     const x = observable({ a })
@@ -91,22 +90,18 @@ test("throw on double entry", () => {
     })
 
     expect(() => {
-        (x as any).b = a
+        ;(x as any).b = a
     }).toThrow("trying to assign it to '/b', but it already exists at '/a'")
 })
 
 test("array", () => {
-    assertChanges([
-        1,
-        2,
-        { x: 3 }
-    ], (ar: any) => {
-        ar.splice(1, 1, { x: 1}, { x: 2 })
+    assertChanges([1, 2, { x: 3 }], (ar: any) => {
+        ar.splice(1, 1, { x: 1 }, { x: 2 })
         ar[1].x = "a"
         ar[2].x = "b"
         ar[3].x = "c"
         ar.splice(0, 3)
-        ar.push({x: "B"})
+        ar.push({ x: "B" })
         ar[0].x = "A"
     })
 })

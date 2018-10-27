@@ -3,7 +3,7 @@
 const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
 
-mobx.configure({ enforceActions: true })
+mobx.configure({ enforceActions: "observed" })
 
 test("lazy observable should work", done => {
     let started = false

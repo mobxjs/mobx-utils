@@ -3,7 +3,7 @@
 const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
 
-mobx.configure({ enforceActions: true })
+mobx.configure({ enforceActions: "observed" })
 
 test("keep alive should work for computeds", () => {
     const a = mobx.observable.box(1)

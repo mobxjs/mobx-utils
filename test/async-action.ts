@@ -11,7 +11,7 @@ function delay<T>(time: number, value: T, shouldThrow = false): Promise<T> {
 }
 
 test("it should support async generator actions", done => {
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     const values: any[] = []
     const x = mobx.observable({ a: 1 })
     mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
@@ -35,7 +35,7 @@ test("it should support async generator actions", done => {
 })
 
 test("it should support try catch in async generator", done => {
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     const values: any[] = []
     const x = mobx.observable({ a: 1 })
     mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
@@ -95,7 +95,7 @@ test("it should support throw from yielded promise generator", done => {
 test("it should support asyncAction as decorator", done => {
     const values: any[] = []
 
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
 
     class X {
         @mobx.observable a = 1;
@@ -130,11 +130,11 @@ test("it should support asyncAction as decorator", done => {
 })
 
 test("it should support logging", done => {
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     const events: any[] = []
     const x = mobx.observable({ a: 1 })
 
-    const f = utils.asyncAction(function *myaction(initial: number) {
+    const f = utils.asyncAction(function* myaction(initial: number) {
         x.a = initial
         x.a = yield delay(100, 5)
         x.a = 4
