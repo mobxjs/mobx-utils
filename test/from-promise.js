@@ -3,7 +3,7 @@
 const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
 
-mobx.configure({ enforceActions: true })
+mobx.configure({ enforceActions: "observed" })
 
 test("resolves", done => {
     const p = new Promise(resolve => resolve(7))
@@ -19,6 +19,73 @@ test("resolves", done => {
         () => {
             expect(obs.value).toBe(7)
             done()
+        }
+    )
+})
+
+test("old state is undefined", done => {
+    const p = new Promise(resolve => resolve(7))
+    const obs = utils.fromPromise(p, undefined)
+    expect(obs.value).toBe(undefined)
+    expect(obs.state).toBe("pending")
+
+    mobx.when(
+        () => obs.state === "fulfilled",
+        () => {
+            expect(obs.value).toBe(7)
+            done()
+        }
+    )
+})
+
+test("resolves old state", done => {
+    const oldP = utils.fromPromise(new Promise(resolve => resolve(9)))
+    mobx.when(
+        () => oldP.state == "fulfilled",
+        () => {
+            const p = new Promise(resolve => resolve(7))
+            const obs = utils.fromPromise(p, oldP)
+            expect(obs.value).toBe(9)
+            expect(obs.state).toBe("pending")
+            done()
+        }
+    )
+})
+
+test("resolves new state", done => {
+    const oldP = utils.fromPromise(new Promise(resolve => resolve(9)))
+    mobx.when(
+        () => oldP.state == "fulfilled",
+        () => {
+            const p = new Promise(resolve => resolve(7))
+            const obs = utils.fromPromise(p, oldP)
+            mobx.when(
+                () => obs.state === "fulfilled",
+                () => {
+                    expect(obs.value).toBe(7)
+                    done()
+                }
+            )
+        }
+    )
+})
+
+test("rejects new state", done => {
+    const oldP = utils.fromPromise(new Promise(resolve => resolve(9)))
+    mobx.when(
+        () => oldP.state == "fulfilled",
+        () => {
+            const p = new Promise((resolve, reject) => {
+                reject(7)
+            })
+            const obs = utils.fromPromise(p, oldP)
+            mobx.when(
+                () => obs.state === "rejected",
+                () => {
+                    expect(obs.value).toBe(7)
+                    done()
+                }
+            )
         }
     )
 })
@@ -79,7 +146,7 @@ test("rejects with reason value", done => {
 test("rejects with reason value from fn", done => {
     const obs = utils.fromPromise(
         new Promise((resolve, reject) => {
-            reject(7)
+            reject(undefined)
         })
     )
     obs.catch(() => {})
@@ -90,7 +157,7 @@ test("rejects with reason value from fn", done => {
         () => obs.state !== utils.PENDING,
         () => {
             expect(obs.state).toBe(utils.REJECTED)
-            expect(obs.value).toBe(7)
+            expect(obs.value).toBe(undefined)
             done()
         }
     )

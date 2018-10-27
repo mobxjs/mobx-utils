@@ -45,8 +45,8 @@ function caseImpl<U, T>(handlers: {
     }
 }
 
-function createObservablePromise(origPromise: any) {
-    invariant(arguments.length === 1, "fromPromise expects exactly one argument")
+function createObservablePromise(origPromise: any, oldPromise?: any) {
+    invariant(arguments.length <= 2, "fromPromise expects up to two arguments")
     invariant(
         typeof origPromise === "function" ||
             (typeof origPromise === "object" &&
@@ -75,10 +75,11 @@ function createObservablePromise(origPromise: any) {
 
     promise.isPromiseBasedObservable = true
     promise.case = caseImpl
+    const oldData = oldPromise && oldPromise.state === FULFILLED? oldPromise.value: undefined;
     extendObservable(
         promise,
         {
-            value: undefined,
+            value: oldData,
             state: PENDING
         },
         {},
@@ -149,10 +150,12 @@ function createObservablePromise(origPromise: any) {
  * )
  *
  * @param {IThenable<T>} promise The promise which will be observed
+ * @param {IThenable<T>} oldPromise? The promise which will be observed
  * @returns {IPromiseBasedObservable<T>}
  */
 export const fromPromise: {
     <T>(promise: PromiseLike<T>): IPromiseBasedObservable<T>
+    <T>(oldPromise?: PromiseLike<T>): IPromiseBasedObservable<T>
     reject<T>(reason: any): IRejectedPromise & IBasePromiseBasedObservable<T>
     resolve<T>(value?: T): IFulfilledPromise<T> & IBasePromiseBasedObservable<T>
 } = createObservablePromise as any
