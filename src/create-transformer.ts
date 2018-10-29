@@ -57,9 +57,7 @@ function getMemoizationId(object: any) {
     if (objectType === "number") return `number:${object}`
     if (object === null || (objectType !== "object" && objectType !== "function"))
         throw new Error(
-            `[mobx-utils] transform expected an object, function, string or number, got: ${object &&
-                object.toString &&
-                object.toString()}`
+            `[mobx-utils] transform expected an object, function, string or number, got: ${String(object)}`
         )
     let tid = object.$transformId
     if (tid === undefined) {
