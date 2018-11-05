@@ -166,7 +166,7 @@ and which can be kept in sync with some external datasource that can be subscrib
 The created observable will only subscribe to the datasource if it is in use somewhere,
 (un)subscribing when needed. To enable `fromResource` to do that two callbacks need to be provided,
 one to subscribe, and one to unsubscribe. The subscribe callback itself will receive a `sink` callback, which can be used
-to update the current state of the observable, allowing observes to react.
+to update the current state of the observable, allowing observers to react.
 
 Whatever is passed to `sink` will be returned by `current()`. The values passed to the sink will not be converted to
 observables automatically, but feel free to do so.
