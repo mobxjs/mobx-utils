@@ -171,7 +171,7 @@ to update the current state of the observable, allowing observes to react.
 Whatever is passed to `sink` will be returned by `current()`. The values passed to the sink will not be converted to
 observables automatically, but feel free to do so.
 It is the `current()` call itself which is being tracked,
-so make sure that you don't dereference to early.
+so make sure that you don't dereference too early.
 
 For inspiration, an example integration with the apollo-client on [github](https://github.com/apollostack/apollo-client/issues/503#issuecomment-241101379),
 or the [implementation](https://github.com/mobxjs/mobx-utils/blob/1d17cf7f7f5200937f68cc0b5e7ec7f3f71dccba/src/now.ts#L43-L57) of `mobxUtils.now`
