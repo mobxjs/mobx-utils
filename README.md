@@ -133,7 +133,7 @@ current value of the lazyObservable. It is allowed to call `sink` multiple times
 to keep the lazyObservable up to date with some external resource.
 
 Note that it is the `current()` call itself which is being tracked by MobX,
-so make sure that you don't dereference to early.
+so make sure that you don't dereference too early.
 
 **Parameters**
 
