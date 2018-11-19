@@ -1,3 +1,9 @@
+# 5.1.0
+
+* `fromPromise` now accepts a second argument, a previous obsevable promise, that can be used to temporarily show old values until the new promise has resolved. See [#160](https://github.com/mobxjs/mobx-utils/pull/160) by [@ItamarShDev](https://github.com/ItamarShDev)
+* `createTransformer` can now also memoize on function arguments, see [#159](https://github.com/mobxjs/mobx-utils/pull/159) by [@hc-12](https://github.com/hc-12)
+
+
 # 5.0.4
 
 * Fixed [#158](https://github.com/mobxjs/mobx-utils/issues/158), `deepObserve` not being published

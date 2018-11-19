@@ -31,13 +31,13 @@ export type IPromiseBasedObservable<T> = IBasePromiseBasedObservable<T> &
     (IPendingPromise | IFulfilledPromise<T> | IRejectedPromise)
 
 function caseImpl<U, T>(handlers: {
-    pending?: () => U
+    pending?: (t?: T) => U
     fulfilled?: (t: T) => U
     rejected?: (e: any) => U
 }): U {
     switch (this.state) {
         case PENDING:
-            return handlers.pending && handlers.pending()
+            return handlers.pending && handlers.pending(this.value)
         case REJECTED:
             return handlers.rejected && handlers.rejected(this.value)
         case FULFILLED:
@@ -103,6 +103,41 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
  *
  * Note that the status strings are available as constants:
  * `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
+ *
+ * fromPromise takes an optional second argument, a previously created `fromPromise` based observable.
+ * This is useful to replace one promise based observable with another, without going back to an intermediate
+ * "pending" promise state while fetching data. For example:
+ *
+ * ```javascript
+ * @observer
+ * class SearchResults extends React.Component {
+ *   @observable searchResults
+ *
+ *   componentWillReceiveProps(nextProps) {
+ *     if (nextProps.query !== this.props.query)
+ *       this.comments = fromPromse(
+ *         window.fetch("/search?q=" + nextProps.query),
+ *         // by passing, we won't render a pending state if we had a successful search query before
+ *         // rather, we will keep showing the previous search results, until the new promise resolves (or rejects)
+ *         this.searchResults
+ *       )
+ *   }
+ *
+ *   render() {
+ *     return this.searchResults.case({
+ *        pending(staleValue) {
+ *          return staleValue || "searching" // <- value might set to previous results while the promise is still pending
+ *        },
+ *        fullfilled(value) {
+ *          return value // the fresh results
+ *        },
+ *        rejected(error) {
+ *          return "Oops: " + error
+ *        }
+ *     })
+ *   }
+ * }
+ * ```
  *
  * Observable promises can be created immediately in a certain state using
  * `fromPromise.reject(reason)` or `fromPromise.resolve(value?)`.
