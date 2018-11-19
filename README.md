@@ -40,16 +40,18 @@ The returned object implements `PromiseLike<TValue>`, so you can chain additiona
 Note that the status strings are available as constants:
 `mobxUtils.PENDING`, `mobxUtils.REJECTED`, `mobxUtil.FULFILLED`
 
-Observable promises can be created immediately in a certain state using
-`fromPromise.reject(reason)` or `fromPromise.resolve(value?)`.
-The main advantage of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
+fromPromise takes an optional second argument, a previously created `fromPromise` based observable.
+This is useful to replace one promise based observable with another, without going back to an intermediate
+"pending" promise state while fetching data. For example:
 
-It is possible to directly create a promise using a resolve, reject function:
-`fromPromise((resolve, reject) => setTimeout(() => resolve(true), 1000))`
+```javascript
+
+```
 
 **Parameters**
 
 -   `promise` **IThenable&lt;T>** The promise which will be observed
+-   `oldPromise` **IThenable&lt;T>** ? The promise which will be observed
 
 **Examples**
 
@@ -133,7 +135,7 @@ current value of the lazyObservable. It is allowed to call `sink` multiple times
 to keep the lazyObservable up to date with some external resource.
 
 Note that it is the `current()` call itself which is being tracked by MobX,
-so make sure that you don't dereference too early.
+so make sure that you don't dereference to early.
 
 **Parameters**
 
@@ -166,12 +168,12 @@ and which can be kept in sync with some external datasource that can be subscrib
 The created observable will only subscribe to the datasource if it is in use somewhere,
 (un)subscribing when needed. To enable `fromResource` to do that two callbacks need to be provided,
 one to subscribe, and one to unsubscribe. The subscribe callback itself will receive a `sink` callback, which can be used
-to update the current state of the observable, allowing observers to react.
+to update the current state of the observable, allowing observes to react.
 
 Whatever is passed to `sink` will be returned by `current()`. The values passed to the sink will not be converted to
 observables automatically, but feel free to do so.
 It is the `current()` call itself which is being tracked,
-so make sure that you don't dereference too early.
+so make sure that you don't dereference to early.
 
 For inspiration, an example integration with the apollo-client on [github](https://github.com/apollostack/apollo-client/issues/503#issuecomment-241101379),
 or the [implementation](https://github.com/mobxjs/mobx-utils/blob/1d17cf7f7f5200937f68cc0b5e7ec7f3f71dccba/src/now.ts#L43-L57) of `mobxUtils.now`
@@ -362,27 +364,6 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-**Parameters**
-
--   `_1`  
--   `_2`  
--   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
-
-**Examples**
-
-```javascript
-const number = observable(3)
-const doubler = computed(() => number.get() * 2)
-const stop = keepAlive(doubler)
-// doubler will now stay in sync reactively even when there are no further observers
-stop()
-// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
-```
-
-Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
-
-## keepAlive
-
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
 `keepAlive` marks a computed value as always in use, meaning that it will always fresh, but never disposed automatically.
@@ -402,6 +383,27 @@ const obj = observable({
   doubler: function() { return this.number * 2 }
 })
 const stop = keepAlive(obj, "doubler")
+```
+
+Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
+
+## keepAlive
+
+**Parameters**
+
+-   `_1`  
+-   `_2`  
+-   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
+
+**Examples**
+
+```javascript
+const number = observable(3)
+const doubler = computed(() => number.get() * 2)
+const stop = keepAlive(doubler)
+// doubler will now stay in sync reactively even when there are no further observers
+stop()
+// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
 ```
 
 Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
