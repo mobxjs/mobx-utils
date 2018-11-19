@@ -3,7 +3,7 @@
 const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
 
-mobx.configure({ enforceActions: true })
+mobx.configure({ enforceActions: "observed" })
 
 test("create view model", () => {
     function Todo(title, done, usersInterested) {

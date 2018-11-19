@@ -3,7 +3,7 @@
 const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
 
-mobx.configure({ enforceActions: true })
+mobx.configure({ enforceActions: "observed" })
 
 test("whenWithTimeout should operate normally", done => {
     var a = mobx.observable.box(1)

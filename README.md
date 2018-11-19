@@ -543,7 +543,7 @@ fetchUsers("http://users.com").then(time => {
 ```javascript
 import {asyncAction} from "mobx-utils"
 
-mobx.configure({ enforceActions: true }) // don't allow state modifications outside actions
+mobx.configure({ enforceActions: "observed" }) // don't allow state modifications outside actions
 
 class Store {
 	\@observable githubProjects = []

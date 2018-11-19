@@ -4,7 +4,7 @@ const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
 
 test("expr", function() {
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
     try {
         let factor = mobx.observable.box(0)
         let price = mobx.observable.box(100)
@@ -42,12 +42,12 @@ test("expr", function() {
         expect(innerCalcs).toBe(9)
         expect(totalCalcs).toBe(5)
     } finally {
-        mobx.configure({ enforceActions: true })
+        mobx.configure({ enforceActions: "observed" })
     }
 })
 
 test("expr2", function() {
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
     try {
         let factor = mobx.observable.box(0)
         let price = mobx.observable.box(100)
@@ -85,6 +85,6 @@ test("expr2", function() {
         expect(innerCalcs).toBe(9)
         expect(totalCalcs).toBe(5)
     } finally {
-        mobx.configure({ enforceActions: true })
+        mobx.configure({ enforceActions: "observed" })
     }
 })

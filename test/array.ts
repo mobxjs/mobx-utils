@@ -15,6 +15,11 @@ test("it should move the item as expected", () => {
     expect(source[1]).toBe(2)
     expect(source[2]).toBe(3)
 })
+test("it throws when index is out of bounds", () => {
+    const source = observable<number>([1, 2, 3])
+    expect(moveItem(source, 0, 0)).toBeUndefined()
+    expect(moveItem(source, 2, 2)).toBeUndefined()
+})
 
 test("it throws when index is out of bounds", () => {
     const source = observable<number>([1, 2, 3])

@@ -10,7 +10,7 @@ test("to observable - should push the initial value by default", () => {
         lastName: "Lewis"
     })
 
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
 
     let values = []
 
@@ -39,7 +39,7 @@ test("to observable - should not push the initial value", () => {
         lastName: "Lewis"
     })
 
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
 
     let values = []
 
@@ -63,7 +63,7 @@ test("to observable - should not push the initial value", () => {
 })
 
 test("from observable", done => {
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     const fromStream = utils.fromStream(Rx.Observable.interval(100), -1)
     const values = []
     const d = mobx.autorun(() => {
@@ -84,7 +84,7 @@ test("from observable", done => {
         expect(fromStream.current).toBe(1)
         expect(values).toEqual([-1, 0, 1])
         d()
-        mobx.configure({ enforceActions: false })
+        mobx.configure({ enforceActions: "never" })
         done()
     }, 350)
 })
