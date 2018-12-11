@@ -233,6 +233,24 @@ test("case method, rejection", done => {
     )
 })
 
+test("case method, returns fulfilled value by default", done => {
+    const p = Promise.resolve(2)
+    const obs = utils.fromPromise(p)
+
+    let mapping = { pending: () => 1 }
+
+    let mapped = obs.case(mapping)
+    expect(mapped).toBe(1)
+    mobx.when(
+        () => obs.state === "fulfilled",
+        () => {
+            let mapped = obs.case(mapping)
+            expect(mapped).toBe(2)
+            done()
+        }
+    )
+})
+
 test("case method, returns undefined when handler is missing", done => {
     const p = Promise.resolve()
     const obs = utils.fromPromise(p)
