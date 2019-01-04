@@ -49,8 +49,11 @@ export class ViewModel<T> implements IViewModel<T> {
                 const derivation = _getAdministration(model, key).derivation // Fixme: there is no clear api to get the derivation
                 this.localComputedValues.set(key, computed(derivation.bind(this)))
             }
+
+            const { enumerable } = Object.getOwnPropertyDescriptor(model, key)
+
             Object.defineProperty(this, key, {
-                enumerable: true,
+                enumerable,
                 configurable: true,
                 get: () => {
                     if (isComputedProp(model, key)) return this.localComputedValues.get(key).get()
