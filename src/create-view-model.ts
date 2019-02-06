@@ -34,6 +34,11 @@ export class ViewModel<T> implements IViewModel<T> {
         return this.localValues.size > 0
     }
 
+    @computed
+    get changedValues() {
+        return this.localValues.toJS()
+    }
+
     constructor(public model: T) {
         invariant(isObservableObject(model), "createViewModel expects an observable object")
 
@@ -58,8 +63,10 @@ export class ViewModel<T> implements IViewModel<T> {
                     else return (this.model as any)[key]
                 },
                 set: action((value: any) => {
-                    if (this.isPropertyDirty(key) || value !== (this.model as any)[key]) {
+                    if (value !== (this.model as any)[key]) {
                         this.localValues.set(key, value)
+                    } else {
+                        this.localValues.delete(key)
                     }
                 })
             })
