@@ -57,6 +57,7 @@ test("create view model", () => {
     expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,usersCount:3")
     expect(vr).toBe("tea:false,interested:Vader,Madonna,Tarzan,usersCount:3") // change reflected in view model
     expect(viewModel.isDirty).toBe(false)
+    expect(viewModel.changedValues.size).toBe(0)
 
     mobx.runInAction(() => (viewModel.done = true))
     expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,usersCount:3")
@@ -66,6 +67,7 @@ test("create view model", () => {
     expect(viewModel.isPropertyDirty("done")).toBe(true)
     expect(viewModel.isPropertyDirty("usersInterested")).toBe(false)
     expect(viewModel.isPropertyDirty("usersCount")).toBe(false)
+    expect(viewModel.changedValues.has("done")).toBe(true)
 
     const newUsers = ["Putin", "Madonna", "Tarzan"]
     mobx.runInAction(() => (viewModel.usersInterested = newUsers))
@@ -76,13 +78,18 @@ test("create view model", () => {
     expect(viewModel.isPropertyDirty("done")).toBe(true)
     expect(viewModel.isPropertyDirty("usersInterested")).toBe(true)
     expect(viewModel.isPropertyDirty("usersCount")).toBe(false)
+    expect(viewModel.changedValues.has("done")).toBe(true)
+
+    mobx.runInAction(() => (viewModel.done = false))
+    expect(viewModel.isPropertyDirty("done")).toBe(false)
+    expect(viewModel.changedValues.has("done")).toBe(false)
 
     mobx.runInAction(() => model.usersInterested.push("Cersei"))
     expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei,usersCount:4")
-    expect(vr).toBe("tea:true,interested:Putin,Madonna,Tarzan,usersCount:3") // change NOT reflected in view model bcs users are dirty
+    expect(vr).toBe("tea:false,interested:Putin,Madonna,Tarzan,usersCount:3") // change NOT reflected in view model bcs users are dirty
     expect(viewModel.isDirty).toBe(true)
     expect(viewModel.isPropertyDirty("title")).toBe(false)
-    expect(viewModel.isPropertyDirty("done")).toBe(true)
+    expect(viewModel.isPropertyDirty("done")).toBe(false)
     expect(viewModel.isPropertyDirty("usersInterested")).toBe(true)
 
     // should reset
