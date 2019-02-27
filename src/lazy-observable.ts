@@ -59,6 +59,7 @@ export function lazyObservable<T>(
         return value.get()
     }
     let resetFnc = action("lazyObservable-reset", () => {
+        started = false
         value.set(initialValue)
         return value.get()
     })
