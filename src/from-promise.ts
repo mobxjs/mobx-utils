@@ -75,7 +75,7 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
 
     promise.isPromiseBasedObservable = true
     promise.case = caseImpl
-    const oldData = oldPromise && oldPromise.state === FULFILLED? oldPromise.value: undefined;
+    const oldData = oldPromise && oldPromise.state === FULFILLED ? oldPromise.value : undefined;
     extendObservable(
         promise,
         {
