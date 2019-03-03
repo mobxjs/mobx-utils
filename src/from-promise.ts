@@ -75,7 +75,7 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
 
     promise.isPromiseBasedObservable = true
     promise.case = caseImpl
-    const oldData = oldPromise && oldPromise.state === FULFILLED? oldPromise.value: undefined;
+    const oldData = oldPromise && oldPromise.state === FULFILLED ? oldPromise.value : undefined;
     extendObservable(
         promise,
         {
@@ -90,8 +90,8 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
 }
 
 /**
- * `fromPromise` takes a Promise and returns a new Promise wrapping the original one. The returned Promise is also extended with 2 observable properties that track
- * the status of the promise. The returned object has the following observable properties:
+ * `fromPromise` takes a Promise, extends it with 2 observable properties that track
+ * the status of the promise and returns it. The returned object has the following observable properties:
  *  - `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference.
  *  - `state`: one of `"pending"`, `"fulfilled"` or `"rejected"`
  *
