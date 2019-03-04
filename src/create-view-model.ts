@@ -121,6 +121,7 @@ export class ViewModel<T> implements IViewModel<T> {
  * - `resetProperty(propName)`: resets the specified property of the viewmodel
  * - `isDirty`: observable property indicating if the viewModel contains any modifications
  * - `isPropertyDirty(propName)`: returns true if the specified property is dirty
+ * - `changedValues`: returns a key / value map with the properties that have been changed in the model so far
  * - `model`: The original model object for which this viewModel was created
  *
  * You may use observable arrays, maps and objects with `createViewModel` but keep in mind to assign fresh instances of those to the viewmodel's properties, otherwise you would end up modifying the properties of the original model.
