@@ -38,7 +38,9 @@ function buildPath(entry: Entry): string {
  * As benefit: path and root will be provided in the callback, so the signature of the listener is
  * (change, path, root) => void
  *
- * The returned disposer can be invoked to clean up the listner
+ * The returned disposer can be invoked to clean up the listener
+ * 
+ * deepObserve cannot be used on computed values.
  *
  * @example
  * const disposer = deepObserve(target, (change, path) => {
