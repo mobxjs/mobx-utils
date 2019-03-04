@@ -83,8 +83,10 @@ export function deepObserve<T = any>(
                 )
                 // update paths
                 for (let i = change.index + change.addedCount; i < change.object.length; i++) {
-                    const entry = entrySet.get(change.object[i])
-                    if (entry) entry.path = "" + i
+                    if (isRecursivelyObservable(change.object[i])) {
+                        const entry = entrySet.get(change.object[i])
+                        if (entry) entry.path = "" + i
+                    }
                 }
                 break
         }
