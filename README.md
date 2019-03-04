@@ -32,7 +32,7 @@ the status of the promise. The returned object has the following observable prop
 
 And the following methods:
 
--   `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
+-   `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers. If no handler is available, returns the value of the promise for the `fulfilled` state, otherwise returns `undefined`.
 -   `then((value: TValue) => TResult1 | PromiseLike<TResult1>, [(rejectReason: any) => any])`: chains additional handlers to the provided promise.
 
 The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`. You may also use it with `await` in `async` functions.
