@@ -31,14 +31,14 @@ function buildPath(entry: Entry): string {
 
 /**
  * Given an object, deeply observes the given object.
- * It is like `observe` from mobx, but applied recursively, including all future children
+ * It is like `observe` from mobx, but applied recursively, including all future children.
  *
  * Note that the given object cannot ever contain cycles and should be a tree.
  *
  * As benefit: path and root will be provided in the callback, so the signature of the listener is
  * (change, path, root) => void
  *
- * The returned disposer can be invoked to clean up the listner
+ * The returned disposer can be invoked to clean up the listener.
  *
  * @example
  * const disposer = deepObserve(target, (change, path) => {
@@ -90,8 +90,12 @@ export function deepObserve<T = any>(
         }
     }
 
+    function isRecursivelyObservable(thing: any) {
+        return isObservableObject(thing) || isObservableArray(thing) || isObservableMap(thing)
+    }
+
     function observeRecursively(thing: any, parent: Entry, path: string) {
-        if (isObservableObject(thing) || isObservableArray(thing) || isObservableMap(thing)) {
+        if (isRecursivelyObservable(thing)) {
             if (entrySet.has(thing)) {
                 const entry = entrySet.get(thing)
                 if (entry.parent !== parent || entry.path !== path)
@@ -118,11 +122,13 @@ export function deepObserve<T = any>(
     }
 
     function unobserveRecursively(thing: any) {
-        const entry = entrySet.get(thing)
-        if (!entry) return
-        entrySet.delete(thing)
-        entry.dispose()
-        values(thing).forEach(unobserveRecursively)
+        if (isRecursivelyObservable(thing)) {
+            const entry = entrySet.get(thing)
+            if (!entry) return
+            entrySet.delete(thing)
+            entry.dispose()
+            values(thing).forEach(unobserveRecursively)
+        }
     }
 
     observeRecursively(target, undefined, "")
