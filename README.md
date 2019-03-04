@@ -24,15 +24,15 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 
 ## fromPromise
 
-`fromPromise` takes a Promise and returns a new Promise wrapping the original one. The returned Promise is also extended with 2 observable properties that track
-the status of the promise. The returned object has the following observable properties:
+`fromPromise` takes a Promise, extends it with 2 observable properties that track
+the status of the promise and returns it. The returned object has the following observable properties:
 
 -   `value`: either the initial value, the value the Promise resolved to, or the value the Promise was rejected with. use `.state` if you need to be able to tell the difference.
 -   `state`: one of `"pending"`, `"fulfilled"` or `"rejected"`
 
 And the following methods:
 
--   `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers. If no handler is available, returns the value of the promise for the `fulfilled` state, otherwise returns `undefined`.
+-   `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
 -   `then((value: TValue) => TResult1 | PromiseLike<TResult1>, [(rejectReason: any) => any])`: chains additional handlers to the provided promise.
 
 The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`. You may also use it with `await` in `async` functions.
@@ -295,6 +295,7 @@ The viewmodel exposes the following additional methods, besides all the enumerab
 -   `resetProperty(propName)`: resets the specified property of the viewmodel
 -   `isDirty`: observable property indicating if the viewModel contains any modifications
 -   `isPropertyDirty(propName)`: returns true if the specified property is dirty
+-   `changedValues`: returns a key / value map with the properties that have been changed in the model so far
 -   `model`: The original model object for which this viewModel was created
 
 You may use observable arrays, maps and objects with `createViewModel` but keep in mind to assign fresh instances of those to the viewmodel's properties, otherwise you would end up modifying the properties of the original model.
@@ -633,7 +634,9 @@ Note that the given object cannot ever contain cycles and should be a tree.
 As benefit: path and root will be provided in the callback, so the signature of the listener is
 (change, path, root) => void
 
-The returned disposer can be invoked to clean up the listner
+The returned disposer can be invoked to clean up the listener
+
+deepObserve cannot be used on computed values.
 
 **Parameters**
 
