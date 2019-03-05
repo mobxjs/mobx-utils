@@ -29,6 +29,10 @@ function buildPath(entry: Entry): string {
     return res.reverse().join("/")
 }
 
+function isRecursivelyObservable(thing: any) {
+    return isObservableObject(thing) || isObservableArray(thing) || isObservableMap(thing)
+}
+
 /**
  * Given an object, deeply observes the given object.
  * It is like `observe` from mobx, but applied recursively, including all future children.
@@ -90,10 +94,6 @@ export function deepObserve<T = any>(
                 }
                 break
         }
-    }
-
-    function isRecursivelyObservable(thing: any) {
-        return isObservableObject(thing) || isObservableArray(thing) || isObservableMap(thing)
     }
 
     function observeRecursively(thing: any, parent: Entry, path: string) {
