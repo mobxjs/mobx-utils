@@ -1,6 +1,6 @@
 {
   "name": "mobx-utils",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "Utility functions and common patterns for MobX",
   "main": "mobx-utils.umd.js",
   "module": "mobx-utils.module.js",
@@ -33,20 +33,20 @@
   ],
   "devDependencies": {
     "@types/jest": "^22.2.0",
-    "@types/tape": "^4.2.30",
     "coveralls": "^2.11.4",
-    "documentation": "^4.0.0-beta.18",
-    "faucet": "0.0.1",
+    "documentation": "*",
+    "faucet": "*",
     "jest": "^22.4.2",
-    "lodash.clonedeep": "^4.5.0",
-    "lodash.clonedeepwith": "^4.5.0",
-    "lodash.intersection": "^4.4.0",
+    "lodash.clonedeep": "*",
+    "lodash.clonedeepwith": "*",
+    "lodash.intersection": "*",
     "mobx": "^5.5.0",
     "prettier": "^1.7.2",
     "rollup": "^0.50.0",
     "rxjs": "^5.0.2",
+    "shelljs": "^0.8.3",
     "ts-jest": "^22.4.1",
-    "typescript": "^2.9.0"
+    "typescript": "*"
   },
   "dependencies": {},
   "peerDependencies": {

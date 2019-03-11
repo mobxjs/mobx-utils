@@ -9,7 +9,7 @@ export const REJECTED = "rejected"
 
 export type IBasePromiseBasedObservable<T> = {
     isPromiseBasedObservable: true
-    case<U>(handlers: { pending?: () => U; fulfilled?: (t: T) => U; rejected?: (e: any) => U }): U
+    case<U>(handlers: { pending?: () => U; fulfilled?: (t: T) => U; rejected?: (e: any) => U }, defaultFulfilled?: boolean): U
 } & PromiseLike<T>
 
 export type IPendingPromise = {
@@ -41,7 +41,7 @@ function caseImpl<U, T>(handlers: {
         case REJECTED:
             return handlers.rejected && handlers.rejected(this.value)
         case FULFILLED:
-            return handlers.fulfilled && handlers.fulfilled(this.value)
+            return handlers.fulfilled ? handlers.fulfilled(this.value) : this.value
     }
 }
 

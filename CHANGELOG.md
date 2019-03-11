@@ -1,3 +1,9 @@
+# 5.2.0
+
+* `createViewModel` now has an additional field `changedValues` on the returned viewmodel, that returns a map with all the pending changes. See [#172](https://github.com/mobxjs/mobx-utils/pull/172) by [@ItamarShDev](https://github.com/ItamarShDev). Fixes [#171](https://github.com/mobxjs/mobx-utils/issues/171) and [#173](https://github.com/mobxjs/mobx-utils/issues/173)
+* `fromPromise().case`: if the `onFullfilled` handler is omitted, `case` will now return the resolved value, rather than `undefined`. See [#167](https://github.com/mobxjs/mobx-utils/pull/167/) by [@JefHellemans](https://github.com/JefHellemans)
+* `createViewModel` will now respect the enumerability of properties. See [#169](https://github.com/mobxjs/mobx-utils/pull/169) by [dr0p](https://github.com/dr0p)
+
 # 5.1.0
 
 * `fromPromise` now accepts a second argument, a previous obsevable promise, that can be used to temporarily show old values until the new promise has resolved. See [#160](https://github.com/mobxjs/mobx-utils/pull/160) by [@ItamarShDev](https://github.com/ItamarShDev)
