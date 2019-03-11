@@ -22,6 +22,22 @@ function assertChanges<T>(x: T, fn: (x: T) => void) {
     expect(events).toMatchSnapshot()
 }
 
+test("not throwing on primitive value changes", () => {
+    // deepObserve uses a WeakMap to track what is being observed.
+    // WeakMaps can only contain objects as their keys, not primitive values.
+    // Certain JS runtimes throw when passing a non-object to #get, #set or #has.
+    // deepObserve should not throw on primitive value changes, but still observe them.
+    expect(() => {
+        const x = observable({ a: 1 })
+        const d = deepObserve(x, (change) => {
+            expect(change.oldValue).toBe(1)
+            expect(change.newValue).toBe(2)
+        });
+
+        x.a = 2
+    }).not.toThrow();
+})
+
 test("basic & dispose", () => {
     const x = observable({ a: 1, b: { z: 3 } })
     const events: any[] = []
