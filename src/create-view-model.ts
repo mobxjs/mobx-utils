@@ -19,6 +19,7 @@ export interface IViewModel<T> {
     reset(): void
     submit(): void
     isDirty: boolean
+    changedValues: Map<any, any>
     isPropertyDirty(key: string): boolean
     resetProperty(key: string): void
 }
