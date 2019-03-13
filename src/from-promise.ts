@@ -189,8 +189,7 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
  * @returns {IPromiseBasedObservable<T>}
  */
 export const fromPromise: {
-    <T>(promise: PromiseLike<T>): IPromiseBasedObservable<T>
-    <T>(oldPromise?: PromiseLike<T>): IPromiseBasedObservable<T>
+    <T>(promise: PromiseLike<T>, oldPromise?: PromiseLike<T>): IPromiseBasedObservable<T>
     reject<T>(reason: any): IRejectedPromise & IBasePromiseBasedObservable<T>
     resolve<T>(value?: T): IFulfilledPromise<T> & IBasePromiseBasedObservable<T>
 } = createObservablePromise as any
