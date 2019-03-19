@@ -106,3 +106,13 @@ test("lazy observable pending", done => {
         done()
     }, 150)
 })
+
+test("lazy observable initialized", done => {
+    const lo = utils.lazyObservable(sink => sink(1))
+
+    expect(lo.initialized).toBeFalsy()
+    lo.current()
+    expect(lo.initialized).toBeTruthy()
+
+    done()
+})

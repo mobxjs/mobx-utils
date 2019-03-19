@@ -6,6 +6,7 @@ export interface ILazyObservable<T> {
     refresh(): T
     reset(): T
     pending: boolean
+    initialized: boolean
 }
 
 /**
@@ -38,8 +39,9 @@ export interface ILazyObservable<T> {
  * @returns {{
  *     current(): T,
  *     refresh(): T,
- *     reset(): T
- *     pendind: boolean
+ *     reset(): T,
+ *     pendind: boolean,
+ *     initialized: boolean
  * }}
  */
 
@@ -50,6 +52,7 @@ export function lazyObservable<T>(
     let started = false
     const value = observable.box(initialValue, { deep: false })
     const pending = observable.box(false)
+    const initialized = observable.box(false)
     let currentFnc = () => {
         if (!started) {
             started = true
@@ -58,6 +61,7 @@ export function lazyObservable<T>(
                 _allowStateChanges(true, () => {
                     value.set(newValue)
                     pending.set(false)
+                    initialized.set(true)
                 })
             })
         }
@@ -82,6 +86,9 @@ export function lazyObservable<T>(
         },
         get pending() {
             return pending.get()
+        },
+        get initialized() {
+            return initialized.get()
         }
     }
 }
