@@ -48,12 +48,12 @@ This is useful to replace one promise based observable with another, without goi
 
 ```
 
-**Parameters**
+### Parameters
 
 -   `promise` **IThenable&lt;T>** The promise which will be observed
 -   `oldPromise` **IThenable&lt;T>** ? The promise which will be observed
 
-**Examples**
+### Examples
 
 ```javascript
 const fetchResult = fromPromise(fetch("http://someurl"))
@@ -100,23 +100,23 @@ Returns **IPromiseBasedObservable&lt;T>**
 
 Returns true if the provided value is a promise-based observable.
 
-**Parameters**
+### Parameters
 
 -   `value`  any
 
-Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
 
 ## moveItem
 
 Moves an item from one position to another, checking that the indexes given are within bounds.
 
-**Parameters**
+### Parameters
 
 -   `target` **ObservableArray&lt;T>** 
--   `fromIndex` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
--   `toIndex` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
+-   `fromIndex` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
+-   `toIndex` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
 
-**Examples**
+### Examples
 
 ```javascript
 const source = observable([1, 2, 3])
@@ -137,12 +137,12 @@ to keep the lazyObservable up to date with some external resource.
 Note that it is the `current()` call itself which is being tracked by MobX,
 so make sure that you don't dereference to early.
 
-**Parameters**
+### Parameters
 
 -   `fetch`  
 -   `initialValue` **T** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
 
-**Examples**
+### Examples
 
 ```javascript
 const userProfile = lazyObservable(
@@ -181,13 +181,13 @@ or the [implementation](https://github.com/mobxjs/mobx-utils/blob/1d17cf7f7f5200
 The following example code creates an observable that connects to a `dbUserRecord`,
 which comes from an imaginary database and notifies when it has changed.
 
-**Parameters**
+### Parameters
 
 -   `subscriber`  
 -   `unsubscriber` **IDisposer**  (optional, default `NOOP`)
 -   `initialValue` **T** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
 
-**Examples**
+### Examples
 
 ```javascript
 function createObservableUser(dbUserRecord) {
@@ -229,12 +229,12 @@ Converts an expression to an observable stream (a.k.a. TC 39 Observable / RxJS o
 The provided expression is tracked by mobx as long as there are subscribers, automatically
 emitting when new values become available. The expressions respect (trans)actions.
 
-**Parameters**
+### Parameters
 
 -   `expression`  
--   `fireImmediately` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** (by default false)
+-   `fireImmediately` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** (by default false)
 
-**Examples**
+### Examples
 
 ```javascript
 const user = observable({
@@ -258,12 +258,12 @@ Converts a subscribable, observable stream (TC 39 observable / RxJS stream)
 into an object which stores the current value (as `current`). The subscription can be cancelled through the `dispose` method.
 Takes an initial value as second optional argument
 
-**Parameters**
+### Parameters
 
 -   `observable` **IObservableStream&lt;T>** 
 -   `initialValue`  
 
-**Examples**
+### Examples
 
 ```javascript
 const debouncedClickDelta = MobxUtils.fromStream(Rx.Observable.fromEvent(button, 'click')
@@ -301,15 +301,15 @@ The viewmodel exposes the following additional methods, besides all the enumerab
 You may use observable arrays, maps and objects with `createViewModel` but keep in mind to assign fresh instances of those to the viewmodel's properties, otherwise you would end up modifying the properties of the original model.
 Note that if you read a non-dirty property, viewmodel only proxies the read to the model. You therefore need to assign a fresh instance not only the first time you make the assignment but also after calling `reset()` or `submit()`.
 
-**Parameters**
+### Parameters
 
 -   `model` **T** 
 
-**Examples**
+### Examples
 
 ```javascript
 class Todo {
-  \@observable title = "Test"
+  @observable title = "Test"
 }
 
 const model = new Todo()
@@ -333,14 +333,14 @@ viewModel.reset()
 
 Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
 
-**Parameters**
+### Parameters
 
 -   `expr`  
 -   `action`  
--   `timeout` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount when spends waiting before giving up (optional, default `10000`)
--   `onTimeout` **any** the ontimeout handler will be called if the condition wasn't met within the given time (optional, default `()`)
+-   `timeout` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount when spends waiting before giving up (optional, default `10000`)
+-   `onTimeout` **any** the ontimeout handler will be called if the condition wasn't met within the given time (optional, default `()=>{}`)
 
-**Examples**
+### Examples
 
 ```javascript
 test("expect store to load", t => {
@@ -369,14 +369,14 @@ MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
 `keepAlive` marks a computed value as always in use, meaning that it will always fresh, but never disposed automatically.
 
-**Parameters**
+### Parameters
 
 -   `_1`  
 -   `_2`  
--   `target` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** an object that has a computed property, created by `@computed` or `extendObservable`
--   `property` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the property to keep alive
+-   `target` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an object that has a computed property, created by `@computed` or `extendObservable`
+-   `property` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the property to keep alive
 
-**Examples**
+### Examples
 
 ```javascript
 const obj = observable({
@@ -390,13 +390,13 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ## keepAlive
 
-**Parameters**
+### Parameters
 
 -   `_1`  
 -   `_2`  
 -   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
 
-**Examples**
+### Examples
 
 ```javascript
 const number = observable(3)
@@ -414,13 +414,13 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 `queueProcessor` takes an observable array, observes it and calls `processor`
 once for each item added to the observable array, optionally deboucing the action
 
-**Parameters**
+### Parameters
 
--   `observableArray` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
+-   `observableArray` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
 -   `processor`  
--   `debounce` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
+-   `debounce` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
 
-**Examples**
+### Examples
 
 ```javascript
 const pendingNotifications = observable([])
@@ -443,14 +443,14 @@ The maximum chunk size can be limited by number.
 This allows both, splitting larger into smaller chunks or (when debounced) combining smaller
 chunks and/or single items into reasonable chunks of work.
 
-**Parameters**
+### Parameters
 
--   `observableArray` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
+-   `observableArray` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
 -   `processor`  
--   `debounce` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
--   `maxChunkSize` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** optionally do not call on full array but smaller chunks. With 0 it will process the full array. (optional, default `0`)
+-   `debounce` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
+-   `maxChunkSize` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optionally do not call on full array but smaller chunks. With 0 it will process the full array. (optional, default `0`)
 
-**Examples**
+### Examples
 
 ```javascript
 const trackedActions = observable([])
@@ -480,11 +480,11 @@ Multiple clocks with the same interval will automatically be synchronized.
 
 Countdown example: <https://jsfiddle.net/mweststrate/na0qdmkw/>
 
-**Parameters**
+### Parameters
 
--   `interval` **([number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) \| `"frame"`)** interval in milliseconds about how often the interval should update (optional, default `1000`)
+-   `interval` **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) \| `"frame"`)** interval in milliseconds about how often the interval should update (optional, default `1000`)
 
-**Examples**
+### Examples
 
 ```javascript
 const start = Date.now()
@@ -519,12 +519,12 @@ The `yield` number indicates the progress of the generator. `init` indicates spa
 
  N.B. due to a [babel limitation](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy/issues/26), in Babel generatos cannot be combined with decorators. See also [#70](https://github.com/mobxjs/mobx-utils/issues/70)
 
-**Parameters**
+### Parameters
 
 -   `arg1`  
 -   `arg2`  
 
-**Examples**
+### Examples
 
 ```javascript
 import {asyncAction} from "mobx-utils"
@@ -549,10 +549,10 @@ import {asyncAction} from "mobx-utils"
 mobx.configure({ enforceActions: "observed" }) // don't allow state modifications outside actions
 
 class Store {
-	\@observable githubProjects = []
-	\@state = "pending" // "pending" / "done" / "error"
+	@observable githubProjects = []
+	@state = "pending" // "pending" / "done" / "error"
 
-	\@asyncAction
+	@asyncAction
 	*fetchProjects() { // <- note the star, this a generator function!
 		this.githubProjects = []
 		this.state = "pending"
@@ -569,7 +569,7 @@ class Store {
 }
 ```
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
 
 ## whenAsync
 
@@ -577,12 +577,12 @@ _deprecated_ whenAsync is deprecated, use mobx.when without effect instead.
 
 Like normal `when`, except that this `when` will return a promise that resolves when the expression becomes truthy
 
-**Parameters**
+### Parameters
 
 -   `fn`  
--   `timeout` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount of time to wait, before the promise rejects
+-   `timeout` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount of time to wait, before the promise rejects
 
-**Examples**
+### Examples
 
 ```javascript
 await whenAsync(() => !state.someBoolean)
@@ -598,11 +598,11 @@ This can be improved to improve performance if a value changes often, but usuall
 In the following example the expression prevents that a component is rerender _each time_ the selection changes;
 instead it will only rerenders when the current todo is (de)selected.
 
-**Parameters**
+### Parameters
 
 -   `expr`  
 
-**Examples**
+### Examples
 
 ```javascript
 const Todo = observer((props) => {
@@ -619,7 +619,7 @@ The mapping is memoized.
 
 See: <https://mobx.js.org/refguide/create-transformer.html>
 
-**Parameters**
+### Parameters
 
 -   `transformer`  
 -   `onCleanup`  
@@ -638,15 +638,57 @@ The returned disposer can be invoked to clean up the listener
 
 deepObserve cannot be used on computed values.
 
-**Parameters**
+### Parameters
 
 -   `target`  
 -   `listener`  
 
-**Examples**
+### Examples
 
 ```javascript
 const disposer = deepObserve(target, (change, path) => {
    console.dir(change)
 })
 ```
+
+## updateableObservable
+
+`updateableObservable` takes a non observable (or observable) value and turns it into
+an observable that can be later updater with another non-observable (or observable) value
+while trying to keep observable object references the same as much as possible.
+
+Think of this as an observable with support for a "smart" deep merge.
+This is useful for example when there's a big object coming from a back-end call,
+yet you'd like to only trigger the minimum amount of reactions possibles (the ones with
+actual changes).
+
+The returned value will have two methods:
+
+-   `get()` returns the value of the observable
+-   `update(newValue)`: use this to update the current observable with the new value
+
+The first parameter is the inital value the updateable observable should take.
+
+The second parameter (update mode) can take one of the folowing values:
+
+-   `"shallow"`: properties (primitives, objects, maps and arrays) are turned into a shallowly observable values
+-   `"deep"`: properties (primitives, objects, maps and arrays) are turned into a deeply observable values
+-   `{ deepProps: [keys] }`: like 'shallow', except some properties are turned into deep observables 'opt-in'
+
+### Parameters
+
+-   `initialValue` **T** 
+-   `mode` **UpdateableObservableMode&lt;T>** 
+
+### Examples
+
+```javascript
+const backendTodoList = ... // a plain array with list of plain todo objects
+const todoList = updateableObservable(backendTodoList, "deep")
+// new todo list comes from backend
+todoList.update(newBackendTodoList)
+// get the observable value
+todoList.get()
+```
+
+Returns **IUpdateableObservable&lt;T>** 
