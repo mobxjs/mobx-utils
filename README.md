@@ -654,7 +654,7 @@ const disposer = deepObserve(target, (change, path) => {
 ## updateableObservable
 
 `updateableObservable` takes a non observable (or observable) value and turns it into
-an observable that can be later updater with another non-observable (or observable) value
+an observable that can be later updated with another non-observable (or observable) value
 while trying to keep observable object references the same as much as possible.
 
 Think of this as an observable with support for a "smart" deep merge.
