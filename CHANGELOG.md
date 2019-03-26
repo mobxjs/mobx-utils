@@ -1,3 +1,5 @@
+* Added `updateableObservable`, a "deepMerge" to ensure the minumum amount of changes to an observable structure by [@xaviergonz](https://github.com/xaviergonz)
+
 # 5.2.0
 
 * `createViewModel` now has an additional field `changedValues` on the returned viewmodel, that returns a map with all the pending changes. See [#172](https://github.com/mobxjs/mobx-utils/pull/172) by [@ItamarShDev](https://github.com/ItamarShDev). Fixes [#171](https://github.com/mobxjs/mobx-utils/issues/171) and [#173](https://github.com/mobxjs/mobx-utils/issues/173)
