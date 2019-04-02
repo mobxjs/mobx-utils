@@ -23,3 +23,13 @@ export function addHiddenProp(object: any, propName: string, value: any) {
         value
     })
 }
+
+const isGetter = (x: any, name: any) => (Object.getOwnPropertyDescriptor(x, name) || {}).get
+const isFunction = (x: any, name: any) => typeof x[name] === "function";
+const deepFunctions = (x: any): any => 
+  x && x !== Object.prototype && 
+  Object.getOwnPropertyNames(x)
+    .filter(name => isGetter(x, name) || isFunction(x, name))
+    .concat(deepFunctions(Object.getPrototypeOf(x)) || []);
+const distinctDeepFunctions = (x: any): any => Array.from(new Set(deepFunctions(x)));
+export const getAllMethodsAndProperties = (x: any): any => distinctDeepFunctions(x).filter((name: string) => name !== "constructor" && !~name.indexOf("__"));

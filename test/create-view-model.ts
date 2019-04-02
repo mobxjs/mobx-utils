@@ -1,25 +1,46 @@
-"use strict"
-
-const utils = require("../src/mobx-utils")
-const mobx = require("mobx")
+import * as utils from "../src/mobx-utils";
+import * as mobx from "mobx";
 
 mobx.configure({ enforceActions: "observed" })
 
-test("create view model", () => {
-    function Todo(title, done, usersInterested) {
-        mobx.extendObservable(this, {
-            title: title,
-            done: done,
-            usersInterested: usersInterested,
-            get usersCount() {
-                return this.usersInterested.length
-            }
-        })
+class TodoClass {
+    @mobx.observable title;
+    @mobx.observable done;
+    @mobx.observable usersInterested;
+    @mobx.computed
+    get usersCount() {
+        return this.usersInterested.length
     }
+}
 
-    const model = new Todo("coffee", false, ["Vader", "Madonna"])
-    const viewModel = utils.createViewModel(model)
+function Todo(title, done, usersInterested) {
+    mobx.extendObservable(this, {
+        title: title,
+        done: done,
+        usersInterested: usersInterested,
+        get usersCount() {
+            return this.usersInterested.length
+        }
+    })
+}
 
+test("test NON Class/decorator createViewModel behaviour", () => {
+    const model = new Todo("coffee", false, ["Vader", "Madonna"]);
+    
+    tests(model);
+})
+
+test("test Class/decorator createViewModel behaviour", () => {
+    const model = new TodoClass();
+    model.title = "coffee";
+    model.done = false;
+    model.usersInterested = ["Vader", "Madonna"];    
+
+    tests(model);
+})
+
+function tests(model) {
+    const viewModel = utils.createViewModel(model);
     let tr
     let vr
     // original rendering
@@ -154,4 +175,4 @@ test("create view model", () => {
 
     d1()
     d2()
-})
+}
