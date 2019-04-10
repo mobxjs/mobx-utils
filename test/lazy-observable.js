@@ -87,8 +87,12 @@ test("lazy observable reset", done => {
 
     setTimeout(() => {
         expect(lo.current()).toBe(1)
-        done()
     }, 200)
+
+    setTimeout(() => {
+        expect(lo.current()).toBe(2)
+        done()
+    }, 250)
 })
 
 test("lazy observable pending", done => {
