@@ -63,7 +63,7 @@ export class ViewModel<T> implements IViewModel<T> {
                 configurable: true,
                 get: () => {
                     if (isComputedProp(model, key)) return this.localComputedValues.get(key).get()
-                    if (this.isPropertyDirty(key)) return this.localValues.get(key)
+                    if (this.isPropertyDirty(key as any)) return this.localValues.get(key)
                     else return (this.model as any)[key]
                 },
                 set: action((value: any) => {
@@ -77,7 +77,7 @@ export class ViewModel<T> implements IViewModel<T> {
         })
     }
 
-    isPropertyDirty = (key: string): boolean => {
+    isPropertyDirty = (key: keyof T): boolean => {
         return this.localValues.has(key)
     }
 
@@ -104,7 +104,7 @@ export class ViewModel<T> implements IViewModel<T> {
     }
 
     @action.bound
-    resetProperty(key: string) {
+    resetProperty(key: keyof T) {
         this.localValues.delete(key)
     }
 }

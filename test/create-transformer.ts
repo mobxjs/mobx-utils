@@ -1179,7 +1179,7 @@ test("transform with mixed key types", () => {
     expect(transformedStringKey).not.toEqual(transformedNumberKey)
 })
 
-const intersection = require("lodash.intersection")
+import * as intersection from "lodash.intersection"
 
 function pluckFn(key) {
     return function(obj) {

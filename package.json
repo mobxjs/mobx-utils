@@ -32,11 +32,11 @@
     "mobx-utils.module.js"
   ],
   "devDependencies": {
-    "@types/jest": "^22.2.0",
+    "@types/jest": "^24.0.11",
     "coveralls": "^2.11.4",
-    "documentation": "*",
+    "documentation": "^9.3.1",
     "faucet": "*",
-    "jest": "^22.4.2",
+    "jest": "^24.7.1",
     "lodash.clonedeep": "*",
     "lodash.clonedeepwith": "*",
     "lodash.intersection": "*",
@@ -45,7 +45,7 @@
     "rollup": "^0.50.0",
     "rxjs": "^5.0.2",
     "shelljs": "^0.8.3",
-    "ts-jest": "^22.4.1",
+    "ts-jest": "^24.0.2",
     "typescript": "*"
   },
   "dependencies": {},

@@ -1,5 +1,5 @@
 import { deepObserve } from "../src/mobx-utils"
-import { observable, $mobx } from "mobx"
+import { observable, $mobx, IObjectDidChange } from "mobx"
 import * as cloneDeepWith from "lodash.clonedeepwith"
 
 function cleanChange(change, includeObject = true) {
@@ -29,7 +29,7 @@ test("not throwing on primitive value changes", () => {
     // deepObserve should not throw on primitive value changes, but still observe them.
     expect(() => {
         const x = observable({ a: 1 })
-        const d = deepObserve(x, (change) => {
+        const d = deepObserve(x, (change: any) => {
             expect(change.oldValue).toBe(1)
             expect(change.newValue).toBe(2)
         });

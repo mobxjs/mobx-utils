@@ -1,7 +1,7 @@
 "use strict"
 
-const utils = require("../src/mobx-utils")
-const mobx = require("mobx")
+import * as utils from "../src/mobx-utils"
+import * as mobx from "mobx" 
 
 test("expr", function() {
     mobx.configure({ enforceActions: "never" })
