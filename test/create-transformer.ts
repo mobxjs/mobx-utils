@@ -1299,3 +1299,61 @@ it("should throw error when passed invalid param type", () => {
         }).toThrowErrorMatchingSnapshot()
     })
 })
+test("should respect onCleanup argument", () => {
+    let state = m.observable({
+        todos: [
+            { title: "coffee"}
+        ],
+        name: "michel",
+    })
+    let mapped
+    let unloaded = []
+    let objectName;
+    let transformState = createTransformer(function(state: any) {
+        return state.name + state.todos.map(transformTodo).join(",")
+    })
+    let transformTodo = createTransformer(
+        function(todo: any) {
+            return todo.title.toUpperCase()
+        },
+        {
+            onCleanup: function(text, value) {
+                unloaded.push([text, value])
+            },
+            debugNameGenerator: function(todo) {
+                return todo.title.toUpperCase() + "-DEBUG"
+            }
+        }
+    )
+    m.autorun(function() {
+        mapped = transformState(state)
+    })
+    state.todos.shift()
+    expect(unloaded.length).toBe(1)
+})
+
+
+test("should respect debugNameGenerator argument", () => {
+    let state = m.observable.map({
+        title: "coffee",
+        name: "michel"
+    })
+    let mapped
+    let objectName;
+    let transformTodo = createTransformer(
+        function(state: any) {
+            return state.get('title').toUpperCase()
+        },
+        {
+            debugNameGenerator: function(state) {
+                return state.get('title').toUpperCase() + "-DEBUG"
+            }
+        }
+    )
+    m.autorun(function() {
+        mapped = transformTodo(state)
+    })
+    state.set('name', "BISCUIT")
+    objectName = m.getObserverTree(state, 'title').observers[0].name
+    expect(objectName).toBe("COFFEE-DEBUG")
+})
