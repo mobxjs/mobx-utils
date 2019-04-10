@@ -2,6 +2,13 @@ import { createViewModel } from '../src/create-view-model';
 import { extendObservable, autorun, runInAction } from "mobx";
 
 test("create view model TS", () => {
+   type ITodo = {
+      title: string,
+      done: boolean,
+      usersInterested: string[],
+      usersCount: number
+   }
+
    function Todo(title: string, done: boolean, usersInterested: Array<string>) {
       extendObservable(this, {
          title: title,
@@ -13,7 +20,7 @@ test("create view model TS", () => {
       })
    }
 
-   const model = new Todo("coffee", false, ["Vader", "Madonna"])
+   const model: ITodo = new Todo("coffee", false, ["Vader", "Madonna"])
    const viewModel = createViewModel(model)
 
    let tr: string;
@@ -63,4 +70,5 @@ test("create view model TS", () => {
    expect(viewModel.isPropertyDirty("done")).toBe(true)
    expect(viewModel.isPropertyDirty("usersInterested")).toBe(false)
    expect(viewModel.isPropertyDirty("usersCount")).toBe(false)
-   expect(viewModel.changedValues.has("done")).toBe(true))
+   expect(viewModel.changedValues.has("done")).toBe(true)
+})

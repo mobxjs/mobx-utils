@@ -19,9 +19,9 @@ export interface IViewModel<T> {
     reset(): void
     submit(): void
     isDirty: boolean
-    changedValues: Map<any, any>
-    isPropertyDirty(key: string): boolean
-    resetProperty(key: string): void
+    changedValues: Map<keyof T, T[keyof T]>
+    isPropertyDirty(key: keyof T): boolean
+    resetProperty(key: keyof T): void
 }
 
 const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty", "resetProperty"]
