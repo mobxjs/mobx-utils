@@ -9,8 +9,6 @@ export interface ITransformerParams<A, B> {
 }
 
 let memoizationId = 0
-let onCleanup: Function = undefined
-let debugNameGenerator: Function = undefined
 
 /**
  * Creates a function that maps an object to a view.
@@ -34,7 +32,9 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, arg2?: 
 
     // Memoizes: object id -> reactive view that applies transformer to the object
     let views: { [id: number]: IComputedValue<B> } = {}
-
+    let onCleanup: Function = undefined
+    let debugNameGenerator: Function = undefined
+    
     function createView(sourceIdentifier: number, sourceObject: A) {
         let latestValue: B
         if (typeof arg2 === "object") {
