@@ -29,9 +29,13 @@ function buildPath(entry: Entry): string {
     return res.reverse().join("/")
 }
 
+function isRecursivelyObservable(thing: any) {
+    return isObservableObject(thing) || isObservableArray(thing) || isObservableMap(thing)
+}
+
 /**
  * Given an object, deeply observes the given object.
- * It is like `observe` from mobx, but applied recursively, including all future children
+ * It is like `observe` from mobx, but applied recursively, including all future children.
  *
  * Note that the given object cannot ever contain cycles and should be a tree.
  *
@@ -39,7 +43,7 @@ function buildPath(entry: Entry): string {
  * (change, path, root) => void
  *
  * The returned disposer can be invoked to clean up the listener
- * 
+ *
  * deepObserve cannot be used on computed values.
  *
  * @example
@@ -85,15 +89,17 @@ export function deepObserve<T = any>(
                 )
                 // update paths
                 for (let i = change.index + change.addedCount; i < change.object.length; i++) {
-                    const entry = entrySet.get(change.object[i])
-                    if (entry) entry.path = "" + i
+                    if (isRecursivelyObservable(change.object[i])) {
+                        const entry = entrySet.get(change.object[i])
+                        if (entry) entry.path = "" + i
+                    }
                 }
                 break
         }
     }
 
     function observeRecursively(thing: any, parent: Entry, path: string) {
-        if (isObservableObject(thing) || isObservableArray(thing) || isObservableMap(thing)) {
+        if (isRecursivelyObservable(thing)) {
             if (entrySet.has(thing)) {
                 const entry = entrySet.get(thing)
                 if (entry.parent !== parent || entry.path !== path)
@@ -120,11 +126,13 @@ export function deepObserve<T = any>(
     }
 
     function unobserveRecursively(thing: any) {
-        const entry = entrySet.get(thing)
-        if (!entry) return
-        entrySet.delete(thing)
-        entry.dispose()
-        values(thing).forEach(unobserveRecursively)
+        if (isRecursivelyObservable(thing)) {
+            const entry = entrySet.get(thing)
+            if (!entry) return
+            entrySet.delete(thing)
+            entry.dispose()
+            values(thing).forEach(unobserveRecursively)
+        }
     }
 
     observeRecursively(target, undefined, "")
