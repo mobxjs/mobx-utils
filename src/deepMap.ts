@@ -76,7 +76,7 @@ export class DeepMap<T> {
   private argsLength = -1
   private last: DeepMapEntry<T>
 
-  get(args: any[]): DeepMapEntry<T> {
+  entry(args: any[]): DeepMapEntry<T> {
     if (this.argsLength === -1)
       this.argsLength = args.length
     else if (this.argsLength !== args.length)
