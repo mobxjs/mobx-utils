@@ -1,3 +1,7 @@
+# 5.3.0
+
+* Observable getters defined on prototype are now included in the view model. Fixes [#100](https://github.com/mobxjs/mobx-utils/issues/100#issuecomment-401765101) through [#188](https://github.com/mobxjs/mobx-utils/pull/188) by [wrench7](https://github.com/wrench7)
+
 # 5.2.0
 
 * `createViewModel` now has an additional field `changedValues` on the returned viewmodel, that returns a map with all the pending changes. See [#172](https://github.com/mobxjs/mobx-utils/pull/172) by [@ItamarShDev](https://github.com/ItamarShDev). Fixes [#171](https://github.com/mobxjs/mobx-utils/issues/171) and [#173](https://github.com/mobxjs/mobx-utils/issues/173)
