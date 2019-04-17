@@ -12,7 +12,7 @@ import {
     _getAdministration,
     $mobx
 } from "mobx"
-import { invariant } from "./utils"
+import { invariant, getAllMethodsAndProperties } from "./utils"
 
 export interface IViewModel<T> {
     model: T
@@ -43,7 +43,8 @@ export class ViewModel<T> implements IViewModel<T> {
     constructor(public model: T) {
         invariant(isObservableObject(model), "createViewModel expects an observable object")
 
-        Object.getOwnPropertyNames(model).forEach(key => {
+        // use this helper as Object.getOwnPropertyNames doesn't return getters
+        getAllMethodsAndProperties(model).forEach((key: any) => {
             if (key === ($mobx as any) || key === "__mobxDidRunLazyInitializers") {
                 return
             }
