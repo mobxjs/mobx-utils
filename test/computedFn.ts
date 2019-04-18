@@ -122,7 +122,7 @@ test("make sure the fn is cached", () => {
     a: 1,
     b: 2,
     c: 3,
-    m: computedFn(function(x) {
+    m: computedFn(function m(x) {
       expect(this).toBe(store)
       events.push("calc " + x)
       return this.a * this.b * x
@@ -132,6 +132,8 @@ test("make sure the fn is cached", () => {
   const d = autorun(() => {
     events.push("autorun "+ (store.m(3) * store.c))
   })
+
+  expect(getDependencyTree(d)).toMatchSnapshot()
 
   store.b = 3
   store.c = 4
