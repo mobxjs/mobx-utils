@@ -1,6 +1,6 @@
 # 5.4.0
 
-Introduced `computedFn`, to support using arbitrary functions as computed!
+Introduced `computedFn`, to support using arbitrary functions as computed! Implements [#184](https://github.com/mobxjs/mobx-utils/issues/184) through [#190](https://github.com/mobxjs/mobx-utils/pull/190)
 
 # 5.3.0
 
