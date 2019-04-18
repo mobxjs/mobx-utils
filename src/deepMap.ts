@@ -9,10 +9,10 @@ export class DeepMapEntry<T> {
     let i = 0
     for(; i < this.args.length -1; i++) {
       current = current!.get(args[i])
-      if (!current)
-        break
-      else
+      if (current)
         this.closest = current
+      else
+        break
     }
     this.closestIdx = i
   }
