@@ -1,3 +1,6 @@
+/**
+ * @private
+ */
 export class DeepMapEntry<T> {
   private root: Map<any, any>
   private closest: Map<any, any>
@@ -71,6 +74,9 @@ export class DeepMapEntry<T> {
   }
 }
 
+/**
+ * @private
+ */
 export class DeepMap<T> {
   private store = new Map<any, any>()
   private argsLength = -1

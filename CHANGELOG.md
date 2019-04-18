@@ -1,3 +1,7 @@
+# 5.4.0
+
+Introduced `computedFn`, to support using arbitrary functions as computed!
+
 # 5.3.0
 
 * Observable getters defined on prototype are now included in the view model. Fixes [#100](https://github.com/mobxjs/mobx-utils/issues/100#issuecomment-401765101) through [#188](https://github.com/mobxjs/mobx-utils/pull/188) by [wrench7](https://github.com/wrench7)
