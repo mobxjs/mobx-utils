@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`make sure the fn is cached 1`] = `
+Object {
+  "dependencies": Array [
+    Object {
+      "name": "ObservableObject@10.m",
+    },
+    Object {
+      "dependencies": Array [
+        Object {
+          "name": "ObservableObject@10.a",
+        },
+        Object {
+          "name": "ObservableObject@10.b",
+        },
+      ],
+      "name": "computedFn(m#1)",
+    },
+    Object {
+      "name": "ObservableObject@10.c",
+    },
+  ],
+  "name": "Autorun@11",
+}
+`;
