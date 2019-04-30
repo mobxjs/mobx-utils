@@ -108,12 +108,12 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
  * This is useful to replace one promise based observable with another, without going back to an intermediate
  * "pending" promise state while fetching data. For example:
  *
- * ```javascript
- * @observer
+ * @example
+ * \@observer
  * class SearchResults extends React.Component {
- *   @observable searchResults
+ *   \@observable searchResults
  *
- *   componentWillReceiveProps(nextProps) {
+ *   componentDidUpdate(nextProps) {
  *     if (nextProps.query !== this.props.query)
  *       this.comments = fromPromse(
  *         window.fetch("/search?q=" + nextProps.query),
@@ -125,19 +125,18 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
  *
  *   render() {
  *     return this.searchResults.case({
- *        pending(staleValue) {
+ *        pending: (staleValue) => {
  *          return staleValue || "searching" // <- value might set to previous results while the promise is still pending
  *        },
- *        fullfilled(value) {
+ *        fullfilled: (value) => {
  *          return value // the fresh results
  *        },
- *        rejected(error) {
+ *        rejected: (error) => {
  *          return "Oops: " + error
  *        }
  *     })
  *   }
  * }
- * ```
  *
  * Observable promises can be created immediately in a certain state using
  * `fromPromise.reject(reason)` or `fromPromise.resolve(value?)`.
