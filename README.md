@@ -704,8 +704,8 @@ const disposer = deepObserve(target, (change, path) => {
 
 ## computedFn
 
-computedFn takes a function with an arbitrarily amount of arguments,
-and memoized the output of the function based on the arguments passed in.
+computedFn takes a function with an arbitrary amount of arguments,
+and memoizes the output of the function based on the arguments passed in.
 
 computedFn(fn) returns a function with the very same signature. There is no limit on the amount of arguments
 that is accepted. However, the amount of arguments must be consistent and default arguments are not supported.
