@@ -35,7 +35,7 @@ import { IComputedValue, computed, onBecomeUnobserved, _isComputingDerivation, i
  * @param fn 
  * @param keepAlive 
  */
-export function computedFn<T extends Function>(fn: T, keepAlive = false) {
+export function computedFn<T extends Function>(fn: T, keepAlive = false): T {
   if (isAction(fn))
     throw new Error("computedFn shouldn't be used on actions")
 
