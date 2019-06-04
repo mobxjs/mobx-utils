@@ -134,7 +134,7 @@ class SearchResults extends React.Component {
        pending: (staleValue) => {
          return staleValue || "searching" // <- value might set to previous results while the promise is still pending
        },
-       fullfilled: (value) => {
+       fulfilled: (value) => {
          return value // the fresh results
        },
        rejected: (error) => {
