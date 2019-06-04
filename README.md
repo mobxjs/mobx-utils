@@ -107,16 +107,50 @@ fromPromise takes an optional second argument, a previously created `fromPromise
 This is useful to replace one promise based observable with another, without going back to an intermediate
 "pending" promise state while fetching data. For example:
 
-```javascript
-
-```
-
 ### Parameters
 
 -   `promise` **IThenable&lt;T>** The promise which will be observed
 -   `oldPromise` **IThenable&lt;T>** ? The promise which will be observed
 
 ### Examples
+
+```javascript
+@observer
+class SearchResults extends React.Component {
+  @observable searchResults
+
+  componentDidUpdate(nextProps) {
+    if (nextProps.query !== this.props.query)
+      this.comments = fromPromse(
+        window.fetch("/search?q=" + nextProps.query),
+        // by passing, we won't render a pending state if we had a successful search query before
+        // rather, we will keep showing the previous search results, until the new promise resolves (or rejects)
+        this.searchResults
+      )
+  }
+
+  render() {
+    return this.searchResults.case({
+       pending: (staleValue) => {
+         return staleValue || "searching" // <- value might set to previous results while the promise is still pending
+       },
+       fullfilled: (value) => {
+         return value // the fresh results
+       },
+       rejected: (error) => {
+         return "Oops: " + error
+       }
+    })
+  }
+}
+
+Observable promises can be created immediately in a certain state using
+`fromPromise.reject(reason)` or `fromPromise.resolve(value?)`.
+The main advantage of `fromPromise.resolve(value)` over `fromPromise(Promise.resolve(value))` is that the first _synchronously_ starts in the desired state.
+
+It is possible to directly create a promise using a resolve, reject function:
+`fromPromise((resolve, reject) => setTimeout(() => resolve(true), 1000))`
+```
 
 ```javascript
 const fetchResult = fromPromise(fetch("http://someurl"))
@@ -704,8 +738,8 @@ const disposer = deepObserve(target, (change, path) => {
 
 ## computedFn
 
-computedFn takes a function with an arbitrary amount of arguments,
-and memoizes the output of the function based on the arguments passed in.
+computedFn takes a function with an arbitrarily amount of arguments,
+and memoized the output of the function based on the arguments passed in.
 
 computedFn(fn) returns a function with the very same signature. There is no limit on the amount of arguments
 that is accepted. However, the amount of arguments must be consistent and default arguments are not supported.
