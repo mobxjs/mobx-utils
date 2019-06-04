@@ -1,6 +1,7 @@
 import {
     action,
     ObservableMap,
+    IComputedValue,
     observable,
     isObservableObject,
     isObservableArray,
@@ -27,8 +28,8 @@ export interface IViewModel<T> {
 const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty", "resetProperty"]
 
 export class ViewModel<T> implements IViewModel<T> {
-    localValues: ObservableMap<any, any> = observable.map({})
-    localComputedValues: ObservableMap<any, any> = observable.map({})
+    localValues: ObservableMap<keyof T, T[keyof T]> = observable.map({})
+    localComputedValues: ObservableMap<keyof T, IComputedValue<T[keyof T]>> = observable.map({})
 
     @computed
     get isDirty() {
@@ -64,11 +65,11 @@ export class ViewModel<T> implements IViewModel<T> {
                 configurable: true,
                 get: () => {
                     if (isComputedProp(model, key)) return this.localComputedValues.get(key).get()
-                    if (this.isPropertyDirty(key as any)) return this.localValues.get(key)
-                    else return (this.model as any)[key]
+                    if (this.isPropertyDirty(key)) return this.localValues.get(key)
+                    else return this.model[key as keyof T]
                 },
                 set: action((value: any) => {
-                    if (value !== (this.model as any)[key]) {
+                    if (value !== this.model[key as keyof T]) {
                         this.localValues.set(key, value)
                     } else {
                         this.localValues.delete(key)
@@ -84,16 +85,16 @@ export class ViewModel<T> implements IViewModel<T> {
 
     @action.bound
     submit() {
-        keys(this.localValues).forEach((key: string) => {
+        keys(this.localValues).forEach((key: keyof T) => {
             const source = this.localValues.get(key)
-            const destination = (this.model as any)[key]
+            const destination = this.model[key]
             if (isObservableArray(destination)) {
-                destination.replace(source)
+                destination.replace(source as any)
             } else if (isObservableMap(destination)) {
                 destination.clear()
                 destination.merge(source)
             } else if (!isComputed(source)) {
-                ; (this.model as any)[key] = source
+                this.model[key] = source
             }
         })
         this.localValues.clear()
