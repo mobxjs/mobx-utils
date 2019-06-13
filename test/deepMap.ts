@@ -43,7 +43,7 @@ test("args length 2", () => {
     d.entry(["hello", "world"]).delete()
     expect(d.entry(["hello", "world"]).exists()).toBe(false)
     expect(d.entry(["hello", "universe"]).get()).toBe(42)
-    
+
     d.entry(["coffee", "tea"]).delete()
     expect((d as any).store.size).toBe(1)
 
@@ -53,29 +53,29 @@ test("args length 2", () => {
 })
 
 test("really deep", () => {
-  const d = new DeepMap<number>()
-  const path = ["a", "b", "c", "d", "e"]
-  expect(d.entry(path).exists()).toBe(false)
-  d.entry(path).set(3)
-  expect(d.entry(path).exists()).toBe(true)
-  expect(d.entry(path).get()).toBe(3)
-  d.entry(path).set(4)
-  expect(d.entry(path).get()).toBe(4)
+    const d = new DeepMap<number>()
+    const path = ["a", "b", "c", "d", "e"]
+    expect(d.entry(path).exists()).toBe(false)
+    d.entry(path).set(3)
+    expect(d.entry(path).exists()).toBe(true)
+    expect(d.entry(path).get()).toBe(3)
+    d.entry(path).set(4)
+    expect(d.entry(path).get()).toBe(4)
 
-  d.entry(path).delete()
-  expect((d as any).store.size).toBe(0)
+    d.entry(path).delete()
+    expect((d as any).store.size).toBe(0)
 })
 
 test("really shallow", () => {
-  const d = new DeepMap<number>()
-  const path = []
-  expect(d.entry(path).exists()).toBe(false)
-  d.entry(path).set(3)
-  expect(d.entry(path).exists()).toBe(true)
-  expect(d.entry(path).get()).toBe(3)
-  d.entry(path).set(4)
-  expect(d.entry(path).get()).toBe(4)
+    const d = new DeepMap<number>()
+    const path = []
+    expect(d.entry(path).exists()).toBe(false)
+    d.entry(path).set(3)
+    expect(d.entry(path).exists()).toBe(true)
+    expect(d.entry(path).get()).toBe(3)
+    d.entry(path).set(4)
+    expect(d.entry(path).get()).toBe(4)
 
-  d.entry(path).delete()
-  expect((d as any).store.size).toBe(0)
+    d.entry(path).delete()
+    expect((d as any).store.size).toBe(0)
 })

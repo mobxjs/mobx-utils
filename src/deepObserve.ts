@@ -109,9 +109,9 @@ export function deepObserve<T = any>(
                     throw new Error(
                         `The same observable object cannot appear twice in the same tree, trying to assign it to '${buildPath(
                             parent
-                        )}/${path}', but it already exists at '${buildPath(
-                            entry.parent
-                        )}/${entry.path}'`
+                        )}/${path}', but it already exists at '${buildPath(entry.parent)}/${
+                            entry.path
+                        }'`
                     )
             } else {
                 const entry = {

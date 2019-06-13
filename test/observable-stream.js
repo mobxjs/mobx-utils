@@ -14,8 +14,7 @@ test("to observable - should push the initial value by default", () => {
 
     let values = []
 
-    const sub = Rx.Observable
-        .from(utils.toStream(() => user.firstName + user.lastName, true))
+    const sub = Rx.Observable.from(utils.toStream(() => user.firstName + user.lastName, true))
         .map(x => x.toUpperCase())
         .subscribe(v => values.push(v))
 
@@ -43,8 +42,7 @@ test("to observable - should not push the initial value", () => {
 
     let values = []
 
-    const sub = Rx.Observable
-        .from(utils.toStream(() => user.firstName + user.lastName))
+    const sub = Rx.Observable.from(utils.toStream(() => user.firstName + user.lastName))
         .map(x => x.toUpperCase())
         .subscribe(v => values.push(v))
 

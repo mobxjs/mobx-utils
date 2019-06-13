@@ -1,12 +1,12 @@
-import * as utils from "../src/mobx-utils";
-import * as mobx from "mobx";
+import * as utils from "../src/mobx-utils"
+import * as mobx from "mobx"
 
 mobx.configure({ enforceActions: "observed" })
 
 class TodoClass {
-    @mobx.observable title;
-    @mobx.observable done;
-    @mobx.observable usersInterested;
+    @mobx.observable title
+    @mobx.observable done
+    @mobx.observable usersInterested
     @mobx.computed
     get usersCount() {
         return this.usersInterested.length
@@ -25,22 +25,22 @@ function Todo(title, done, usersInterested) {
 }
 
 test("test NON Class/decorator createViewModel behaviour", () => {
-    const model = new Todo("coffee", false, ["Vader", "Madonna"]);
-    
-    tests(model);
+    const model = new Todo("coffee", false, ["Vader", "Madonna"])
+
+    tests(model)
 })
 
 test("test Class/decorator createViewModel behaviour", () => {
-    const model = new TodoClass();
-    model.title = "coffee";
-    model.done = false;
-    model.usersInterested = ["Vader", "Madonna"];    
+    const model = new TodoClass()
+    model.title = "coffee"
+    model.done = false
+    model.usersInterested = ["Vader", "Madonna"]
 
-    tests(model);
+    tests(model)
 })
 
 function tests(model) {
-    const viewModel = utils.createViewModel(model);
+    const viewModel = utils.createViewModel(model)
     let tr
     let vr
     // original rendering
