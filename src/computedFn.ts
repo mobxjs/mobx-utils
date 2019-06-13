@@ -35,7 +35,7 @@ import { IComputedValue, computed, onBecomeUnobserved, _isComputingDerivation, i
  * @param fn 
  * @param keepAlive 
  */
-export function computedFn<T extends Function>(fn: T, keepAlive = false) {
+export function computedFn<T extends (...args: any[]) => any>(fn: T, keepAlive = false) {
   if (isAction(fn))
     throw new Error("computedFn shouldn't be used on actions")
 
@@ -43,7 +43,7 @@ export function computedFn<T extends Function>(fn: T, keepAlive = false) {
   let i = 0;
   const d = new DeepMap<IComputedValue<any>>()
 
-  return function(...args: any[]) {
+  return function(...args: Parameters<T>): ReturnType<T> {
     const self = this
     const entry = d.entry(args)
     // cache hit, return
