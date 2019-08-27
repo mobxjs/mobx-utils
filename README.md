@@ -121,7 +121,7 @@ class SearchResults extends React.Component {
 
   componentDidUpdate(nextProps) {
     if (nextProps.query !== this.props.query)
-      this.comments = fromPromse(
+      this.comments = fromPromise(
         window.fetch("/search?q=" + nextProps.query),
         // by passing, we won't render a pending state if we had a successful search query before
         // rather, we will keep showing the previous search results, until the new promise resolves (or rejects)
