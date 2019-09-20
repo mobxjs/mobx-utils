@@ -1,5 +1,5 @@
 import { computedFn } from "../src/computedFn"
-import { observable, autorun, onBecomeUnobserved, action, getDependencyTree, getObserverTree } from "mobx";
+import { observable, autorun, onBecomeUnobserved, action, getDependencyTree, comparer, getObserverTree } from "mobx";
 
 const john = {
   name: "john",
@@ -145,6 +145,19 @@ test("make sure the fn is cached", () => {
     "autorun 27",
     "autorun 36"
   ])
+})
+
+test("supports options", () => {
+  const events: number[][] = []
+  const xs = observable([1, 2, 3]);
+  const xsLessThan = computedFn(n => xs.filter(x => x < n), { equals: comparer.structural });
+
+  autorun(() => events.push(xsLessThan(3)));
+  expect(events).toEqual([[1, 2]]);
+
+  events.length = 0;
+  xs.push(4);
+  expect(events).toEqual([]);
 })
 
 test("should not allow actions", () => {
