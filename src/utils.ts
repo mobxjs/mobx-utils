@@ -32,5 +32,9 @@ const deepFunctions = (x: any): any =>
   Object.getOwnPropertyNames(x)
     .filter(name => isGetter(x, name) || isFunction(x, name) || isProperty(x, name))
     .concat(deepFunctions(Object.getPrototypeOf(x)) || []);
-const distinctDeepFunctions = (x: any): any => Array.from(new Set(deepFunctions(x)));
+const distinctDeepFunctions = (x: any) => {
+    const deepFunctionsIndistinct = deepFunctions(x);
+    const deepFunctionsDistinct = deepFunctionsIndistinct.filter((item: any, index: number) => deepFunctionsIndistinct.indexOf(item) === index);
+    return deepFunctionsDistinct;
+};
 export const getAllMethodsAndProperties = (x: any): any => distinctDeepFunctions(x).filter((name: string) => name !== "constructor" && !~name.indexOf("__"));
