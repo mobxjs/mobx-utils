@@ -24,12 +24,12 @@ export function addHiddenProp(object: any, propName: string, value: any) {
     })
 }
 
-const deepFunctions = (x: any): any => {
-    return x && x !== Object.prototype && Object.getOwnPropertyNames(x).concat(deepFunctions(Object.getPrototypeOf(x)) || []);
+const deepFields = (x: any): any => {
+    return x && x !== Object.prototype && Object.getOwnPropertyNames(x).concat(deepFields(Object.getPrototypeOf(x)) || []);
 }
-const distinctDeepFunctions = (x: any) => {
-    const deepFunctionsIndistinct = deepFunctions(x);
-    const deepFunctionsDistinct = deepFunctionsIndistinct.filter((item: any, index: number) => deepFunctionsIndistinct.indexOf(item) === index);
-    return deepFunctionsDistinct;
+const distinctDeepFields = (x: any) => {
+    const deepFieldsIndistinct = deepFields(x);
+    const deepFieldsDistinct = deepFieldsIndistinct.filter((item: any, index: number) => deepFieldsIndistinct.indexOf(item) === index);
+    return deepFieldsDistinct;
 };
-export const getAllMethodsAndProperties = (x: any): any => distinctDeepFunctions(x).filter((name: string) => name !== "constructor" && !~name.indexOf("__"));
+export const getAllMethodsAndProperties = (x: any): any => distinctDeepFields(x).filter((name: string) => name !== "constructor" && !~name.indexOf("__"));
