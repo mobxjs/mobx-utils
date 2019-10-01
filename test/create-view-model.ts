@@ -101,10 +101,10 @@ function tests(model) {
     expect(vr).toBe("tea:true,interested:Vader,Madonna,Tarzan,unobservedProp:testing,usersCount:3") // change NOT reflected in view model
     expect(viewModel.isDirty).toBe(true)
 
-    const newUsers = ["Putin", "Madonna", "Tarzan"]
+    const newUsers = ["Putin", "Madonna", "Tarzan", "Rocky"]
     mobx.runInAction(() => (viewModel.usersInterested = newUsers))
     expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,unobservedProp:testing,usersCount:3")
-    expect(vr).toBe("tea:true,interested:Putin,Madonna,Tarzan,unobservedProp:testing testing,usersCount:3")
+    expect(vr).toBe("tea:true,interested:Putin,Madonna,Tarzan,Rocky,unobservedProp:testing testing,usersCount:4")
     expect(viewModel.isDirty).toBe(true)
     expect(viewModel.isPropertyDirty("title")).toBe(false)
     expect(viewModel.isPropertyDirty("done")).toBe(true)
@@ -119,7 +119,7 @@ function tests(model) {
 
     mobx.runInAction(() => model.usersInterested.push("Cersei"))
     expect(tr).toBe("tea:false,interested:Vader,Madonna,Tarzan,Cersei,unobservedProp:testing testing,usersCount:4")
-    expect(vr).toBe("tea:false,interested:Putin,Madonna,Tarzan,unobservedProp:testing testing,usersCount:3") // change NOT reflected in view model bcs users are dirty
+    expect(vr).toBe("tea:false,interested:Putin,Madonna,Tarzan,Rocky,unobservedProp:testing testing,usersCount:4") // change NOT reflected in view model bcs users are dirty
     expect(viewModel.isDirty).toBe(true)
     expect(viewModel.isPropertyDirty("title")).toBe(false)
     expect(viewModel.isPropertyDirty("done")).toBe(false)
@@ -172,7 +172,7 @@ function tests(model) {
         viewModel.unobservedProp = "new value"
     })
     expect(tr).toBe("tea:false,interested:Vader,Madonna,unobservedProp:testing testing,usersCount:2")
-    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan,unobservedProp:new value,usersCount:3")
+    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan,Rocky,unobservedProp:new value,usersCount:4")
     expect(viewModel.isDirty).toBe(true)
     expect(viewModel.isPropertyDirty("done")).toBe(false)
     expect(viewModel.isPropertyDirty("title")).toBe(true)
@@ -185,11 +185,11 @@ function tests(model) {
         model.unobservedProp = "another new value"
     })
     expect(tr).toBe("coffee:false,interested:Vader,Madonna,unobservedProp:another new value,usersCount:2")
-    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan,unobservedProp:new value,usersCount:3")
+    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan,Rocky,unobservedProp:new value,usersCount:4")
 
     viewModel.submit()
-    expect(tr).toBe("cola:false,interested:Putin,Madonna,Tarzan,unobservedProp:new value,usersCount:3")
-    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan,unobservedProp:new value,usersCount:3")
+    expect(tr).toBe("cola:false,interested:Putin,Madonna,Tarzan,Rocky,unobservedProp:new value,usersCount:4")
+    expect(vr).toBe("cola:false,interested:Putin,Madonna,Tarzan,Rocky,unobservedProp:new value,usersCount:4")
     expect(viewModel.isDirty).toBe(false)
     expect(viewModel.isPropertyDirty("done")).toBe(false)
     expect(viewModel.isPropertyDirty("title")).toBe(false)

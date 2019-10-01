@@ -24,14 +24,9 @@ export function addHiddenProp(object: any, propName: string, value: any) {
     })
 }
 
-const isProperty = (x: any, name: any) => (x.hasOwnProperty(name));
-const isGetter = (x: any, name: any) => (Object.getOwnPropertyDescriptor(x, name) || {}).get
-const isFunction = (x: any, name: any) => typeof x[name] === "function";
-const deepFunctions = (x: any): any => 
-  x && x !== Object.prototype && 
-  Object.getOwnPropertyNames(x)
-    .filter(name => isGetter(x, name) || isFunction(x, name) || isProperty(x, name))
-    .concat(deepFunctions(Object.getPrototypeOf(x)) || []);
+const deepFunctions = (x: any): any => {
+    return x && x !== Object.prototype && Object.getOwnPropertyNames(x).concat(deepFunctions(Object.getPrototypeOf(x)) || []);
+}
 const distinctDeepFunctions = (x: any) => {
     const deepFunctionsIndistinct = deepFunctions(x);
     const deepFunctionsDistinct = deepFunctionsIndistinct.filter((item: any, index: number) => deepFunctionsIndistinct.indexOf(item) === index);
