@@ -32,10 +32,10 @@ test("not throwing on primitive value changes", () => {
         const d = deepObserve(x, (change: any) => {
             expect(change.oldValue).toBe(1)
             expect(change.newValue).toBe(2)
-        });
+        })
 
         x.a = 2
-    }).not.toThrow();
+    }).not.toThrow()
 })
 
 test("basic & dispose", () => {

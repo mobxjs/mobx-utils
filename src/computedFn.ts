@@ -1,5 +1,12 @@
 import { DeepMap } from "./deepMap"
-import { IComputedValue, IComputedValueOptions, computed, onBecomeUnobserved, _isComputingDerivation, isAction } from "mobx";
+import {
+    IComputedValue,
+    IComputedValueOptions,
+    computed,
+    onBecomeUnobserved,
+    _isComputingDerivation,
+    isAction
+} from "mobx"
 
 /**
  * computedFn takes a function with an arbitrarily amount of arguments, 
@@ -35,44 +42,52 @@ import { IComputedValue, IComputedValueOptions, computed, onBecomeUnobserved, _i
  * @param fn 
  * @param keepAliveOrOptions
  */
-export function computedFn<T extends (...args: any[]) => any>(fn: T, keepAliveOrOptions: IComputedValueOptions<ReturnType<T>> | boolean = false) {
-  if (isAction(fn))
-    throw new Error("computedFn shouldn't be used on actions")
+export function computedFn<T extends (...args: any[]) => any>(
+    fn: T,
+    keepAliveOrOptions: IComputedValueOptions<ReturnType<T>> | boolean = false
+) {
+    if (isAction(fn)) throw new Error("computedFn shouldn't be used on actions")
 
-  let memoWarned = false;
-  let i = 0;
-  const opts = typeof keepAliveOrOptions === 'boolean'
-      ? { keepAlive: keepAliveOrOptions }
-      : keepAliveOrOptions;
-  const d = new DeepMap<IComputedValue<any>>()
+    let memoWarned = false
+    let i = 0
+    const opts =
+        typeof keepAliveOrOptions === "boolean"
+            ? { keepAlive: keepAliveOrOptions }
+            : keepAliveOrOptions
+    const d = new DeepMap<IComputedValue<any>>()
 
-  return function(...args: Parameters<T>): ReturnType<T> {
-    const self = this
-    const entry = d.entry(args)
-    // cache hit, return
-    if (entry.exists())
-      return entry.get().get()
-    // if function is invoked, and its a cache miss without reactive, there is no point in caching...
-    if (!opts.keepAlive && !_isComputingDerivation()) {
-      if (!memoWarned) {
-        console.warn("invoking a computedFn from outside an reactive context won't be memoized, unless keepAlive is set")
-        memoWarned = true
-      }
-      return fn.apply(self, args)
+    return function(...args: Parameters<T>): ReturnType<T> {
+        const self = this
+        const entry = d.entry(args)
+        // cache hit, return
+        if (entry.exists()) return entry.get().get()
+        // if function is invoked, and its a cache miss without reactive, there is no point in caching...
+        if (!opts.keepAlive && !_isComputingDerivation()) {
+            if (!memoWarned) {
+                console.warn(
+                    "invoking a computedFn from outside an reactive context won't be memoized, unless keepAlive is set"
+                )
+                memoWarned = true
+            }
+            return fn.apply(self, args)
+        }
+        // create new entry
+        const c = computed(
+            () => {
+                return fn.apply(self, args)
+            },
+            {
+                ...opts,
+                name: `computedFn(${fn.name}#${++i})`
+            }
+        )
+        entry.set(c)
+        // clean up if no longer observed
+        if (!opts.keepAlive)
+            onBecomeUnobserved(c, () => {
+                d.entry(args).delete()
+            })
+        // return current val
+        return c.get()
     }
-    // create new entry
-    const c = computed(() => {
-      return fn.apply(self, args)
-    }, {
-      ...opts,
-      name: `computedFn(${fn.name}#${(++i)})`,
-    })
-    entry.set(c)
-    // clean up if no longer observed
-    if (!opts.keepAlive) onBecomeUnobserved(c, () => {
-      d.entry(args).delete()
-    })
-    // return current val
-    return c.get()
-  }
 }

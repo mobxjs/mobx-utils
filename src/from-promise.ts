@@ -7,7 +7,7 @@ export const PENDING = "pending"
 export const FULFILLED = "fulfilled"
 export const REJECTED = "rejected"
 
-type CaseHandlers<U, T> =  {
+type CaseHandlers<U, T> = {
     pending?: (t?: T) => U
     fulfilled?: (t: T) => U
     rejected?: (e: any) => U
@@ -77,7 +77,7 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
 
     promise.isPromiseBasedObservable = true
     promise.case = caseImpl
-    const oldData = oldPromise && oldPromise.state === FULFILLED ? oldPromise.value : undefined;
+    const oldData = oldPromise && oldPromise.state === FULFILLED ? oldPromise.value : undefined
     extendObservable(
         promise,
         {

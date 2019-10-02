@@ -1,7 +1,7 @@
 "use strict"
 
 import * as utils from "../src/mobx-utils"
-import * as mobx from "mobx" 
+import * as mobx from "mobx"
 
 test("expr", function() {
     mobx.configure({ enforceActions: "never" })

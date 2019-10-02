@@ -4,8 +4,8 @@ import { invariant, addHiddenProp } from "./utils"
 export type ITransformer<A, B> = (object: A) => B
 
 export interface ITransformerParams<A, B> {
-    onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void,
-    debugNameGenerator?: (sourceObject?: A) => string,
+    onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void
+    debugNameGenerator?: (sourceObject?: A) => string
 }
 
 let memoizationId = 0
@@ -19,12 +19,15 @@ let memoizationId = 0
 export function createTransformer<A, B>(
     transformer: ITransformer<A, B>,
     onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void
-): ITransformer<A, B>;
+): ITransformer<A, B>
 export function createTransformer<A, B>(
     transformer: ITransformer<A, B>,
     arg2?: ITransformerParams<A, B>
-): ITransformer<A, B>;
-export function createTransformer<A, B>(transformer: ITransformer<A, B>, arg2?: any): ITransformer<A, B> {
+): ITransformer<A, B>
+export function createTransformer<A, B>(
+    transformer: ITransformer<A, B>,
+    arg2?: any
+): ITransformer<A, B> {
     invariant(
         typeof transformer === "function" && transformer.length < 2,
         "createTransformer expects a function that accepts one argument"
@@ -34,7 +37,7 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, arg2?: 
     let views: { [id: number]: IComputedValue<B> } = {}
     let onCleanup: Function = undefined
     let debugNameGenerator: Function = undefined
-    
+
     function createView(sourceIdentifier: number, sourceObject: A) {
         let latestValue: B
         if (typeof arg2 === "object") {
@@ -46,9 +49,9 @@ export function createTransformer<A, B>(transformer: ITransformer<A, B>, arg2?: 
             onCleanup = undefined
             debugNameGenerator = undefined
         }
-        const prettifiedName = debugNameGenerator ?
-            debugNameGenerator(sourceObject) :
-            `Transformer-${(<any>transformer).name}-${sourceIdentifier}`
+        const prettifiedName = debugNameGenerator
+            ? debugNameGenerator(sourceObject)
+            : `Transformer-${(<any>transformer).name}-${sourceIdentifier}`
         const expr = computed(
             () => {
                 return (latestValue = transformer(sourceObject))
@@ -81,7 +84,9 @@ function getMemoizationId(object: any) {
     if (objectType === "number") return `number:${object}`
     if (object === null || (objectType !== "object" && objectType !== "function"))
         throw new Error(
-            `[mobx-utils] transform expected an object, function, string or number, got: ${String(object)}`
+            `[mobx-utils] transform expected an object, function, string or number, got: ${String(
+                object
+            )}`
         )
     let tid = object.$transformId
     if (tid === undefined) {

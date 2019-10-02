@@ -58,8 +58,8 @@ export class ViewModel<T> implements IViewModel<T> {
                 this.localComputedValues.set(key, computed(derivation.bind(this)))
             }
 
-            const descriptor = Object.getOwnPropertyDescriptor(model, key);
-            const additionalDescriptor = descriptor ? { enumerable: descriptor.enumerable } : {};
+            const descriptor = Object.getOwnPropertyDescriptor(model, key)
+            const additionalDescriptor = descriptor ? { enumerable: descriptor.enumerable } : {}
 
             Object.defineProperty(this, key, {
                 ...additionalDescriptor,
