@@ -36,7 +36,9 @@
     "coveralls": "^2.11.4",
     "documentation": "^9.3.1",
     "faucet": "*",
+    "husky": "^2.4.1",
     "jest": "^24.7.1",
+    "lint-staged": "^8.2.0",
     "lodash.clonedeep": "*",
     "lodash.clonedeepwith": "*",
     "lodash.intersection": "*",
@@ -81,6 +83,17 @@
     ],
     "watchPathIgnorePatterns": [
       "<rootDir>/node_modules/"
-    ]
+    ],
+    "lint-staged": {
+      "*.{ts,tsx,js,jsx}": [
+        "prettier --write",
+        "git add"
+      ]
+    },
+    "husky": {
+      "hooks": {
+        "pre-commit": "lint-staged"
+      }
+    }
   }
 }
