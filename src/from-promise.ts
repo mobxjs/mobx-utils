@@ -7,9 +7,15 @@ export const PENDING = "pending"
 export const FULFILLED = "fulfilled"
 export const REJECTED = "rejected"
 
+type CaseHandlers<U, T> =  {
+    pending?: (t?: T) => U
+    fulfilled?: (t: T) => U
+    rejected?: (e: any) => U
+}
+
 export type IBasePromiseBasedObservable<T> = {
     isPromiseBasedObservable: true
-    case<U>(handlers: { pending?: () => U; fulfilled?: (t: T) => U; rejected?: (e: any) => U }, defaultFulfilled?: boolean): U
+    case<U>(handlers: CaseHandlers<U, T>, defaultFulfilled?: boolean): U
 } & PromiseLike<T>
 
 export type IPendingPromise = {
@@ -30,11 +36,7 @@ export type IRejectedPromise = {
 export type IPromiseBasedObservable<T> = IBasePromiseBasedObservable<T> &
     (IPendingPromise | IFulfilledPromise<T> | IRejectedPromise)
 
-function caseImpl<U, T>(handlers: {
-    pending?: (t?: T) => U
-    fulfilled?: (t: T) => U
-    rejected?: (e: any) => U
-}): U {
+function caseImpl<U, T>(handlers: CaseHandlers<U, T>): U {
     switch (this.state) {
         case PENDING:
             return handlers.pending && handlers.pending(this.value)
