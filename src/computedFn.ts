@@ -1,5 +1,5 @@
 import { DeepMap } from "./deepMap"
-import { IComputedValue, computed, onBecomeUnobserved, _isComputingDerivation, isAction } from "mobx";
+import { IComputedValue, IComputedValueOptions, computed, onBecomeUnobserved, _isComputingDerivation, isAction } from "mobx";
 
 /**
  * computedFn takes a function with an arbitrarily amount of arguments, 
@@ -33,14 +33,17 @@ import { IComputedValue, computed, onBecomeUnobserved, _isComputingDerivation, i
   })
  * 
  * @param fn 
- * @param keepAlive 
+ * @param keepAliveOrOptions
  */
-export function computedFn<T extends (...args: any[]) => any>(fn: T, keepAlive = false) {
+export function computedFn<T extends (...args: any[]) => any>(fn: T, keepAliveOrOptions: IComputedValueOptions<ReturnType<T>> | boolean = false) {
   if (isAction(fn))
     throw new Error("computedFn shouldn't be used on actions")
 
   let memoWarned = false;
   let i = 0;
+  const opts = typeof keepAliveOrOptions === 'boolean'
+      ? { keepAlive: keepAliveOrOptions }
+      : keepAliveOrOptions;
   const d = new DeepMap<IComputedValue<any>>()
 
   return function(...args: Parameters<T>): ReturnType<T> {
@@ -50,7 +53,7 @@ export function computedFn<T extends (...args: any[]) => any>(fn: T, keepAlive =
     if (entry.exists())
       return entry.get().get()
     // if function is invoked, and its a cache miss without reactive, there is no point in caching...
-    if (!keepAlive && !_isComputingDerivation()) {
+    if (!opts.keepAlive && !_isComputingDerivation()) {
       if (!memoWarned) {
         console.warn("invoking a computedFn from outside an reactive context won't be memoized, unless keepAlive is set")
         memoWarned = true
@@ -61,12 +64,12 @@ export function computedFn<T extends (...args: any[]) => any>(fn: T, keepAlive =
     const c = computed(() => {
       return fn.apply(self, args)
     }, {
+      ...opts,
       name: `computedFn(${fn.name}#${(++i)})`,
-      keepAlive
     })
     entry.set(c)
     // clean up if no longer observed
-    if (!keepAlive) onBecomeUnobserved(c, () => {
+    if (!opts.keepAlive) onBecomeUnobserved(c, () => {
       d.entry(args).delete()
     })
     // return current val
