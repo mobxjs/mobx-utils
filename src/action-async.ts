@@ -112,13 +112,13 @@ export function actionAsync<F extends (...args: any[]) => Promise<any>>(fn: F): 
  * mobx.configure({ enforceActions: "observed" }) // don't allow state modifications outside actions
  *
  * class Store {
- * 	 \@observable githubProjects = []
- * 	 \@state = "pending" // "pending" / "done" / "error"
+ *   \@observable githubProjects = []
+ *   \@state = "pending" // "pending" / "done" / "error"
  *
- * 	 \@actionAsync
- * 	 async fetchProjects() {
- * 	   this.githubProjects = []
- * 	   this.state = "pending"
+ *   \@actionAsync
+ *   async fetchProjects() {
+ *     this.githubProjects = []
+ *     this.state = "pending"
  *     try {
  *       // note the use of task when awaiting!
  *       const projects = await task(fetchGithubProjectsSomehow())
