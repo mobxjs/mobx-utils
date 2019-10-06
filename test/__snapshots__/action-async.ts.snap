@@ -4,9 +4,17 @@ exports[`it should support logging 1`] = `
 Array [
   Object {
     "arguments": Array [
+      1,
+    ],
+    "name": "f - runid 7 - step 0",
+    "spyReportStart": true,
+    "type": "action",
+  },
+  Object {
+    "arguments": Array [
       2,
     ],
-    "name": "myaction - runid 7 - step 0",
+    "name": "innerF - runid 8 - step 0",
     "spyReportStart": true,
     "type": "action",
   },
@@ -25,17 +33,20 @@ Array [
     "spyReportEnd": true,
   },
   Object {
+    "spyReportEnd": true,
+  },
+  Object {
     "arguments": Array [
       2,
     ],
-    "name": "myaction - runid 7 - step 1",
+    "name": "innerF - runid 8 - step 1",
     "spyReportStart": true,
     "type": "action",
   },
   Object {
     "key": "a",
     "name": "ObservableObject@16",
-    "newValue": 5,
+    "newValue": 3,
     "oldValue": 2,
     "spyReportStart": true,
     "type": "update",
@@ -47,7 +58,7 @@ Array [
     "key": "a",
     "name": "ObservableObject@16",
     "newValue": 4,
-    "oldValue": 5,
+    "oldValue": 3,
     "spyReportStart": true,
     "type": "update",
   },
@@ -59,9 +70,31 @@ Array [
   },
   Object {
     "arguments": Array [
-      2,
+      1,
     ],
-    "name": "myaction - runid 7 - step 2",
+    "name": "f - runid 7 - step 1",
+    "spyReportStart": true,
+    "type": "action",
+  },
+  Object {
+    "key": "a",
+    "name": "ObservableObject@16",
+    "newValue": 5,
+    "oldValue": 4,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "arguments": Array [
+      1,
+    ],
+    "name": "f - runid 7 - step 2",
     "spyReportStart": true,
     "type": "action",
   },
@@ -69,7 +102,7 @@ Array [
     "key": "a",
     "name": "ObservableObject@16",
     "newValue": 3,
-    "oldValue": 4,
+    "oldValue": 5,
     "spyReportStart": true,
     "type": "update",
   },
