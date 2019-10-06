@@ -1,3 +1,5 @@
+* Added `actionAsync` (not to be confused with `asyncAction`) as an alternative to flows.
+
 # 5.4.1
 
 * Fixed `cannot read property enumerable of undefined` error, [#191](https://github.com/mobxjs/mobx-utils/issues/191) through [#198](https://github.com/mobxjs/mobx-utils/pull/198) by [@dr0p](https://github.com/dr0p)
