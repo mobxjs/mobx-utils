@@ -87,7 +87,7 @@ export function actionAsync<F extends (...args: any[]) => Promise<any>>(fn: F): 
  * * `"fetchUsers - runid 6 - step 2"`
  * 
  * The `runId` represents the action instance. In other words, if `fetchUsers` is invoked
- * multiple times concurrently, the events with the same `runid` belong toghether.
+ * multiple times concurrently, the events with the same `runid` belong together.
  * The `step` number indicates the code block that is now being executed.
  * 
  * @example
