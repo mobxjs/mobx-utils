@@ -4,8 +4,12 @@ export const NOOP = () => {}
 
 export const IDENTITY = (_: any) => _
 
+export function fail(message: string): never {
+    throw new Error("[mobx-utils] " + message)
+}
+
 export function invariant(cond: boolean, message = "Illegal state") {
-    if (!cond) throw new Error("[mobx-utils] " + message)
+    if (!cond) fail(message)
 }
 
 const deprecatedMessages: string[] = []

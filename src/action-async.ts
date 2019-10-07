@@ -1,6 +1,7 @@
 import { _startAction, _endAction, IActionRunInfo } from "mobx"
 import { invariant } from "./utils"
 import { decorateMethodOrField } from "./decorator-utils"
+import { fail } from "./utils"
 
 let runId = 0
 
