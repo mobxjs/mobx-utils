@@ -789,8 +789,9 @@ Alternative syntax for async actions, similar to `flow` but more compatible with
 Typescript typings. Not to be confused with `asyncAction`, which is deprecated.
 
 `actionAsync` can be used either as a decorator or as a function.
-It takes an async function that internally must use `await task(promise)` rather than
-the standard `await promise`.
+
+It is _very_ important to await for any promises that are created _directly_ inside the async action,
+or else an exception will be thrown.
 
 When using the mobx devTools, an asyncAction will emit `action` events with names like:
 
@@ -811,15 +812,14 @@ The `step` number indicates the code block that is now being executed.
 ### Examples
 
 ```javascript
-import {actionAsync, task} from "mobx-utils"
+import {actionAsync} from "mobx-utils"
 
 let users = []
 
 const fetchUsers = actionAsync("fetchUsers", async (url) => {
   const start = Date.now()
-  // note the use of task when awaiting!
-  const data = await task(window.fetch(url))
-  users = await task(data.json())
+  const data = await window.fetch(url)
+  users = await data.json()
   return start - Date.now()
 })
 
@@ -828,7 +828,7 @@ console.log("Got users", users, "in ", time, "ms")
 ```
 
 ```javascript
-import {actionAsync, task} from "mobx-utils"
+import {actionAsync} from "mobx-utils"
 
 mobx.configure({ enforceActions: "observed" }) // don't allow state modifications outside actions
 
@@ -841,8 +841,7 @@ class Store {
     this.githubProjects = []
     this.state = "pending"
     try {
-      // note the use of task when awaiting!
-      const projects = await task(fetchGithubProjectsSomehow())
+      const projects = await fetchGithubProjectsSomehow()
       const filteredProjects = somePreprocessing(projects)
       // the asynchronous blocks will automatically be wrapped actions
       this.state = "done"

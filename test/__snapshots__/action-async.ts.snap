@@ -37,6 +37,14 @@ Array [
   },
   Object {
     "arguments": Array [
+      1,
+    ],
+    "name": "f - runid 7 - step 1",
+    "spyReportStart": true,
+    "type": "action",
+  },
+  Object {
+    "arguments": Array [
       2,
     ],
     "name": "innerF - runid 8 - step 1",
@@ -67,14 +75,6 @@ Array [
   },
   Object {
     "spyReportEnd": true,
-  },
-  Object {
-    "arguments": Array [
-      1,
-    ],
-    "name": "f - runid 7 - step 1",
-    "spyReportStart": true,
-    "type": "action",
   },
   Object {
     "key": "a",

@@ -1,5 +1,5 @@
 import * as mobx from "mobx"
-import { actionAsync, task } from "../src/mobx-utils"
+import { actionAsync } from "../src/mobx-utils"
 
 function delay<T>(time: number, value: T) {
     return new Promise<T>(resolve => {
@@ -25,8 +25,8 @@ test("it should support async actions", async () => {
 
     const f = actionAsync(async function(initial) {
         x.a = initial // this runs in action
-        x.a = await task(delay(100, 3))
-        await task(delay(100, 0))
+        x.a = await delay(100, 3)
+        await delay(100, 0)
         x.a = 4
         return x.a
     })
@@ -45,8 +45,8 @@ test("it should support try catch in async", async () => {
     const f = actionAsync(async function(initial) {
         x.a = initial // this runs in action
         try {
-            x.a = await task(delayThrow(100, 5))
-            await task(delay(100, 0))
+            x.a = await delayThrow(100, 5)
+            await delay(100, 0)
             x.a = 4
         } catch (e) {
             x.a = e
@@ -62,7 +62,7 @@ test("it should support try catch in async", async () => {
 test("it should support throw from async actions", async () => {
     try {
         await actionAsync(async () => {
-            await task(delay(10, 7))
+            await delay(10, 7)
             throw 7
         })()
         fail("should fail")
@@ -74,7 +74,7 @@ test("it should support throw from async actions", async () => {
 test("it should support throw from awaited promise", async () => {
     try {
         await actionAsync(async () => {
-            return await task(delayThrow(10, 7))
+            return await delayThrow(10, 7)
         })()
         fail("should fail")
     } catch (e) {
@@ -93,8 +93,8 @@ test("it should support async action in classes", async () => {
         f = actionAsync(async function(initial) {
             this.a = initial // this runs in action
             try {
-                this.a = await task(delayThrow(100, 5))
-                await task(delay(100, 0))
+                this.a = await delayThrow(100, 5)
+                await delay(100, 0)
                 this.a = 4
             } catch (e) {
                 this.a = e
@@ -127,8 +127,8 @@ test("it should support async action in classes with a method decorator", async 
         async f(initial) {
             this.a = initial // this runs in action
             try {
-                this.a = await task(delayThrow(100, 5))
-                await task(delay(100, 0))
+                this.a = await delayThrow(100, 5)
+                await delay(100, 0)
                 this.a = 4
             } catch (e) {
                 this.a = e
@@ -158,8 +158,8 @@ test("it should support async action in classes with a field decorator", async (
         f = async initial => {
             this.a = initial // this runs in action
             try {
-                this.a = await task(delayThrow(100, 5))
-                await task(delay(100, 0))
+                this.a = await delayThrow(100, 5)
+                await delay(100, 0)
                 this.a = 4
             } catch (e) {
                 this.a = e
@@ -184,16 +184,16 @@ test("it should support logging", async () => {
 
     const innerF = actionAsync("innerF", async initial => {
         x.a = initial // this runs in action
-        x.a = await task(delay(100, 3))
+        x.a = await delay(100, 3)
         x.a = 4
         return x.a
     })
 
     const f = actionAsync("f", async initial => {
         x.a = initial
-        x.a = await task(innerF(2))
+        x.a = await innerF(2)
         x.a = 5
-        x.a = await task(delay(100, 3))
+        x.a = await delay(100, 3)
         return x.a
     })
     const d = mobx.spy(ev => events.push(ev))
@@ -220,16 +220,16 @@ test("it should support async actions within async actions", async () => {
 
     const innerF = actionAsync(async initial => {
         x.a = initial // this runs in action
-        x.a = await task(delay(100, 3))
-        await task(delay(100, 0))
+        x.a = await delay(100, 3)
+        await delay(100, 0)
         x.a = 4
         return x.a
     })
 
     const f1 = actionAsync(async initial => {
-        x.a = await task(innerF(initial))
-        x.a = await task(delay(100, 5))
-        await task(delay(100, 0))
+        x.a = await innerF(initial)
+        x.a = await delay(100, 5)
+        await delay(100, 0)
         x.a = 6
         return x.a
     })
@@ -237,6 +237,54 @@ test("it should support async actions within async actions", async () => {
     const v = await f1(2)
     expect(v).toBe(6)
     expect(values).toEqual([1, 2, 3, 4, 5, 6])
+})
+
+test("it should support recursive async", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    const values = []
+    const x = mobx.observable({ a: 10 })
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
+    const f1 = actionAsync(async () => {
+        if (x.a <= 0) return
+        x.a -= await delay(100, 1)
+        await f1()
+    })
+
+    await f1()
+    expect(values).toEqual([10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
+})
+
+test("dangling promises created directly inside the action should throw", async () => {
+    mobx.configure({ enforceActions: "observed" })
+
+    const f1 = actionAsync(async () => {
+        delay(100, 1) // dangling promise
+    })
+
+    try {
+        await f1()
+        fail("should fail")
+    } catch (e) {
+        expect(e.message).toBe(
+            "[mobx-utils] 'actionAsync' context not present or invalid. did you forget to await a promise directly created inside the async action?"
+        )
+    }
+})
+
+test("dangling promises created indirectly inside the action should be ok", async () => {
+    mobx.configure({ enforceActions: "observed" })
+
+    const f1 = actionAsync(async () => {
+        await new Promise(resolve => {
+            setTimeout(() => {
+                delay(100, 1) // indirect dangling promise
+                resolve()
+            }, 100)
+        })
+    })
+
+    await f1()
 })
 
 test("it should support async actions within async actions that throw", async () => {
@@ -247,16 +295,16 @@ test("it should support async actions within async actions that throw", async ()
 
     const innerF = actionAsync(async function(initial) {
         x.a = initial // this runs in action
-        x.a = await task(delay(100, 3))
-        await task(delay(100, 0))
+        x.a = await delay(100, 3)
+        await delay(100, 0)
         x.a = 4
         throw "err"
     })
 
     const f = actionAsync(async function(initial) {
-        x.a = await task(innerF(initial))
-        x.a = await task(delay(100, 5))
-        await task(delay(100, 0))
+        x.a = await innerF(initial)
+        x.a = await delay(100, 5)
+        await delay(100, 0)
         x.a = 6
         return x.a
     })
@@ -275,10 +323,33 @@ test("typing", async () => {
     }
 
     const f = actionAsync(async (_initial: number) => {
-        const _n: number[] = await task(nothingAsync())
+        const _n: number[] = await nothingAsync()
         expect(_n).toEqual([5])
         return "string"
     })
 
     const n: string = await f(5)
+})
+
+test("promise polyfill", async () => {
+    const p = Promise.resolve(5)
+    expect(p instanceof Promise).toBe(true)
+    expect(await p).toBe(5)
+
+    const p2 = new Promise(resolve => {
+        resolve(6)
+    })
+    expect(p2 instanceof Promise).toBe(true)
+    expect(await p2).toBe(6)
+
+    const p3 = new Promise((_, reject) => {
+        reject(7)
+    })
+    expect(p3 instanceof Promise).toBe(true)
+    try {
+        await p3
+        fail("should fail")
+    } catch (e) {
+        expect(e).toBe(7)
+    }
 })

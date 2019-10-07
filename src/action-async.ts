@@ -1,6 +1,7 @@
 import { _startAction, _endAction, IActionRunInfo } from "mobx"
 import { invariant } from "./utils"
 import { decorateMethodOrField } from "./decorator-utils"
+import { fail } from "./utils"
 
 let runId = 0
 
@@ -17,14 +18,12 @@ const actionAsyncContextStack: IActionAsyncContext[] = []
 
 function getCurrentActionAsyncContext() {
     if (actionAsyncContextStack.length <= 0) {
-        fail(
-            "'actionAsync' context not present. did you await inside an 'actionAsync' without using 'task(promise)'?"
-        )
+        fail("'actionAsync' context not present")
     }
     return actionAsyncContextStack[actionAsyncContextStack.length - 1]!
 }
 
-export async function task<R>(promise: Promise<R>): Promise<R> {
+async function task<R>(promise: Promise<R>): Promise<R> {
     invariant(
         typeof promise === "object" && typeof promise.then === "function",
         "'task' expects a promise"
@@ -78,8 +77,9 @@ export function actionAsync<F extends (...args: any[]) => Promise<any>>(fn: F): 
  * Typescript typings. Not to be confused with `asyncAction`, which is deprecated.
  * 
  * `actionAsync` can be used either as a decorator or as a function.
- * It takes an async function that internally must use `await task(promise)` rather than
- * the standard `await promise`.
+ * 
+ * It is *very* important to await for any promises that are created *directly* inside the async action,
+ * or else an exception will be thrown.
  * 
  * When using the mobx devTools, an asyncAction will emit `action` events with names like:
  * * `"fetchUsers - runid 6 - step 0"`
@@ -91,15 +91,14 @@ export function actionAsync<F extends (...args: any[]) => Promise<any>>(fn: F): 
  * The `step` number indicates the code block that is now being executed.
  * 
  * @example
- * import {actionAsync, task} from "mobx-utils"
+ * import {actionAsync} from "mobx-utils"
  *
  * let users = []
  *
  * const fetchUsers = actionAsync("fetchUsers", async (url) => {
  *   const start = Date.now()
- *   // note the use of task when awaiting!
- *   const data = await task(window.fetch(url))
- *   users = await task(data.json())
+ *   const data = await window.fetch(url)
+ *   users = await data.json()
  *   return start - Date.now()
  * })
  *
@@ -107,7 +106,7 @@ export function actionAsync<F extends (...args: any[]) => Promise<any>>(fn: F): 
  * console.log("Got users", users, "in ", time, "ms")
  *
  * @example
- * import {actionAsync, task} from "mobx-utils"
+ * import {actionAsync} from "mobx-utils"
  *
  * mobx.configure({ enforceActions: "observed" }) // don't allow state modifications outside actions
  *
@@ -120,8 +119,7 @@ export function actionAsync<F extends (...args: any[]) => Promise<any>>(fn: F): 
  *     this.githubProjects = []
  *     this.state = "pending"
  *     try {
- *       // note the use of task when awaiting!
- *       const projects = await task(fetchGithubProjectsSomehow())
+ *       const projects = await fetchGithubProjectsSomehow()
  *       const filteredProjects = somePreprocessing(projects)
  *       // the asynchronous blocks will automatically be wrapped actions
  *       this.state = "done"
@@ -187,7 +185,7 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
             const ctx = actionAsyncContextStack.pop()
             if (!ctx || ctx.runId !== nextRunId) {
                 fail(
-                    "'actionAsync' context not present or invalid. did you await inside an 'actionAsync' without using 'task(promise)'?"
+                    "'actionAsync' context not present or invalid. did you forget to await a promise directly created inside the async action?"
                 )
             }
 
@@ -200,3 +198,39 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
 function getActionAsyncName(actionName: string, runId: number, step: number) {
     return `${actionName} - runid ${runId} - step ${step}`
 }
+
+let promisePolyfilled = false
+
+function polyfillPromise() {
+    if (promisePolyfilled) {
+        return
+    }
+    promisePolyfilled = true
+
+    const OrigPromise: any = Promise
+
+    const MobxPromise = function Promise(this: any, ...args: any[]) {
+        const p = new OrigPromise(...args)
+
+        if (actionAsyncContextStack.length > 0) {
+            // inside an async action
+            return task(p)
+        } else {
+            return p
+        }
+    }
+
+    // hoist statics
+    for (const pname of Object.getOwnPropertyNames(OrigPromise)) {
+        const desc = Object.getOwnPropertyDescriptor(OrigPromise, pname)
+        Object.defineProperty(MobxPromise, pname, desc)
+    }
+    for (const pname of Object.getOwnPropertySymbols(OrigPromise)) {
+        const desc = Object.getOwnPropertyDescriptor(OrigPromise, pname)
+        Object.defineProperty(MobxPromise, pname, desc)
+    }
+
+    Promise = MobxPromise as any
+}
+
+polyfillPromise()
