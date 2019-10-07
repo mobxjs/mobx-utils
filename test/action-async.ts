@@ -17,6 +17,15 @@ function delayThrow<T>(time: number, value: T) {
     })
 }
 
+function expectNoActionsRunning() {
+    const obs = mobx.observable.box(1)
+    const d = mobx.reaction(() => obs.get(), () => {})
+    expect(() => obs.set(2)).toThrow(
+        "changing observed observable values outside actions is not allowed"
+    )
+    d()
+}
+
 test("it should support async actions", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
@@ -34,6 +43,7 @@ test("it should support async actions", async () => {
     const v = await f(2)
     expect(v).toBe(4)
     expect(values).toEqual([1, 2, 3, 4])
+    expectNoActionsRunning()
 })
 
 test("it should support try catch in async", async () => {
@@ -57,9 +67,11 @@ test("it should support try catch in async", async () => {
     const v = await f(2)
     expect(v).toBe(5)
     expect(values).toEqual([1, 2, 5])
+    expectNoActionsRunning()
 })
 
 test("it should support throw from async actions", async () => {
+    mobx.configure({ enforceActions: "observed" })
     try {
         await actionAsync(async () => {
             await delay(10, 7)
@@ -69,9 +81,11 @@ test("it should support throw from async actions", async () => {
     } catch (e) {
         expect(e).toBe(7)
     }
+    expectNoActionsRunning()
 })
 
 test("it should support throw from awaited promise", async () => {
+    mobx.configure({ enforceActions: "observed" })
     try {
         await actionAsync(async () => {
             return await delayThrow(10, 7)
@@ -80,6 +94,7 @@ test("it should support throw from awaited promise", async () => {
     } catch (e) {
         expect(e).toBe(7)
     }
+    expectNoActionsRunning()
 })
 
 test("it should support async action in classes", async () => {
@@ -113,6 +128,7 @@ test("it should support async action in classes", async () => {
     expect(v).toBe(5)
     expect(values).toEqual([1, 2, 5])
     expect(x.a).toBe(5)
+    expectNoActionsRunning()
 })
 
 test("it should support async action in classes with a method decorator", async () => {
@@ -144,6 +160,7 @@ test("it should support async action in classes with a method decorator", async 
     expect(v).toBe(5)
     expect(values).toEqual([1, 2, 5])
     expect(x.a).toBe(5)
+    expectNoActionsRunning()
 })
 
 test("it should support async action in classes with a field decorator", async () => {
@@ -175,6 +192,7 @@ test("it should support async action in classes with a field decorator", async (
     expect(v).toBe(5)
     expect(values).toEqual([1, 2, 5])
     expect(x.a).toBe(5)
+    expectNoActionsRunning()
 })
 
 test("it should support logging", async () => {
@@ -201,6 +219,7 @@ test("it should support logging", async () => {
     await f(1)
     expect(stripEvents(events)).toMatchSnapshot()
     d()
+    expectNoActionsRunning()
 })
 
 function stripEvents(events) {
@@ -237,6 +256,7 @@ test("it should support async actions within async actions", async () => {
     const v = await f1(2)
     expect(v).toBe(6)
     expect(values).toEqual([1, 2, 3, 4, 5, 6])
+    expectNoActionsRunning()
 })
 
 test("it should support recursive async", async () => {
@@ -253,38 +273,7 @@ test("it should support recursive async", async () => {
 
     await f1()
     expect(values).toEqual([10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
-})
-
-test("dangling promises created directly inside the action should throw", async () => {
-    mobx.configure({ enforceActions: "observed" })
-
-    const f1 = actionAsync(async () => {
-        delay(100, 1) // dangling promise
-    })
-
-    try {
-        await f1()
-        fail("should fail")
-    } catch (e) {
-        expect(e.message).toBe(
-            "[mobx-utils] 'actionAsync' context not present or invalid. did you forget to await a promise directly created inside the async action?"
-        )
-    }
-})
-
-test("dangling promises created indirectly inside the action should be ok", async () => {
-    mobx.configure({ enforceActions: "observed" })
-
-    const f1 = actionAsync(async () => {
-        await new Promise(resolve => {
-            setTimeout(() => {
-                delay(100, 1) // indirect dangling promise
-                resolve()
-            }, 100)
-        })
-    })
-
-    await f1()
+    expectNoActionsRunning()
 })
 
 test("it should support async actions within async actions that throw", async () => {
@@ -315,6 +304,8 @@ test("it should support async actions within async actions that throw", async ()
     } catch (e) {
         expect(e).toBe("err")
     }
+
+    expectNoActionsRunning()
 })
 
 test("typing", async () => {
@@ -352,4 +343,46 @@ test("promise polyfill", async () => {
     } catch (e) {
         expect(e).toBe(7)
     }
+})
+
+test("dangling promises created indirectly inside the action should be ok", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    let danglingP
+
+    const f1 = actionAsync(async () => {
+        await new Promise(resolve => {
+            setTimeout(() => {
+                danglingP = delay(100, 1) // indirect dangling promise
+                resolve()
+            }, 100)
+        })
+    })
+
+    await f1()
+
+    expect(danglingP).toBeTruthy()
+    await danglingP
+    expectNoActionsRunning()
+})
+
+test("dangling promises created directly inside the action should throw", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    let danglingP
+
+    const f1 = actionAsync(async () => {
+        danglingP = delay(100, 1) // dangling promise
+    })
+
+    try {
+        await f1()
+        fail("should fail")
+    } catch (e) {
+        expect(e.message).toBe(
+            "[mobx-utils] 'actionAsync' context not present or invalid. did you forget to await a promise directly created inside the async action?"
+        )
+    }
+
+    expect(danglingP).toBeTruthy()
+    await danglingP
+    expectNoActionsRunning()
 })
