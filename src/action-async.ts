@@ -4,6 +4,7 @@ import { decorateMethodOrField } from "./decorator-utils"
 import { fail } from "./utils"
 
 let runId = 0
+const runningIds = new Set<number>()
 
 interface IActionAsyncContext {
     runId: number
@@ -41,20 +42,23 @@ export async function task<R>(promise: Promise<R>): Promise<R> {
     try {
         return await promise
     } finally {
-        const actionRunInfo = _startAction(
-            getActionAsyncName(actionName, runId, nextStep),
-            this,
-            args
-        )
+        // only restart if it not a dangling promise (the action is not yet finished)
+        if (runningIds.has(runId)) {
+            const actionRunInfo = _startAction(
+                getActionAsyncName(actionName, runId, nextStep),
+                this,
+                args
+            )
 
-        actionAsyncContextStack.push({
-            runId,
-            step: nextStep,
-            actionRunInfo,
-            actionName,
-            args,
-            scope
-        })
+            actionAsyncContextStack.push({
+                runId,
+                step: nextStep,
+                actionRunInfo,
+                actionName,
+                args,
+                scope
+            })
+        }
     }
 }
 
@@ -165,6 +169,7 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
 
     return async function(this: any, ...args: any) {
         const nextRunId = runId++
+        runningIds.add(nextRunId)
 
         const actionRunInfo = _startAction(getActionAsyncName(actionName, nextRunId, 0), this, args)
 
@@ -185,6 +190,8 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
             errThrown = err
             throw err
         } finally {
+            runningIds.delete(nextRunId)
+
             const ctx = actionAsyncContextStack.pop()
             if (!ctx || ctx.runId !== nextRunId) {
                 fail(
