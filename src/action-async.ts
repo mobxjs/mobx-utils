@@ -4,7 +4,8 @@ import { decorateMethodOrField } from "./decorator-utils"
 import { fail } from "./utils"
 
 let runId = 0
-const runningIds = new Set<number>()
+const unfinishedIds = new Set<number>()
+const currentlyActiveIds = new Set<number>()
 
 interface IActionAsyncContext {
     runId: number
@@ -38,12 +39,13 @@ export async function task<R>(promise: Promise<R>): Promise<R> {
     const nextStep = step + 1
     actionAsyncContextStack.pop()
     _endAction(actionRunInfo)
+    currentlyActiveIds.delete(runId)
 
     try {
         return await promise
     } finally {
         // only restart if it not a dangling promise (the action is not yet finished)
-        if (runningIds.has(runId)) {
+        if (unfinishedIds.has(runId)) {
             const actionRunInfo = _startAction(
                 getActionAsyncName(actionName, runId, nextStep),
                 this,
@@ -58,6 +60,7 @@ export async function task<R>(promise: Promise<R>): Promise<R> {
                 args,
                 scope
             })
+            currentlyActiveIds.add(runId)
         }
     }
 }
@@ -169,7 +172,7 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
 
     return async function(this: any, ...args: any) {
         const nextRunId = runId++
-        runningIds.add(nextRunId)
+        unfinishedIds.add(nextRunId)
 
         const actionRunInfo = _startAction(getActionAsyncName(actionName, nextRunId, 0), this, args)
 
@@ -181,6 +184,7 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
             args,
             scope: this
         })
+        currentlyActiveIds.add(nextRunId)
 
         let errThrown: any
         try {
@@ -190,17 +194,19 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
             errThrown = err
             throw err
         } finally {
-            runningIds.delete(nextRunId)
+            unfinishedIds.delete(nextRunId)
 
-            const ctx = actionAsyncContextStack.pop()
-            if (!ctx || ctx.runId !== nextRunId) {
-                fail(
-                    "'actionAsync' context not present or invalid. did you await inside an 'actionAsync' without using 'task(promise)'?"
-                )
+            if (currentlyActiveIds.has(nextRunId)) {
+                const ctx = actionAsyncContextStack.pop()
+                if (!ctx || ctx.runId !== nextRunId) {
+                    fail(
+                        "'actionAsync' context not present or invalid. did you await inside an 'actionAsync' without using 'task(promise)'?"
+                    )
+                }
+                ctx.actionRunInfo.error = errThrown
+                _endAction(ctx.actionRunInfo)
+                currentlyActiveIds.delete(nextRunId)
             }
-
-            ctx.actionRunInfo.error = errThrown
-            _endAction(ctx.actionRunInfo)
         }
     }
 }

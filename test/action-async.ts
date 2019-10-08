@@ -17,6 +17,15 @@ function delayThrow<T>(time: number, value: T) {
     })
 }
 
+function delayFn(time: number, fn: () => void) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            fn()
+            resolve()
+        }, time)
+    })
+}
+
 function expectNoActionsRunning() {
     const obs = mobx.observable.box(1)
     const d = mobx.reaction(() => obs.get(), () => {})
@@ -326,7 +335,7 @@ test("dangling promises created indirectly inside the action should be ok", asyn
     expectNoActionsRunning()
 })
 
-test("dangling promises created directly inside the action using task should throw", async () => {
+test("dangling promises created directly inside the action using task should be ok", async () => {
     mobx.configure({ enforceActions: "observed" })
     let danglingP
 
@@ -334,14 +343,7 @@ test("dangling promises created directly inside the action using task should thr
         danglingP = task(delay(100, 1)) // dangling promise
     })
 
-    try {
-        await f1()
-        fail("should fail")
-    } catch (e) {
-        expect(e.message).toBe(
-            "[mobx-utils] 'actionAsync' context not present or invalid. did you await inside an 'actionAsync' without using 'task(promise)'?"
-        )
-    }
+    await f1()
 
     expect(danglingP).toBeTruthy()
     await danglingP
@@ -360,5 +362,73 @@ test("dangling promises created directly inside the action without using task be
 
     expect(danglingP).toBeTruthy()
     await danglingP
+    expectNoActionsRunning()
+})
+
+test("it should support recursive async (with task)", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    const values = []
+    const x = mobx.observable({ a: 10 })
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
+    const f1 = actionAsync(async () => {
+        if (x.a <= 0) return
+        x.a -= await task(delay(10, 1))
+        await task(f1())
+    })
+
+    await f1()
+    expect(values).toEqual([10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
+    expectNoActionsRunning()
+})
+
+test("it should support recursive async (without task)", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    const values = []
+    const x = mobx.observable({ a: 10 })
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
+    const f1 = actionAsync(async () => {
+        if (x.a <= 0) return
+        x.a -= await task(delay(10, 1))
+        await f1()
+    })
+
+    await f1()
+    expect(values).toEqual([10, 0])
+    expectNoActionsRunning()
+})
+
+test("it should support parallel async", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    const values = []
+    const x = mobx.observable({ a: 1 })
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
+    const f1 = actionAsync(async () => {
+        x.a = 2
+        x.a = await task(delay(20, 5))
+        x.a = await task(delay(40, 7))
+    })
+
+    const f2 = actionAsync(async () => {
+        x.a = 3
+        x.a = await task(delay(10, 4))
+        x.a = await task(delay(30, 6))
+    })
+
+    await Promise.all([
+        f1(),
+        f2(),
+        async () => {
+            expectNoActionsRunning()
+        },
+        delayFn(5, expectNoActionsRunning),
+        delayFn(15, expectNoActionsRunning),
+        delayFn(25, expectNoActionsRunning),
+        delayFn(35, expectNoActionsRunning),
+        delayFn(45, expectNoActionsRunning)
+    ])
+    expect(values).toEqual([1, 2, 3, 4, 5, 6, 7])
     expectNoActionsRunning()
 })
