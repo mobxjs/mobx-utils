@@ -365,7 +365,7 @@ test("dangling promises created directly inside the action without using task be
     expectNoActionsRunning()
 })
 
-test("it should support recursive async (with task)", async () => {
+test("it should support recursive async", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 10 })
@@ -379,23 +379,6 @@ test("it should support recursive async (with task)", async () => {
 
     await f1()
     expect(values).toEqual([10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
-    expectNoActionsRunning()
-})
-
-test("it should support recursive async (without task)", async () => {
-    mobx.configure({ enforceActions: "observed" })
-    const values = []
-    const x = mobx.observable({ a: 10 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
-
-    const f1 = actionAsync(async () => {
-        if (x.a <= 0) return
-        x.a -= await task(delay(10, 1))
-        await f1()
-    })
-
-    await f1()
-    expect(values).toEqual([10, 0])
     expectNoActionsRunning()
 })
 
