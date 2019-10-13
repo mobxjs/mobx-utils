@@ -375,7 +375,6 @@ test("it should support recursive async", async () => {
         if (x.a <= 0) return
         x.a -= await task(delay(10, 1))
         await task(f1())
-        
     })
 
     await f1()
