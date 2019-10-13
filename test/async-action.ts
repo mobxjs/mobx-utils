@@ -63,33 +63,37 @@ test("it should support try catch in async generator", done => {
 })
 
 test("it should support throw from async generator", done => {
-    utils.asyncAction(function*() {
-        throw 7
-    })().then(
-        () => {
-            fail()
-            done()
-        },
-        e => {
-            expect(e).toBe(7)
-            done()
-        }
-    )
+    utils
+        .asyncAction(function*() {
+            throw 7
+        })()
+        .then(
+            () => {
+                fail()
+                done()
+            },
+            e => {
+                expect(e).toBe(7)
+                done()
+            }
+        )
 })
 
 test("it should support throw from yielded promise generator", done => {
-    utils.asyncAction(function*() {
-        return yield delay(10, 7, true)
-    })().then(
-        () => {
-            fail()
-            done()
-        },
-        e => {
-            expect(e).toBe(7)
-            done()
-        }
-    )
+    utils
+        .asyncAction(function*() {
+            return yield delay(10, 7, true)
+        })()
+        .then(
+            () => {
+                fail()
+                done()
+            },
+            e => {
+                expect(e).toBe(7)
+                done()
+            }
+        )
 })
 
 test("it should support asyncAction as decorator", done => {

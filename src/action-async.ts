@@ -84,20 +84,20 @@ export function actionAsync<F extends (...args: any[]) => Promise<any>>(fn: F): 
 /**
  * Alternative syntax for async actions, similar to `flow` but more compatible with
  * Typescript typings. Not to be confused with `asyncAction`, which is deprecated.
- * 
+ *
  * `actionAsync` can be used either as a decorator or as a function.
  * It takes an async function that internally must use `await task(promise)` rather than
  * the standard `await promise`.
- * 
+ *
  * When using the mobx devTools, an asyncAction will emit `action` events with names like:
  * * `"fetchUsers - runid 6 - step 0"`
  * * `"fetchUsers - runid 6 - step 1"`
  * * `"fetchUsers - runid 6 - step 2"`
- * 
+ *
  * The `runId` represents the action instance. In other words, if `fetchUsers` is invoked
  * multiple times concurrently, the events with the same `runid` belong together.
  * The `step` number indicates the code block that is now being executed.
- * 
+ *
  * @example
  * import {actionAsync, task} from "mobx-utils"
  *

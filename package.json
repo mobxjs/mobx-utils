@@ -9,12 +9,12 @@
   "typings": "lib/mobx-utils.d.ts",
   "sideEffects": false,
   "scripts": {
-    "prettier": "prettier --write --print-width 100 --tab-width 4 --no-semi \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
+    "prettier": "prettier --write \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
     "build": "tsc -p src && rollup lib/mobx-utils.js -e mobx -g mobx:mobx -o mobx-utils.umd.js -f umd --name mobxUtils && rollup lib/mobx-utils.js -e mobx -o mobx-utils.module.js -f es",
-    "watch": "yarn jest --watch",
-    "test": "yarn jest",
+    "watch": "jest --watch",
+    "test": "jest",
     "prepublishOnly": "npm run build && npm run build-docs",
-    "coverage": "yarn jest --coverage",
+    "coverage": "jest --coverage",
     "build-docs": "npm run build && documentation readme lib/mobx-utils.js --section API"
   },
   "repository": {
@@ -33,12 +33,12 @@
   ],
   "devDependencies": {
     "@types/jest": "^24.0.11",
-    "coveralls": "^2.11.4",
+    "coveralls": "^3.0.7",
     "documentation": "^9.3.1",
     "faucet": "*",
-    "husky": "^2.4.1",
+    "husky": "^3.0.9",
     "jest": "^24.7.1",
-    "lint-staged": "^8.2.0",
+    "lint-staged": "^9.4.2",
     "lodash.clonedeep": "*",
     "lodash.clonedeepwith": "*",
     "lodash.intersection": "*",
@@ -48,7 +48,7 @@
     "rxjs": "^6.0.0",
     "shelljs": "^0.8.3",
     "ts-jest": "^24.0.2",
-    "typescript": "*"
+    "typescript": "3.6.4"
   },
   "dependencies": {},
   "peerDependencies": {

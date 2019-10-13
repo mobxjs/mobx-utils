@@ -81,8 +81,7 @@ export class DeepMap<T> {
         if (this.argsLength === -1) this.argsLength = args.length
         else if (this.argsLength !== args.length)
             throw new Error(
-                `DeepMap should be used with functions with a consistent length, expected: ${this
-                    .argsLength}, got: ${args.length}`
+                `DeepMap should be used with functions with a consistent length, expected: ${this.argsLength}, got: ${args.length}`
             )
         if (this.last) this.last.isDisposed = true
 

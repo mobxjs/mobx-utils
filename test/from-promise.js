@@ -346,12 +346,11 @@ test("when creating a promise in a fulfilled state it should not fire twice, #36
 })
 
 test("it creates a real promise, #45", () => {
-    return Promise.all([
-        utils.fromPromise.resolve(2),
-        utils.fromPromise(Promise.resolve(3))
-    ]).then(x => {
-        expect(x).toEqual([2, 3])
-    })
+    return Promise.all([utils.fromPromise.resolve(2), utils.fromPromise(Promise.resolve(3))]).then(
+        x => {
+            expect(x).toEqual([2, 3])
+        }
+    )
 })
 
 test("it can construct new promises from function, #45", () => {
