@@ -1,3 +1,5 @@
+* Added `actionAsync` (not to be confused with `asyncAction`) as an alternative to flows.
+
 # 5.4.1
 
 * Fixed `cannot read property enumerable of undefined` error, [#191](https://github.com/mobxjs/mobx-utils/issues/191) through [#198](https://github.com/mobxjs/mobx-utils/pull/198) by [@dr0p](https://github.com/dr0p)
@@ -14,7 +16,7 @@ Introduced `computedFn`, to support using arbitrary functions as computed! Imple
 # 5.2.0
 
 * `createViewModel` now has an additional field `changedValues` on the returned viewmodel, that returns a map with all the pending changes. See [#172](https://github.com/mobxjs/mobx-utils/pull/172) by [@ItamarShDev](https://github.com/ItamarShDev). Fixes [#171](https://github.com/mobxjs/mobx-utils/issues/171) and [#173](https://github.com/mobxjs/mobx-utils/issues/173)
-* `fromPromise().case`: if the `onFullfilled` handler is omitted, `case` will now return the resolved value, rather than `undefined`. See [#167](https://github.com/mobxjs/mobx-utils/pull/167/) by [@JefHellemans](https://github.com/JefHellemans)
+* `fromPromise().case`: if the `onFulfilled` handler is omitted, `case` will now return the resolved value, rather than `undefined`. See [#167](https://github.com/mobxjs/mobx-utils/pull/167/) by [@JefHellemans](https://github.com/JefHellemans)
 * `createViewModel` will now respect the enumerability of properties. See [#169](https://github.com/mobxjs/mobx-utils/pull/169) by [dr0p](https://github.com/dr0p)
 
 # 5.1.0
@@ -83,7 +85,7 @@ Updated mobx-utils to use MobX 4. No futher changes
 * **BREAKING** Fixed #54, the resolved value of a promise is no longer deeply converted to an observable
 * **BREAKING** Dropped `fromPromise().reason`
 * **BREAKING** Improved typings of `fromPromise`. For example, the `value` property is now only available if `.state === "resolved"` (#41)
-* **BREAKING** Dropped optional `initialvalue` param from `fromPromise`. use `fromPromise.fullfilled(value)` instead to create a promise in some ready state
+* **BREAKING** Dropped optional `initialvalue` param from `fromPromise`. use `fromPromise.fulfilled(value)` instead to create a promise in some ready state
 * Introduced `fromPromise.reject(reason)` and `fromPromise.resolve(value?)` to create a promise based observable in a certain state, see #39
 * Fixed #56, observable promises attributes `state` and `value` are now explicit observables
 

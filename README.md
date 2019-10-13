@@ -84,6 +84,9 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
     -   [Examples](#examples-17)
 -   [DeepMapEntry](#deepmapentry)
 -   [DeepMap](#deepmap)
+-   [actionAsync](#actionasync)
+    -   [Parameters](#parameters-19)
+    -   [Examples](#examples-18)
 
 ## fromPromise
 
@@ -608,7 +611,7 @@ When using the mobx devTools, an asyncAction will emit `action` events with name
 -   `"fetchUsers - runid: 6 - yield 0"`
 -   `"fetchUsers - runid: 6 - yield 1"`
 
-The `runId` represents the generator instance. In other words, if `fetchUsers` is invoked multiple times concurrently, the events with the same `runid` belong toghether.
+The `runId` represents the generator instance. In other words, if `fetchUsers` is invoked multiple times concurrently, the events with the same `runid` belong together.
 The `yield` number indicates the progress of the generator. `init` indicates spawning (it won't do anything, but you can find the original arguments of the `asyncAction` here).
 `yield 0` ... `yield n` indicates the code block that is now being executed. `yield 0` is before the first `yield`, `yield 1` after the first one etc. Note that yield numbers are not determined lexically but by the runtime flow.
 
@@ -756,7 +759,7 @@ Note that this might introduce memory leaks!
 ### Parameters
 
 -   `fn`  
--   `keepAlive`  
+-   `keepAliveOrOptions`  
 
 ### Examples
 
@@ -779,3 +782,74 @@ console.log((store.m(3) * store.c))
 ## DeepMapEntry
 
 ## DeepMap
+
+## actionAsync
+
+Alternative syntax for async actions, similar to `flow` but more compatible with
+Typescript typings. Not to be confused with `asyncAction`, which is deprecated.
+
+`actionAsync` can be used either as a decorator or as a function.
+It takes an async function that internally must use `await task(promise)` rather than
+the standard `await promise`.
+
+When using the mobx devTools, an asyncAction will emit `action` events with names like:
+
+-   `"fetchUsers - runid 6 - step 0"`
+-   `"fetchUsers - runid 6 - step 1"`
+-   `"fetchUsers - runid 6 - step 2"`
+
+The `runId` represents the action instance. In other words, if `fetchUsers` is invoked
+multiple times concurrently, the events with the same `runid` belong together.
+The `step` number indicates the code block that is now being executed.
+
+### Parameters
+
+-   `arg1`  
+-   `arg2`  
+-   `arg3`  
+
+### Examples
+
+```javascript
+import {actionAsync, task} from "mobx-utils"
+
+let users = []
+
+const fetchUsers = actionAsync("fetchUsers", async (url) => {
+  const start = Date.now()
+  // note the use of task when awaiting!
+  const data = await task(window.fetch(url))
+  users = await task(data.json())
+  return start - Date.now()
+})
+
+const time = await fetchUsers("http://users.com")
+console.log("Got users", users, "in ", time, "ms")
+```
+
+```javascript
+import {actionAsync, task} from "mobx-utils"
+
+mobx.configure({ enforceActions: "observed" }) // don't allow state modifications outside actions
+
+class Store {
+  @observable githubProjects = []
+  @state = "pending" // "pending" / "done" / "error"
+
+  @actionAsync
+  async fetchProjects() {
+    this.githubProjects = []
+    this.state = "pending"
+    try {
+      // note the use of task when awaiting!
+      const projects = await task(fetchGithubProjectsSomehow())
+      const filteredProjects = somePreprocessing(projects)
+      // the asynchronous blocks will automatically be wrapped actions
+      this.state = "done"
+      this.githubProjects = filteredProjects
+    } catch (error) {
+       this.state = "error"
+    }
+  }
+}
+```

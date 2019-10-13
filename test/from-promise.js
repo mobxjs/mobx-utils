@@ -313,7 +313,7 @@ test("it is possible to create a promise in a rejected state, #36", done => {
     })
 })
 
-test("it is possible to create a promise in a fullfilled state, #36", done => {
+test("it is possible to create a promise in a fulfilled state, #36", done => {
     const someObject = { a: 3 }
     const obs = utils.fromPromise.resolve(someObject)
     expect(obs.state).toBe(utils.FULFILLED)
@@ -329,7 +329,7 @@ test("it is possible to create a promise in a fullfilled state, #36", done => {
     })
 })
 
-test("when creating a promise in a fullfilled state it should not fire twice, #36", done => {
+test("when creating a promise in a fulfilled state it should not fire twice, #36", done => {
     let events = 0
     const obs = utils.fromPromise.resolve(3)
 
