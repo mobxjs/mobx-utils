@@ -64,7 +64,7 @@ test("to observable - should not push the initial value", () => {
 
 test("from observable", done => {
     mobx.configure({ enforceActions: "observed" })
-    const fromStream = utils.fromStream(Rx.Observable.interval(100), -1)
+    const fromStream = utils.fromStream(Rx.Observable.interval(10), -1)
     const values = []
     const d = mobx.autorun(() => {
         values.push(fromStream.current)
@@ -72,19 +72,19 @@ test("from observable", done => {
 
     setTimeout(() => {
         expect(fromStream.current).toBe(-1)
-    }, 50)
+    }, 5)
     setTimeout(() => {
         expect(fromStream.current).toBe(0)
-    }, 150)
+    }, 15)
     setTimeout(() => {
         expect(fromStream.current).toBe(1)
         fromStream.dispose()
-    }, 250)
+    }, 25)
     setTimeout(() => {
         expect(fromStream.current).toBe(1)
         expect(values).toEqual([-1, 0, 1])
         d()
         mobx.configure({ enforceActions: "never" })
         done()
-    }, 350)
+    }, 35)
 })
