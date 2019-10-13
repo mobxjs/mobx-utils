@@ -83,17 +83,17 @@
     ],
     "watchPathIgnorePatterns": [
       "<rootDir>/node_modules/"
-    ],
-    "lint-staged": {
-      "*.{ts,tsx,js,jsx}": [
-        "prettier --write",
-        "git add"
-      ]
-    },
-    "husky": {
-      "hooks": {
-        "pre-commit": "lint-staged"
-      }
+    ]
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
     }
   }
 }
