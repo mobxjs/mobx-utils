@@ -1,8 +1,7 @@
-"use strict"
-
-const utils = require("../src/mobx-utils")
-const mobx = require("mobx")
-const Rx = require("rxjs")
+import *  as utils from "../src/mobx-utils"
+import * as mobx from "mobx"
+import {from, interval} from "rxjs"
+import { map } from 'rxjs/operators';
 
 test("to observable - should push the initial value by default", () => {
     const user = mobx.observable({
@@ -14,9 +13,8 @@ test("to observable - should push the initial value by default", () => {
 
     let values = []
 
-    const sub = Rx.Observable
-        .from(utils.toStream(() => user.firstName + user.lastName, true))
-        .map(x => x.toUpperCase())
+    const sub = from(utils.toStream(() => user.firstName + user.lastName, true)).pipe(
+        map(x => x.toUpperCase()))
         .subscribe(v => values.push(v))
 
     user.firstName = "John"
@@ -43,9 +41,8 @@ test("to observable - should not push the initial value", () => {
 
     let values = []
 
-    const sub = Rx.Observable
-        .from(utils.toStream(() => user.firstName + user.lastName))
-        .map(x => x.toUpperCase())
+    const sub = from(utils.toStream(() => user.firstName + user.lastName)).pipe(
+        map(x => x.toUpperCase()))
         .subscribe(v => values.push(v))
 
     user.firstName = "John"
@@ -64,7 +61,7 @@ test("to observable - should not push the initial value", () => {
 
 test("from observable", done => {
     mobx.configure({ enforceActions: "observed" })
-    const fromStream = utils.fromStream(Rx.Observable.interval(10), -1)
+    const fromStream = utils.fromStream(interval(10), -1)
     const values = []
     const d = mobx.autorun(() => {
         values.push(fromStream.current)
