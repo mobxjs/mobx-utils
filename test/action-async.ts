@@ -46,12 +46,13 @@ test("it should support async actions", async () => {
         x.a = await task(delay(100, 3))
         await task(delay(100, 0))
         x.a = 4
+        x.a = await task(5)
         return x.a
     })
 
     const v = await f(2)
-    expect(v).toBe(4)
-    expect(values).toEqual([1, 2, 3, 4])
+    expect(v).toBe(5)
+    expect(values).toEqual([1, 2, 3, 4, 5])
     expectNoActionsRunning()
 })
 

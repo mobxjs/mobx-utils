@@ -27,12 +27,7 @@ function getCurrentActionAsyncContext() {
     return actionAsyncContextStack[actionAsyncContextStack.length - 1]!
 }
 
-export async function task<R>(promise: Promise<R>): Promise<R> {
-    invariant(
-        typeof promise === "object" && typeof promise.then === "function",
-        "'task' expects a promise"
-    )
-
+export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
     const ctx = getCurrentActionAsyncContext()
 
     const { runId, actionName, args, scope, actionRunInfo, step } = ctx
@@ -42,7 +37,7 @@ export async function task<R>(promise: Promise<R>): Promise<R> {
     currentlyActiveIds.delete(runId)
 
     try {
-        return await promise
+        return await value
     } finally {
         // only restart if it not a dangling promise (the action is not yet finished)
         if (unfinishedIds.has(runId)) {
