@@ -1,4 +1,11 @@
-* Added `actionAsync` (not to be confused with `asyncAction`) as an alternative to flows.
+# 5.5.0
+
+_Note: the minimum required MobX version for this release has been bumped to `"mobx": "^4.13.1 || ^5.13.1"`_
+
+* Added `actionAsync` (not to be confused with `asyncAction`) as an alternative to flows, see [#217](https://github.com/mobxjs/mobx-utils/pull/217) by [xaviergonz](https://github.com/xaviergonz)
+* Fixed a typing issue for the pending handler of `fromPromise`, see [#208](https://github.com/mobxjs/mobx-utils/pull/208) by [Ricardo-Marques](https://github.com/Ricardo-Marques)
+* `computedFn` now supports the standard options accepted by classic `computed`, see [#215](https://github.com/mobxjs/mobx-utils/pull/215) by [hearnden](https://github.com/hearnden)
+* Fixed [#205](https://github.com/mobxjs/mobx-utils/issues/205), something with to unobserved properties and `createViewModel`. See [#216](https://github.com/mobxjs/mobx-utils/pull/216) by [wrench7](https://github.com/wrench7)
 
 # 5.4.1
 
