@@ -1,3 +1,5 @@
+* `task` now supports plain values as well.
+
 # 5.5.0
 
 _Note: the minimum required MobX version for this release has been bumped to `"mobx": "^4.13.1 || ^5.13.1"`_
