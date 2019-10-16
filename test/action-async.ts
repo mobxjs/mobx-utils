@@ -47,6 +47,7 @@ test("it should support async actions", async () => {
         await task(delay(100, 0))
         x.a = 4
         x.a = await task(5)
+        expect(x.a).toBe(5)
         return x.a
     })
 
@@ -336,15 +337,23 @@ test("dangling promises created indirectly inside the action should be ok", asyn
     expectNoActionsRunning()
 })
 
-test("dangling promises created directly inside the action using task should be ok", async () => {
+test("dangling promises created directly inside the action using task should NOT be ok", async () => {
     mobx.configure({ enforceActions: "observed" })
     let danglingP
 
-    const f1 = actionAsync(async () => {
+    const f1 = actionAsync("f1", async () => {
         danglingP = task(delay(100, 1)) // dangling promise
     })
 
-    await f1()
+    try {
+        await f1()
+        fail("should fail")
+    } catch (err) {
+        expect(err.message).toBe(
+            "[mobx-utils] invalid 'actionAsync' context when finishing action 'f1'. no action context could be found instead. did you await inside an 'actionAsync' without using 'task(promise)'? did you forget to await the task?"
+        )
+    }
+    expectNoActionsRunning()
 
     expect(danglingP).toBeTruthy()
     await danglingP
@@ -391,28 +400,65 @@ test("it should support parallel async", async () => {
 
     const f1 = actionAsync(async () => {
         x.a = 2
-        x.a = await task(delay(20, 5))
-        x.a = await task(delay(40, 7))
+        x.a = await task(delay(20, 6))
+        x.a = await task(delay(40, 9))
     })
 
     const f2 = actionAsync(async () => {
         x.a = 3
-        x.a = await task(delay(10, 4))
-        x.a = await task(delay(30, 6))
+        x.a = await task(delay(10, 5))
+        x.a = await task(delay(30, 8))
+    })
+
+    const f3 = actionAsync(async () => {
+        x.a = 4 // 5
+        x.a = await task(delay(20, 7)) // 25
+        x.a = await task(delay(40, 10)) // 45
     })
 
     await Promise.all([
         f1(),
         f2(),
-        async () => {
+        (async () => {
+            await delay(5, 0)
+            await f3()
+        })(),
+        (async () => {
             expectNoActionsRunning()
-        },
-        delayFn(5, expectNoActionsRunning),
+        })(),
+        delayFn(4, expectNoActionsRunning),
+        delayFn(6, expectNoActionsRunning),
         delayFn(15, expectNoActionsRunning),
-        delayFn(25, expectNoActionsRunning),
+        delayFn(24, expectNoActionsRunning),
+        delayFn(26, expectNoActionsRunning),
         delayFn(35, expectNoActionsRunning),
-        delayFn(45, expectNoActionsRunning)
+        delayFn(44, expectNoActionsRunning),
+        delayFn(46, expectNoActionsRunning)
     ])
-    expect(values).toEqual([1, 2, 3, 4, 5, 6, 7])
+    expect(values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     expectNoActionsRunning()
+})
+
+test("calling async actions that do not await should be ok", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    const values = []
+    const x = mobx.observable({ a: 1 })
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
+    const f1 = actionAsync("f1", async () => {
+        x.a++
+    })
+    const f2 = actionAsync("f2", async () => {
+        x.a++
+    })
+
+    await f1()
+    expectNoActionsRunning()
+    await f2()
+    expectNoActionsRunning()
+
+    await Promise.all([f1(), f2()])
+    expectNoActionsRunning()
+
+    expect(values).toEqual([1, 2, 3, 4, 5])
 })
