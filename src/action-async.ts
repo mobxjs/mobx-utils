@@ -18,17 +18,14 @@ interface IActionAsyncContext {
 
 const actionAsyncContextStack: IActionAsyncContext[] = []
 
-function getCurrentActionAsyncContext() {
-    if (actionAsyncContextStack.length <= 0) {
+export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
+    const ctx = actionAsyncContextStack[actionAsyncContextStack.length - 1]
+
+    if (!ctx) {
         fail(
-            "'actionAsync' context not present. did you await inside an 'actionAsync' without using 'task(promise)'?"
+            "'actionAsync' context not present when running 'task'. did you await inside an 'actionAsync' without using 'task(promise)'? did you forget to await the task?"
         )
     }
-    return actionAsyncContextStack[actionAsyncContextStack.length - 1]!
-}
-
-export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
-    const ctx = getCurrentActionAsyncContext()
 
     const { runId, actionName, args, scope, actionRunInfo, step } = ctx
     const nextStep = step + 1
@@ -181,27 +178,49 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
         })
         currentlyActiveIds.add(nextRunId)
 
-        let errThrown: any
-        try {
-            const ret = await fn.apply(this, args)
-            return ret
-        } catch (err) {
-            errThrown = err
-            throw err
-        } finally {
+        const finish = (err: any) => {
             unfinishedIds.delete(nextRunId)
 
-            if (currentlyActiveIds.has(nextRunId)) {
-                const ctx = actionAsyncContextStack.pop()
-                if (!ctx || ctx.runId !== nextRunId) {
-                    fail(
-                        "'actionAsync' context not present or invalid. did you await inside an 'actionAsync' without using 'task(promise)'?"
-                    )
+            const ctx = actionAsyncContextStack.pop()
+            if (!ctx || ctx.runId !== nextRunId) {
+                let msg = `invalid 'actionAsync' context when finishing action '${actionName}'.`
+                if (!ctx) {
+                    msg += " no action context could be found instead."
+                } else {
+                    msg += ` an action context for '${ctx.actionName}' was found instead.`
                 }
-                ctx.actionRunInfo.error = errThrown
-                _endAction(ctx.actionRunInfo)
-                currentlyActiveIds.delete(nextRunId)
+                msg +=
+                    " did you await inside an 'actionAsync' without using 'task(promise)'? did you forget to await the task?"
+                fail(msg)
             }
+            ctx.actionRunInfo.error = err
+            _endAction(ctx.actionRunInfo)
+            currentlyActiveIds.delete(nextRunId)
+
+            if (err) {
+                throw err
+            }
+        }
+
+        let promise: any
+        try {
+            promise = fn.apply(this, args)
+        } catch (err) {
+            finish(err)
+        }
+
+        // are we done sync? (no task run)
+        if (currentlyActiveIds.has(nextRunId)) {
+            finish(undefined)
+            return promise
+        }
+
+        try {
+            const ret = await promise
+            finish(undefined)
+            return ret
+        } catch (err) {
+            finish(err)
         }
     }
 }

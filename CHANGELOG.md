@@ -1,3 +1,4 @@
+* Fix for `actionAsync` giving errors when it didn't await a task inside.
 * `task` now supports plain values as well.
 
 # 5.5.0
