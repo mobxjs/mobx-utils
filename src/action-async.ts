@@ -183,6 +183,11 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
 
             const ctx = actionAsyncContextStack.pop()
             if (!ctx || ctx.runId !== nextRunId) {
+                // push it back if invalid
+                if (ctx) {
+                    actionAsyncContextStack.push(ctx)
+                }
+
                 let msg = `invalid 'actionAsync' context when finishing action '${actionName}'.`
                 if (!ctx) {
                     msg += " no action context could be found instead."

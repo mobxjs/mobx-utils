@@ -462,3 +462,38 @@ test("calling async actions that do not await should be ok", async () => {
 
     expect(values).toEqual([1, 2, 3, 4, 5])
 })
+
+test("complex case", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    const values = []
+    const x = mobx.observable({ a: 1 })
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
+    const f1 = actionAsync("f1", async (fn: any) => {
+        x.a++
+        await task(fn())
+    })
+
+    const f2 = async () => {
+        await f3()
+    }
+
+    const f3 = async () => {
+        await delay(10, 1)
+        await f4()
+    }
+
+    const f4 = async () => {
+        await f5()
+    }
+
+    const f5 = actionAsync("f5", async () => {
+        x.a += await task(delay(10, 1))
+    })
+
+    await f1(async () => {
+        await f2()
+    })
+    expectNoActionsRunning()
+    expect(values).toEqual([1, 2, 3])
+})
