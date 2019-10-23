@@ -1354,3 +1354,18 @@ test("should respect debugNameGenerator argument", () => {
     objectName = m.getObserverTree(state, "title").observers[0].name
     expect(objectName).toBe("COFFEE-DEBUG")
 })
+
+test("supports computed value options", () => {
+    const events: number[][] = []
+    const xs = m.observable([1, 2, 3])
+    const xsLessThan = createTransformer(n => xs.filter(x => x < n), {
+        equals: m.comparer.structural
+    })
+
+    m.autorun(() => events.push(xsLessThan(3)))
+    expect(events).toEqual([[1, 2]])
+
+    events.length = 0
+    xs.push(4)
+    expect(events).toEqual([])
+})

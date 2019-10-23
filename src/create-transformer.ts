@@ -1,12 +1,14 @@
-import { computed, onBecomeUnobserved, IComputedValue } from "mobx"
+import { computed, onBecomeUnobserved, IComputedValue, IComputedValueOptions } from "mobx"
 import { invariant, addHiddenProp } from "./utils"
 
 export type ITransformer<A, B> = (object: A) => B
 
-export interface ITransformerParams<A, B> {
-    onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void
-    debugNameGenerator?: (sourceObject?: A) => string
-}
+export type ITransformerParams<A, B> =
+    | {
+          onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void
+          debugNameGenerator?: (sourceObject?: A) => string
+      }
+    | Exclude<IComputedValueOptions<B>, "name">
 
 let memoizationId = 0
 
@@ -40,9 +42,11 @@ export function createTransformer<A, B>(
 
     function createView(sourceIdentifier: number, sourceObject: A) {
         let latestValue: B
+        let computedValueOptions = {}
         if (typeof arg2 === "object") {
             onCleanup = arg2.onCleanup
             debugNameGenerator = arg2.debugNameGenerator
+            computedValueOptions = arg2
         } else if (typeof arg2 === "function") {
             onCleanup = arg2
         } else {
@@ -57,6 +61,7 @@ export function createTransformer<A, B>(
                 return (latestValue = transformer(sourceObject))
             },
             {
+                ...computedValueOptions,
                 name: prettifiedName
             }
         )
