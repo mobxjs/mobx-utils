@@ -220,13 +220,14 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
             return promise
         }
 
+        let ret: any
         try {
-            const ret = await promise
-            finish(undefined)
-            return ret
+            ret = await promise
         } catch (err) {
             finish(err)
         }
+        finish(undefined)
+        return ret
     }
 }
 
