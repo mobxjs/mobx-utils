@@ -270,6 +270,35 @@ test("it should support async actions within async actions", async () => {
     expectNoActionsRunning()
 })
 
+test("it should support async actions within async actions that are awaited later", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    const values = []
+    const x = mobx.observable({ a: 1 })
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
+    const innerF = actionAsync(async initial => {
+        x.a = initial // this runs in action
+        x.a = await task(delay(10, 3))
+        await task(delay(30, 0))
+        x.a = 6
+        return 7
+    })
+
+    const f1 = actionAsync(async initial => {
+        const futureInnerF = innerF(initial)
+        x.a = await task(delay(20, 4))
+        await task(delay(10, 0))
+        x.a = 5
+        x.a = await task(futureInnerF)
+        return x.a
+    })
+
+    const v = await f1(2)
+    expect(v).toBe(7)
+    expect(values).toEqual([1, 2, 3, 4, 5, 6, 7])
+    expectNoActionsRunning()
+})
+
 test("it should support async actions within async actions that throw", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
