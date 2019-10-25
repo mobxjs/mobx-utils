@@ -360,15 +360,23 @@ test("dangling promises created directly inside the action using task should NOT
     expectNoActionsRunning()
 })
 
-test("dangling promises created directly inside the action without using task be ok", async () => {
+test("dangling promises created directly inside the action without using task should be ok", async () => {
     mobx.configure({ enforceActions: "observed" })
+    const values = []
+    const x = mobx.observable({ a: 1 })
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
     let danglingP
 
     const f1 = actionAsync(async () => {
         danglingP = delay(100, 1) // dangling promise
+        x.a = 2
+        x.a = await task(delay(100, 3))
     })
 
     await f1()
+    expectNoActionsRunning()
+    expect(values).toEqual([1, 2, 3])
 
     expect(danglingP).toBeTruthy()
     await danglingP
