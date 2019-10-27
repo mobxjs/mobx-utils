@@ -535,7 +535,7 @@ test("complex case", async () => {
     expect(values).toEqual([1, 2, 3])
 })
 
-test("empty promises", async () => {
+test("immediately resolved promises", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
