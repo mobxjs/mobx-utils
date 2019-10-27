@@ -534,3 +534,26 @@ test("complex case", async () => {
     expectNoActionsRunning()
     expect(values).toEqual([1, 2, 3])
 })
+
+test("empty promises", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    const values = []
+    const x = mobx.observable({ a: 1 })
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
+    const f1 = actionAsync("f1", async () => {
+        await task(Promise.resolve(""))
+        x.a = await task(Promise.resolve(3))
+    })
+
+    const f2 = actionAsync("f2", async () => {
+        const f1Promise = f1()
+        x.a = 2
+        x.a = await task(Promise.resolve(3))
+        await task(f1Promise)
+    })
+
+    await f2()
+    expect(values).toEqual([1, 2, 3])
+    expectNoActionsRunning()
+})
