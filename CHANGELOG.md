@@ -1,3 +1,5 @@
+* Fix for `actionAsync` when awaiting promises that resolve immediately.
+
 # 5.5.1
 
 * Fix for `actionAsync` giving errors when it didn't await a task inside.

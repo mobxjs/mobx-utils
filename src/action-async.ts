@@ -16,6 +16,9 @@ interface IActionAsyncContext {
     args: IArguments
 }
 
+let taskOrderPromise = Promise.resolve()
+const emptyFunction = () => {}
+
 const actionAsyncContextStack: IActionAsyncContext[] = []
 
 export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
@@ -34,7 +37,14 @@ export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
     currentlyActiveIds.delete(runId)
 
     try {
-        return await value
+        const ret = await value
+
+        // we use this trick to force a proper order of execution
+        // even for immediately resolved promises
+        taskOrderPromise = taskOrderPromise.then(emptyFunction)
+        await taskOrderPromise
+
+        return ret
     } finally {
         // only restart if it not a dangling promise (the action is not yet finished)
         if (unfinishedIds.has(runId)) {
