@@ -1,3 +1,5 @@
+# 5.5.2
+
 * Fix for `actionAsync` when awaiting promises that resolve immediately.
 
 # 5.5.1
