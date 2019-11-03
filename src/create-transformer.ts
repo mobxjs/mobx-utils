@@ -8,7 +8,7 @@ export type ITransformerParams<A, B> =
           onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void
           debugNameGenerator?: (sourceObject?: A) => string
       }
-    | Exclude<IComputedValueOptions<B>, "name">
+    | Omit<IComputedValueOptions<B>, "name">
 
 let memoizationId = 0
 
