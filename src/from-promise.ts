@@ -117,7 +117,7 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
  *
  *   componentDidUpdate(nextProps) {
  *     if (nextProps.query !== this.props.query)
- *       this.comments = fromPromise(
+ *       this.searchResults = fromPromise(
  *         window.fetch("/search?q=" + nextProps.query),
  *         // by passing, we won't render a pending state if we had a successful search query before
  *         // rather, we will keep showing the previous search results, until the new promise resolves (or rejects)
@@ -186,7 +186,7 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
  * )
  *
  * @param {IThenable<T>} promise The promise which will be observed
- * @param {IThenable<T>} oldPromise? The promise which will be observed
+ * @param {IThenable<T>} oldPromise? The previously observed promise
  * @returns {IPromiseBasedObservable<T>}
  */
 export const fromPromise: {
