@@ -113,7 +113,7 @@ This is useful to replace one promise based observable with another, without goi
 ### Parameters
 
 -   `promise` **IThenable&lt;T>** The promise which will be observed
--   `oldPromise` **IThenable&lt;T>** ? The promise which will be observed
+-   `oldPromise` **IThenable&lt;T>** ? The previously observed promise
 
 ### Examples
 
@@ -124,7 +124,7 @@ class SearchResults extends React.Component {
 
   componentDidUpdate(nextProps) {
     if (nextProps.query !== this.props.query)
-      this.comments = fromPromise(
+      this.searchResults = fromPromise(
         window.fetch("/search?q=" + nextProps.query),
         // by passing, we won't render a pending state if we had a successful search query before
         // rather, we will keep showing the previous search results, until the new promise resolves (or rejects)
