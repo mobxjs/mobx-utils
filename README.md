@@ -834,7 +834,7 @@ mobx.configure({ enforceActions: "observed" }) // don't allow state modification
 
 class Store {
   @observable githubProjects = []
-  @state = "pending" // "pending" / "done" / "error"
+  @observable state = "pending" // "pending" / "done" / "error"
 
   @actionAsync
   async fetchProjects() {
