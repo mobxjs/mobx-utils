@@ -582,7 +582,7 @@ Countdown example: <https://jsfiddle.net/mweststrate/na0qdmkw/>
 
 ### Parameters
 
--   `interval` **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) \| `"frame"`)** interval in milliseconds about how often the interval should update (optional, default `1000`)
+-   `interval` **([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) \| `"frame"`)** interval in milliseconds about how often the interval should update (optional, default `1000`). A value bigger than 2147483647 will give unexpected results.
 
 ### Examples
 
