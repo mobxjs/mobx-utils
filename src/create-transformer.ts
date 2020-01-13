@@ -1,14 +1,19 @@
-import { computed, onBecomeUnobserved, IComputedValue, IComputedValueOptions } from "mobx"
+import {
+    computed,
+    onBecomeUnobserved,
+    IComputedValue,
+    _isComputingDerivation,
+    IComputedValueOptions
+} from "mobx"
 import { invariant, addHiddenProp } from "./utils"
 
 export type ITransformer<A, B> = (object: A) => B
 
-export type ITransformerParams<A, B> =
-    | {
-          onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void
-          debugNameGenerator?: (sourceObject?: A) => string
-      }
-    | Omit<IComputedValueOptions<B>, "name">
+export type ITransformerParams<A, B> = {
+    onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void
+    debugNameGenerator?: (sourceObject?: A) => string
+    keepAlive?: boolean
+} & Omit<IComputedValueOptions<B>, "name">
 
 let memoizationId = 0
 
@@ -38,7 +43,15 @@ export function createTransformer<A, B>(
     // Memoizes: object id -> reactive view that applies transformer to the object
     let views: { [id: number]: IComputedValue<B> } = {}
     let onCleanup: Function = undefined
+    let keepAlive: boolean = false
     let debugNameGenerator: Function = undefined
+    if (typeof arg2 === "object") {
+        onCleanup = arg2.onCleanup
+        keepAlive = arg2.keepAlive !== undefined ? arg2.keepAlive : false
+        debugNameGenerator = arg2.debugNameGenerator
+    } else if (typeof arg2 === "function") {
+        onCleanup = arg2
+    }
 
     function createView(sourceIdentifier: number, sourceObject: A) {
         let latestValue: B
@@ -65,18 +78,33 @@ export function createTransformer<A, B>(
                 name: prettifiedName
             }
         )
-        const disposer = onBecomeUnobserved(expr, () => {
-            delete views[sourceIdentifier]
-            disposer()
-            if (onCleanup) onCleanup(latestValue, sourceObject)
-        })
+        if (!keepAlive) {
+            const disposer = onBecomeUnobserved(expr, () => {
+                delete views[sourceIdentifier]
+                disposer()
+                if (onCleanup) onCleanup(latestValue, sourceObject)
+            })
+        }
         return expr
     }
 
+    let memoWarned = false
     return (object: A) => {
         const identifier = getMemoizationId(object)
         let reactiveView = views[identifier]
         if (reactiveView) return reactiveView.get()
+        if (!keepAlive && !_isComputingDerivation()) {
+            if (!memoWarned) {
+                console.warn(
+                    "invoking a transformer from outside a reactive context won't memorized " +
+                        "and is cleaned up immediately, unless keepAlive is set"
+                )
+                memoWarned = true
+            }
+            const value = transformer(object)
+            if (onCleanup) onCleanup(value, object)
+            return value
+        }
         // Not in cache; create a reactive view
         reactiveView = views[identifier] = createView(identifier, object)
         return reactiveView.get()
