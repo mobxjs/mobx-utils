@@ -1369,3 +1369,21 @@ test("supports computed value options", () => {
     xs.push(4)
     expect(events).toEqual([])
 })
+
+test("should not memorize outside reactive context", () => {
+    let transformer = jest.fn((input: string) => input.toLowerCase())
+    let onCleanup = jest.fn()
+    let stubTransformer = createTransformer(transformer, onCleanup)
+
+    stubTransformer("HELLO")
+    expect(transformer).toHaveBeenCalledWith("HELLO")
+    expect(onCleanup).toHaveBeenCalledWith("hello", "HELLO")
+    transformer.mockClear()
+    onCleanup.mockClear()
+
+    stubTransformer("HELLO")
+    expect(transformer).toHaveBeenCalledWith("HELLO")
+    expect(onCleanup).toHaveBeenCalledWith("hello", "HELLO")
+    transformer.mockClear()
+    onCleanup.mockClear()
+})
