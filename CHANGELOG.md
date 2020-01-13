@@ -1,3 +1,8 @@
+# 5.5.3
+
+* Support all `IComputedOptions` in `createTransformer`, by [@samdroid-apps](https://github.com/samdroid-apps) through [#224](https://github.com/mobxjs/mobx-utils/pull/224)
+* Make sure that transformers don't memorize when used outside a reactive context. Fixes [#116](https://github.com/mobxjs/mobx-utils/issues/116) through [#228](https://github.com/mobxjs/mobx-utils/pull/228) by [@upsuper](https://github.com/upsuper)
+
 # 5.5.2
 
 * Fix for `actionAsync` when awaiting promises that resolve immediately.
