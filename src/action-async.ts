@@ -123,7 +123,7 @@ export function actionAsync<F extends (...args: any[]) => Promise<any>>(fn: F): 
  *
  * class Store {
  *   \@observable githubProjects = []
- *   \@state = "pending" // "pending" / "done" / "error"
+ *   \@observable = "pending" // "pending" / "done" / "error"
  *
  *   \@actionAsync
  *   async fetchProjects() {

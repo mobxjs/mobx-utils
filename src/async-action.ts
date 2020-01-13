@@ -146,7 +146,7 @@ export function asyncAction<A1>(
  *
  * class Store {
  * 	\@observable githubProjects = []
- * 	\@state = "pending" // "pending" / "done" / "error"
+ * 	\@observable = "pending" // "pending" / "done" / "error"
  *
  * 	\@asyncAction
  * 	*fetchProjects() { // <- note the star, this a generator function!
