@@ -17,7 +17,7 @@ interface IActionAsyncContext {
 }
 
 let taskOrderPromise = Promise.resolve()
-const emptyFunction = () => {}
+const emptyFunction = () => Promise.resolve()
 
 const actionAsyncContextStack: IActionAsyncContext[] = []
 
