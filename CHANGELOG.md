@@ -1,3 +1,5 @@
+* Fix invalid `actionAsync` context when promises resolve at the same time in different actionAsync calls, by [xaviergonz](https://github.com/xaviergonz) through [#240](https://github.com/mobxjs/mobx-utils/pull/240)
+
 # 5.5.3
 
 * Support all `IComputedOptions` in `createTransformer`, by [@samdroid-apps](https://github.com/samdroid-apps) through [#224](https://github.com/mobxjs/mobx-utils/pull/224)

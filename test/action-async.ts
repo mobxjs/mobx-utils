@@ -557,3 +557,24 @@ test("immediately resolved promises", async () => {
     expect(values).toEqual([1, 2, 3])
     expectNoActionsRunning()
 })
+
+test("reusing promises", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    const values = []
+    const x = mobx.observable({ a: 1 })
+    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+
+    const p = delay(10, 2)
+
+    const f1 = actionAsync("f1", async () => {
+        x.a = await task(p)
+    })
+
+    const f2 = actionAsync("f2", async () => {
+        x.a = (await task(p)) + 1
+    })
+
+    await Promise.all([f1(), f2()])
+    expect(values).toEqual([1, 2, 3])
+    expectNoActionsRunning()
+})

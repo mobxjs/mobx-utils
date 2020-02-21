@@ -17,7 +17,7 @@ interface IActionAsyncContext {
 }
 
 let taskOrderPromise = Promise.resolve()
-const emptyFunction = () => {}
+const emptyFunction = () => Promise.resolve()
 
 const actionAsyncContextStack: IActionAsyncContext[] = []
 
@@ -41,7 +41,9 @@ export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
 
         // we use this trick to force a proper order of execution
         // even for immediately resolved promises
-        taskOrderPromise = taskOrderPromise.then(emptyFunction)
+        // we need to also use catch or else it won't work for older versions of node (< 10)
+        // since it would resolve them immediately
+        taskOrderPromise = taskOrderPromise.then(emptyFunction).catch(emptyFunction)
         await taskOrderPromise
 
         return ret

@@ -4,10 +4,17 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "debug unit test",
-            "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
-            "args": ["-i", "${file}"],
-            // "preLaunchTask": "tsc: build - tsconfig.json"
+            "name": "Jest Current File",
+            "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+            "args": ["--ci", "-i", "${fileBasenameNoExtension}"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "disableOptimisticBPs": true,
+            "windows": {
+                "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+            },
+            "skipFiles": ["${workspaceFolder}/node_modules/**/*.js", "<node_internals>/**/*.js"],
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
