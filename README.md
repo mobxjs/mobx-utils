@@ -120,7 +120,7 @@ This is useful to replace one promise based observable with another, without goi
 ```javascript
 @observer
 class SearchResults extends React.Component {
-  @observable searchResults
+  @observable.ref searchResults
 
   componentDidUpdate(nextProps) {
     if (nextProps.query !== this.props.query)
