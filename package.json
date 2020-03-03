@@ -3,7 +3,7 @@
   "version": "5.5.4",
   "description": "Utility functions and common patterns for MobX",
   "main": "mobx-utils.umd.js",
-  "module": "mobx-utils.module.js",
+  "module": "lib/mobx-utils.js",
   "jsnext:main": "mobx-utils.module.js",
   "react-native": "mobx-utils.module.js",
   "typings": "lib/mobx-utils.d.ts",
