@@ -1,3 +1,7 @@
+# 5.5.5
+
+* Fixed tree-shaking mobx-utils, see [#238](https://github.com/mobxjs/mobx-utils/pull/238) by [IgorBabkin](https://github.com/IgorBabkin)
+
 # 5.5.4
 
 * Fix invalid `actionAsync` context when promises resolve at the same time in different actionAsync calls, by [xaviergonz](https://github.com/xaviergonz) through [#240](https://github.com/mobxjs/mobx-utils/pull/240)
