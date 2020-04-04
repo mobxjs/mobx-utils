@@ -16,8 +16,11 @@ interface IActionAsyncContext {
     args: IArguments
 }
 
-let taskOrderPromise = Promise.resolve()
-const emptyFunction = () => Promise.resolve()
+let taskOrderPromise: Promise<any> = Promise.resolve()
+
+// we use this trick to force a proper order of execution even for immediately resolved promises
+// for older versions of node (< 10)
+const emptyFunction = () => Promise.all([Promise.resolve()])
 
 const actionAsyncContextStack: IActionAsyncContext[] = []
 
@@ -41,9 +44,9 @@ export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
 
         // we use this trick to force a proper order of execution
         // even for immediately resolved promises
-        // we need to also use catch or else it won't work for older versions of node (< 10)
+        // we need to also use then twice or else it won't work for older versions of node (< 10)
         // since it would resolve them immediately
-        taskOrderPromise = taskOrderPromise.then(emptyFunction).catch(emptyFunction)
+        taskOrderPromise = taskOrderPromise.then(emptyFunction).then(emptyFunction)
         await taskOrderPromise
 
         return ret
