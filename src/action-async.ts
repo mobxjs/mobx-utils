@@ -16,29 +16,40 @@ interface IActionAsyncContext {
     args: IArguments
 }
 
-let taskOrderPromise: Promise<any> = Promise.resolve()
+let inOrderExecution: () => Promise<void>
 
-let queueMicrotaskPolyfill: typeof queueMicrotask
+{
+    let taskOrderPromise: Promise<any> = Promise.resolve()
 
-if (typeof queueMicrotask !== "undefined") {
-    // use real implementation if possible
-    queueMicrotaskPolyfill = queueMicrotask
-} else if (typeof process !== "undefined" && process.nextTick) {
-    // fallback to node's process.nextTick in node <= 10
-    queueMicrotaskPolyfill = (cb: any) => {
-        process.nextTick(cb)
+    let queueMicrotaskPolyfill: typeof queueMicrotask
+
+    if (typeof queueMicrotask !== "undefined") {
+        // use real implementation if possible in modern browsers/node
+        queueMicrotaskPolyfill = queueMicrotask
+    } else if (typeof process !== "undefined" && process.nextTick) {
+        // fallback to node's process.nextTick in node <= 10
+        queueMicrotaskPolyfill = (cb: any) => {
+            process.nextTick(cb)
+        }
+    } else {
+        // use setTimeout for old browsers
+        queueMicrotaskPolyfill = (cb: any) => {
+            setTimeout(cb, 0)
+        }
     }
-} else {
-    // use setTimeout for old browsers
-    queueMicrotaskPolyfill = (cb: any) => {
-        setTimeout(cb, 0)
+
+    const idle = () =>
+        new Promise(r => {
+            queueMicrotaskPolyfill(r)
+        })
+
+    // we use this trick to force a proper order of execution
+    // even for immediately resolved promises
+    inOrderExecution = () => {
+        taskOrderPromise = taskOrderPromise.then(idle)
+        return taskOrderPromise
     }
 }
-
-const idle = () =>
-    new Promise(r => {
-        queueMicrotaskPolyfill(r)
-    })
 
 const actionAsyncContextStack: IActionAsyncContext[] = []
 
@@ -60,10 +71,7 @@ export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
     try {
         const ret = await value
 
-        // we use this trick to force a proper order of execution
-        // even for immediately resolved promises
-        taskOrderPromise = taskOrderPromise.then(idle)
-        await taskOrderPromise
+        await inOrderExecution()
 
         return ret
     } finally {
