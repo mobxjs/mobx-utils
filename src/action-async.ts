@@ -16,8 +16,40 @@ interface IActionAsyncContext {
     args: IArguments
 }
 
-let taskOrderPromise = Promise.resolve()
-const emptyFunction = () => Promise.resolve()
+let inOrderExecution: () => Promise<void>
+
+{
+    let taskOrderPromise: Promise<any> = Promise.resolve()
+
+    let queueMicrotaskPolyfill: typeof queueMicrotask
+
+    if (typeof queueMicrotask !== "undefined") {
+        // use real implementation if possible in modern browsers/node
+        queueMicrotaskPolyfill = queueMicrotask
+    } else if (typeof process !== "undefined" && process.nextTick) {
+        // fallback to node's process.nextTick in node <= 10
+        queueMicrotaskPolyfill = (cb: any) => {
+            process.nextTick(cb)
+        }
+    } else {
+        // use setTimeout for old browsers
+        queueMicrotaskPolyfill = (cb: any) => {
+            setTimeout(cb, 0)
+        }
+    }
+
+    const idle = () =>
+        new Promise(r => {
+            queueMicrotaskPolyfill(r)
+        })
+
+    // we use this trick to force a proper order of execution
+    // even for immediately resolved promises
+    inOrderExecution = () => {
+        taskOrderPromise = taskOrderPromise.then(idle)
+        return taskOrderPromise
+    }
+}
 
 const actionAsyncContextStack: IActionAsyncContext[] = []
 
@@ -39,12 +71,7 @@ export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
     try {
         const ret = await value
 
-        // we use this trick to force a proper order of execution
-        // even for immediately resolved promises
-        // we need to also use catch or else it won't work for older versions of node (< 10)
-        // since it would resolve them immediately
-        taskOrderPromise = taskOrderPromise.then(emptyFunction).catch(emptyFunction)
-        await taskOrderPromise
+        await inOrderExecution()
 
         return ret
     } finally {
