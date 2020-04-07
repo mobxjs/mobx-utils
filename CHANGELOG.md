@@ -1,4 +1,6 @@
-* Another fix for invalid `actionAsync` through [#246](https://github.com/mobxjs/mobx-utils/pull/246)
+# 5.5.7
+
+* Another fix for invalid `actionAsync` context through [#246](https://github.com/mobxjs/mobx-utils/pull/246)
 
 # 5.5.6
 
