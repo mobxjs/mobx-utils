@@ -1,3 +1,5 @@
+* Another fix for invalid `actionAsync` through [#246](https://github.com/mobxjs/mobx-utils/pull/246)
+
 # 5.5.6
 
 * Another fix for invalid `actionAsync` context when promises resolve at the same time in different actionAsync calls, by [xaviergonz](https://github.com/xaviergonz) through [#244](https://github.com/mobxjs/mobx-utils/pull/244)
