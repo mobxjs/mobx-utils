@@ -578,3 +578,45 @@ test("reusing promises", async () => {
     expect(values).toEqual([1, 2, 3])
     expectNoActionsRunning()
 })
+
+test("actions that throw in parallel", async () => {
+    mobx.configure({ enforceActions: "observed" })
+
+    const r = shouldThrow =>
+        new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (shouldThrow) {
+                    reject("Error")
+                    return
+                }
+                resolve(42)
+            }, 10)
+        })
+
+    const actionAsync1 = actionAsync("actionAsync1", async () => {
+        try {
+            return await task(r(true))
+        } catch (err) {
+            return "error"
+        }
+    })
+
+    const actionAsync2 = actionAsync("actionAsync2", async () => {
+        try {
+            return await task(r(false))
+        } catch (err) {
+            return "error"
+        }
+    })
+
+    const result = await Promise.all([actionAsync1(), actionAsync2(), actionAsync1()])
+
+    expectNoActionsRunning()
+    expect(result).toMatchInlineSnapshot(`
+        Array [
+          "error",
+          42,
+          "error",
+        ]
+    `)
+})
