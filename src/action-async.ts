@@ -74,6 +74,10 @@ export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
         await inOrderExecution()
 
         return ret
+    } catch (err) {
+        await inOrderExecution()
+
+        throw err
     } finally {
         // only restart if it not a dangling promise (the action is not yet finished)
         if (unfinishedIds.has(runId)) {
