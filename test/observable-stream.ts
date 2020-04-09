@@ -11,7 +11,7 @@ test("to observable - should push the initial value by default", () => {
 
     mobx.configure({ enforceActions: "never" })
 
-    let values = []
+    let values: string[] = []
 
     const sub = from(utils.toStream(() => user.firstName + user.lastName, true))
         .pipe(map(x => x.toUpperCase()))
@@ -39,7 +39,7 @@ test("to observable - should not push the initial value", () => {
 
     mobx.configure({ enforceActions: "never" })
 
-    let values = []
+    let values: string[] = []
 
     const sub = from(utils.toStream(() => user.firstName + user.lastName))
         .pipe(map(x => x.toUpperCase()))
@@ -62,7 +62,7 @@ test("to observable - should not push the initial value", () => {
 test("from observable", done => {
     mobx.configure({ enforceActions: "observed" })
     const fromStream = utils.fromStream(interval(10), -1)
-    const values = []
+    const values: number[] = []
     const d = mobx.autorun(() => {
         values.push(fromStream.current)
     })
