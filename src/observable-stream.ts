@@ -1,4 +1,4 @@
-import { computed, observable, IObservableValue, action, runInAction } from "mobx"
+import { computed, observable, action, runInAction } from "mobx"
 
 declare var Symbol: any
 
@@ -69,13 +69,12 @@ export function toStream<T>(
     }
 }
 
-class StreamListener<T> implements IStreamObserver<T> {
-    @observable.ref current: T = undefined
+class StreamListener<T, I> implements IStreamObserver<T | I> {
+    @observable.ref current: T | I = this.initialValue
     subscription: ISubscription
 
-    constructor(observable: IObservableStream<T>, initialValue: T) {
+    constructor(observable: IObservableStream<T>, private readonly initialValue: I) {
         runInAction(() => {
-            this.current = initialValue
             this.subscription = observable.subscribe(this)
         })
     }
@@ -104,7 +103,6 @@ class StreamListener<T> implements IStreamObserver<T> {
 }
 
 /**
- *
  * Converts a subscribable, observable stream (TC 39 observable / RxJS stream)
  * into an object which stores the current value (as `current`). The subscription can be cancelled through the `dispose` method.
  * Takes an initial value as second optional argument
@@ -119,23 +117,15 @@ class StreamListener<T> implements IStreamObserver<T> {
  * autorun(() => {
  *     console.log("distance moved", debouncedClickDelta.current)
  * })
- *
- * @export
- * @template T
- * @param {IObservableStream<T>} observable
- * @returns {{
- *     current: T;
- *     dispose(): void;
- * }}
  */
-export function fromStream<T>(
+export function fromStream<T, I = undefined>(
     observable: IObservableStream<T>,
-    initialValue: T = undefined
-): IStreamListener<T> {
+    initialValue: T | I = undefined
+): IStreamListener<T, I> {
     return new StreamListener(observable, initialValue)
 }
 
-export interface IStreamListener<T> {
-    current: T
+export interface IStreamListener<T, I = undefined> {
+    current: T | I
     dispose(): void
 }
