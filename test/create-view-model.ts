@@ -22,7 +22,7 @@ function Todo(title, done, usersInterested, unobservedProp) {
         usersInterested: usersInterested,
         get usersCount() {
             return this.usersInterested.length
-        }
+        },
     })
 }
 

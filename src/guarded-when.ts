@@ -39,6 +39,6 @@ export function whenWithTimeout(
     deprecated("whenWithTimeout is deprecated, use mobx.when with timeout option instead")
     return when(expr, action, {
         timeout,
-        onError: onTimeout
+        onError: onTimeout,
     })
 }

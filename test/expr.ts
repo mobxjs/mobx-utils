@@ -3,7 +3,7 @@
 import * as utils from "../src/mobx-utils"
 import * as mobx from "mobx"
 
-test("expr", function() {
+test("expr", function () {
     mobx.configure({ enforceActions: "never" })
     try {
         let factor = mobx.observable.box(0)
@@ -11,11 +11,11 @@ test("expr", function() {
         let totalCalcs = 0
         let innerCalcs = 0
 
-        let total = mobx.computed(function() {
+        let total = mobx.computed(function () {
             totalCalcs += 1 // outer observable shouldn't recalc if inner observable didn't publish a real change
             return (
                 price.get() *
-                utils.expr(function() {
+                utils.expr(function () {
                     innerCalcs += 1
                     return factor.get() % 2 === 0 ? 1 : 3
                 })
@@ -25,7 +25,7 @@ test("expr", function() {
         let b = []
         let sub = mobx.observe(
             total,
-            function(x) {
+            function (x) {
                 b.push(x.newValue)
             },
             true
@@ -46,7 +46,7 @@ test("expr", function() {
     }
 })
 
-test("expr2", function() {
+test("expr2", function () {
     mobx.configure({ enforceActions: "never" })
     try {
         let factor = mobx.observable.box(0)
@@ -54,11 +54,11 @@ test("expr2", function() {
         let totalCalcs = 0
         let innerCalcs = 0
 
-        let total = mobx.computed(function() {
+        let total = mobx.computed(function () {
             totalCalcs += 1 // outer observable shouldn't recalc if inner observable didn't publish a real change
             return (
                 price.get() *
-                utils.expr(function() {
+                utils.expr(function () {
                     innerCalcs += 1
                     return factor.get() % 2 === 0 ? 1 : 3
                 })
@@ -68,7 +68,7 @@ test("expr2", function() {
         let b = []
         let sub = mobx.observe(
             total,
-            function(x) {
+            function (x) {
                 b.push(x.newValue)
             },
             true

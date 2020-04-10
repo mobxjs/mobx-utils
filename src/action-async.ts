@@ -39,7 +39,7 @@ let inOrderExecution: () => Promise<void>
     }
 
     const idle = () =>
-        new Promise(r => {
+        new Promise((r) => {
             queueMicrotaskPolyfill(r)
         })
 
@@ -93,7 +93,7 @@ export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
                 actionRunInfo,
                 actionName,
                 args,
-                scope
+                scope,
             })
             currentlyActiveIds.add(runId)
         }
@@ -205,7 +205,7 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
     if (typeof actionName !== "string" || !actionName)
         fail(`actions should have valid names, got: '${actionName}'`)
 
-    return async function(this: any, ...args: any) {
+    return async function (this: any, ...args: any) {
         const nextRunId = runId++
         unfinishedIds.add(nextRunId)
 
@@ -217,7 +217,7 @@ function actionAsyncFn(actionName: string, fn: Function): Function {
             actionRunInfo,
             actionName,
             args,
-            scope: this
+            scope: this,
         })
         currentlyActiveIds.add(nextRunId)
 

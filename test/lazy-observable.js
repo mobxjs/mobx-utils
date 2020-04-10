@@ -5,9 +5,9 @@ const mobx = require("mobx")
 
 mobx.configure({ enforceActions: "observed" })
 
-test("lazy observable should work", done => {
+test("lazy observable should work", (done) => {
     let started = false
-    const lo = utils.lazyObservable(sink => {
+    const lo = utils.lazyObservable((sink) => {
         started = true
         setTimeout(() => sink(4), 50)
         setTimeout(() => sink(5), 100)
@@ -33,17 +33,17 @@ test("lazy observable should work", done => {
     }, 200)
 })
 
-test("lazy observable refresh", done => {
+test("lazy observable refresh", (done) => {
     let started = 0
     let i = 10
 
     const lo = utils.lazyObservable(
-        sink =>
-            new Promise(resolve => {
+        (sink) =>
+            new Promise((resolve) => {
                 started = started + 1
                 resolve(i)
                 i++
-            }).then(value => {
+            }).then((value) => {
                 sink(value)
             }),
         1
@@ -66,12 +66,12 @@ test("lazy observable refresh", done => {
     }, 200)
 })
 
-test("lazy observable reset", done => {
+test("lazy observable reset", (done) => {
     const lo = utils.lazyObservable(
-        sink =>
-            new Promise(resolve => {
+        (sink) =>
+            new Promise((resolve) => {
                 resolve(2)
-            }).then(value => {
+            }).then((value) => {
                 sink(value)
             }),
         1
@@ -95,9 +95,9 @@ test("lazy observable reset", done => {
     }, 250)
 })
 
-test("lazy observable pending", done => {
-    const lo = utils.lazyObservable(sink =>
-        new Promise(resolve => {
+test("lazy observable pending", (done) => {
+    const lo = utils.lazyObservable((sink) =>
+        new Promise((resolve) => {
             setTimeout(resolve, 100)
         }).then(sink)
     )

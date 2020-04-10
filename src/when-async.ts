@@ -17,6 +17,6 @@ import { deprecated } from "./utils"
 export function whenAsync(fn: () => boolean, timeout: number = 0): Promise<void> {
     deprecated("whenAsync is deprecated, use mobx.when without effect instead")
     return when(fn, {
-        timeout
+        timeout,
     })
 }

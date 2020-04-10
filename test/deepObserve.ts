@@ -59,11 +59,11 @@ test("deep", () => {
         {
             a: {
                 b: {
-                    c: 3
-                }
-            }
+                    c: 3,
+                },
+            },
         },
-        x => {
+        (x) => {
             x.a.b.c = 4
         }
     )
@@ -76,7 +76,7 @@ test("add", () => {
 })
 
 test("delete", () => {
-    assertChanges({ x: 1 }, x => {
+    assertChanges({ x: 1 }, (x) => {
         delete x.x
     })
 })

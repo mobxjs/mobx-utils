@@ -27,7 +27,7 @@ export function moveItem<T>(target: IObservableArray<T>, fromIndex: number, toIn
             ...oldItems.slice(0, fromIndex),
             ...oldItems.slice(fromIndex + 1, toIndex + 1),
             oldItems[fromIndex],
-            ...oldItems.slice(toIndex + 1)
+            ...oldItems.slice(toIndex + 1),
         ]
     } else {
         // toIndex < fromIndex
@@ -35,7 +35,7 @@ export function moveItem<T>(target: IObservableArray<T>, fromIndex: number, toIn
             ...oldItems.slice(0, toIndex),
             oldItems[fromIndex],
             ...oldItems.slice(toIndex, fromIndex),
-            ...oldItems.slice(fromIndex + 1)
+            ...oldItems.slice(fromIndex + 1),
         ]
     }
     target.replace(newItems)

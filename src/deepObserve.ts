@@ -8,7 +8,7 @@ import {
     IArraySplice,
     IMapDidChange,
     values,
-    entries
+    entries,
 } from "mobx"
 import { IDisposer } from "./utils"
 
@@ -117,7 +117,7 @@ export function deepObserve<T = any>(
                 const entry = {
                     parent,
                     path,
-                    dispose: observe(thing, genericListener)
+                    dispose: observe(thing, genericListener),
                 }
                 entrySet.set(thing, entry)
                 entries(thing).forEach(([key, value]) => observeRecursively(value, entry, key))

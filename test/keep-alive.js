@@ -48,7 +48,7 @@ test("keep alive should work for properties", () => {
         get doubler() {
             calcs++
             return this.a * 2
-        }
+        },
     })
 
     x.doubler

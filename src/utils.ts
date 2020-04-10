@@ -24,7 +24,7 @@ export function addHiddenProp(object: any, propName: string, value: any) {
         enumerable: false,
         writable: true,
         configurable: true,
-        value
+        value,
     })
 }
 

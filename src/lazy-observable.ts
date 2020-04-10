@@ -83,6 +83,6 @@ export function lazyObservable<T>(
         },
         get pending() {
             return pending.get()
-        }
+        },
     }
 }

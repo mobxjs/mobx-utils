@@ -3,7 +3,7 @@ import {
     onBecomeUnobserved,
     IComputedValue,
     _isComputingDerivation,
-    IComputedValueOptions
+    IComputedValueOptions,
 } from "mobx"
 import { invariant, addHiddenProp } from "./utils"
 
@@ -75,7 +75,7 @@ export function createTransformer<A, B>(
             },
             {
                 ...computedValueOptions,
-                name: prettifiedName
+                name: prettifiedName,
             }
         )
         if (!keepAlive) {
