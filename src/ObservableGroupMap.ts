@@ -14,6 +14,27 @@ interface GrouperItemInfo {
     grouperArrIndex: number
 }
 
+/**
+ * Reactively sorts a base observable array into multiple observable arrays based on the value of a
+ * `groupBy: (item: T) => G` function.
+ *
+ * This observes the individual computed groupBy values and only updates the source and dest arrays
+ * when there is an actual change, so this is far more efficient than, for example
+ * `base.filter(i => groupBy(i) === 'we')`.
+ *
+ * No guarantees are made about the order of items in the grouped arrays.
+ *
+ * @example
+ * const slices = observable([
+ *     { day: "mo", hours: 12 },
+ *     { day: "tu", hours: 2 },
+ * ])
+ * const slicesByDay = new ObservableGroupMap(slices, (slice) => slice.day)
+ * autorun(() => console.log(
+ *     slicesByDay.get("mo")?.length ?? 0,
+ *     slicesByDay.get("we"))) // outputs 1, undefined
+ * slices[0].day = "we" // outputs 0, [{ day: "we", hours: 12 }]
+ */
 export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<T>> {
     private readonly keyToName: (group: G) => string
 
