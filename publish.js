@@ -8,7 +8,7 @@ const readline = require("readline")
 
 const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
 })
 
 function run(command, options) {
@@ -26,8 +26,8 @@ function exit(code, msg) {
 }
 
 async function prompt(question, defaultValue) {
-    return new Promise(resolve => {
-        rl.question(`${question} [${defaultValue}]: `, answer => {
+    return new Promise((resolve) => {
+        rl.question(`${question} [${defaultValue}]: `, (answer) => {
             answer = answer && answer.trim()
             resolve(answer ? answer : defaultValue)
         })
@@ -51,7 +51,7 @@ async function main() {
     // Check registry data
     const npmInfoRet = run(`npm info ${pkg.name} --json`, {
         continueOnErrors: true,
-        silent: true
+        silent: true,
     })
     if (npmInfoRet.code === 0) {
         //package is registered in npm?
@@ -81,6 +81,6 @@ async function main() {
     }
 }
 
-main().catch(e => {
+main().catch((e) => {
     throw e
 })

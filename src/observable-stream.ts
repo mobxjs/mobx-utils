@@ -62,10 +62,10 @@ export function toStream<T>(
                         ? ({ newValue }: { newValue: T }) => observer(newValue)
                         : ({ newValue }: { newValue: T }) => observer.next(newValue),
                     fireImmediately
-                )
+                ),
             }
         },
-        [observableSymbol()]: self
+        [observableSymbol()]: self,
     }
 }
 

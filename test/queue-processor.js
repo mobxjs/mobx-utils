@@ -9,7 +9,7 @@ test("sync processor should work", () => {
     const q = mobx.observable([1, 2])
     const res = []
 
-    const stop = utils.queueProcessor(q, v => res.push(v * 2))
+    const stop = utils.queueProcessor(q, (v) => res.push(v * 2))
 
     expect(res).toEqual([2, 4])
     expect(q.length).toBe(0)
@@ -36,11 +36,11 @@ test("sync processor should work", () => {
     expect(res).toEqual([2, 4, 6, 8, 10, 12, 14])
 })
 
-test("async processor should work", done => {
+test("async processor should work", (done) => {
     const q = mobx.observable([1, 2])
     const res = []
 
-    const stop = utils.queueProcessor(q, v => res.push(v * 2), 10)
+    const stop = utils.queueProcessor(q, (v) => res.push(v * 2), 10)
 
     expect(res.length).toBe(0)
     expect(q.length).toBe(2)

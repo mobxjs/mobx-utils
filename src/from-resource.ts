@@ -116,6 +116,6 @@ export function fromResource<T>(
             isDisposed = true
             suspender()
         },
-        isAlive: () => isActive
+        isAlive: () => isActive,
     }
 }

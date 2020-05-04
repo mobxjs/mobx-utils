@@ -9,7 +9,7 @@ test("sync processor should work with max", () => {
     const q = mobx.observable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     const res = []
 
-    const stop = utils.chunkProcessor(q, v => res.push(v), 0, 3)
+    const stop = utils.chunkProcessor(q, (v) => res.push(v), 0, 3)
 
     expect(res).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]])
     expect(q.length).toBe(0)
@@ -41,7 +41,7 @@ test("sync processor should work with max", () => {
         [4, 5],
         [3],
         [8, 9],
-        [6, 7]
+        [6, 7],
     ])
 
     stop()
@@ -56,7 +56,7 @@ test("sync processor should work with max", () => {
         [4, 5],
         [3],
         [8, 9],
-        [6, 7]
+        [6, 7],
     ])
 })
 
@@ -64,21 +64,24 @@ test("sync processor should work with default max", () => {
     const q = mobx.observable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     const res = []
 
-    utils.chunkProcessor(q, v => res.push(v))
+    utils.chunkProcessor(q, (v) => res.push(v))
 
     expect(res).toEqual([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
     expect(q.length).toBe(0)
 
     mobx.runInAction(() => q.push(1, 2, 3, 4, 5))
-    expect(res).toEqual([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [1, 2, 3, 4, 5]])
+    expect(res).toEqual([
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        [1, 2, 3, 4, 5],
+    ])
     expect(q.length).toBe(0)
 })
 
-test("async processor should work", done => {
+test("async processor should work", (done) => {
     const q = mobx.observable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     const res = []
 
-    const stop = utils.chunkProcessor(q, v => res.push(v), 10, 3)
+    const stop = utils.chunkProcessor(q, (v) => res.push(v), 10, 3)
 
     expect(res.length).toBe(0)
     expect(q.length).toBe(10)
@@ -101,11 +104,11 @@ test("async processor should work", done => {
     }, 50)
 })
 
-test("async processor should combine smaller chunks to max size", done => {
+test("async processor should combine smaller chunks to max size", (done) => {
     const q = mobx.observable([1, 2])
     const res = []
 
-    const stop = utils.chunkProcessor(q, v => res.push(v), 10, 3)
+    const stop = utils.chunkProcessor(q, (v) => res.push(v), 10, 3)
 
     expect(res.length).toBe(0)
     expect(q.length).toBe(2)

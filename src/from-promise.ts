@@ -82,7 +82,7 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
         promise,
         {
             value: oldData,
-            state: PENDING
+            state: PENDING,
         },
         {},
         { deep: false }
@@ -195,14 +195,14 @@ export const fromPromise: {
     resolve<T>(value?: T): IFulfilledPromise<T> & IBasePromiseBasedObservable<T>
 } = createObservablePromise as any
 
-fromPromise.reject = action("fromPromise.reject", function(reason: any) {
+fromPromise.reject = action("fromPromise.reject", function (reason: any) {
     const p: any = fromPromise(Promise.reject(reason))
     p.state = REJECTED
     p.value = reason
     return p
 }) as any
 
-fromPromise.resolve = action("fromPromise.resolve", function(value: any = undefined) {
+fromPromise.resolve = action("fromPromise.resolve", function (value: any = undefined) {
     const p: any = fromPromise(Promise.resolve(value))
     p.state = FULFILLED
     p.value = value

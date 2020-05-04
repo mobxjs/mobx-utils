@@ -10,13 +10,17 @@ function delay<T>(time: number, value: T, shouldThrow = false): Promise<T> {
     })
 }
 
-test("it should support async generator actions", done => {
+test("it should support async generator actions", (done) => {
     mobx.configure({ enforceActions: "observed" })
     const values: any[] = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
-    const f = utils.asyncAction(function*(initial: number) {
+    const f = utils.asyncAction(function* (initial: number) {
         x.a = initial // this runs in action
         x.a = yield delay(100, 3) // and this as well!
         yield delay(100, 0)
@@ -34,13 +38,17 @@ test("it should support async generator actions", done => {
     }, 10)
 })
 
-test("it should support try catch in async generator", done => {
+test("it should support try catch in async generator", (done) => {
     mobx.configure({ enforceActions: "observed" })
     const values: any[] = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
-    const f = utils.asyncAction(function*(initial: number) {
+    const f = utils.asyncAction(function* (initial: number) {
         x.a = initial // this runs in action
         try {
             x.a = yield delay(100, 5, true) // and this as well!
@@ -62,9 +70,9 @@ test("it should support try catch in async generator", done => {
     }, 10)
 })
 
-test("it should support throw from async generator", done => {
+test("it should support throw from async generator", (done) => {
     utils
-        .asyncAction(function*() {
+        .asyncAction(function* () {
             throw 7
         })()
         .then(
@@ -72,16 +80,16 @@ test("it should support throw from async generator", done => {
                 fail()
                 done()
             },
-            e => {
+            (e) => {
                 expect(e).toBe(7)
                 done()
             }
         )
 })
 
-test("it should support throw from yielded promise generator", done => {
+test("it should support throw from yielded promise generator", (done) => {
     utils
-        .asyncAction(function*() {
+        .asyncAction(function* () {
             return yield delay(10, 7, true)
         })()
         .then(
@@ -89,14 +97,14 @@ test("it should support throw from yielded promise generator", done => {
                 fail()
                 done()
             },
-            e => {
+            (e) => {
                 expect(e).toBe(7)
                 done()
             }
         )
 })
 
-test("it should support asyncAction as decorator", done => {
+test("it should support asyncAction as decorator", (done) => {
     const values: any[] = []
 
     mobx.configure({ enforceActions: "observed" })
@@ -119,7 +127,11 @@ test("it should support asyncAction as decorator", done => {
     }
 
     const x = new X()
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
     setTimeout(() => {
         // TODO: mweh on any cast...
@@ -133,7 +145,7 @@ test("it should support asyncAction as decorator", done => {
     }, 10)
 })
 
-test("it should support logging", done => {
+test("it should support logging", (done) => {
     mobx.configure({ enforceActions: "observed" })
     const events: any[] = []
     const x = mobx.observable({ a: 1 })
@@ -145,7 +157,7 @@ test("it should support logging", done => {
         x.a = yield delay(100, 3)
         return x.a
     })
-    const d = mobx.spy(ev => events.push(ev))
+    const d = mobx.spy((ev) => events.push(ev))
 
     setTimeout(() => {
         f(2).then(() => {
@@ -157,7 +169,7 @@ test("it should support logging", done => {
 })
 
 function stripEvents(events) {
-    return events.map(e => {
+    return events.map((e) => {
         delete e.object
         delete e.fn
         delete e.time

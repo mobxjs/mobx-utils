@@ -175,16 +175,16 @@ export function asyncAction(arg1: any, arg2?: any): any {
         const descriptor: PropertyDescriptor = arguments[2]
         if (descriptor && descriptor.value) {
             return Object.assign({}, descriptor, {
-                value: flow(descriptor.value)
+                value: flow(descriptor.value),
             })
         } else {
             return Object.assign({}, descriptor, {
                 set(v: any) {
                     Object.defineProperty(this, name, {
                         ...descriptor,
-                        value: flow(v)
+                        value: flow(v),
                     })
-                }
+                },
             })
         }
     }

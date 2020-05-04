@@ -2,7 +2,7 @@ import * as mobx from "mobx"
 import { actionAsync, task } from "../src/mobx-utils"
 
 function delay<T>(time: number, value: T) {
-    return new Promise<T>(resolve => {
+    return new Promise<T>((resolve) => {
         setTimeout(() => {
             resolve(value)
         }, time)
@@ -18,7 +18,7 @@ function delayThrow<T>(time: number, value: T) {
 }
 
 function delayFn(time: number, fn: () => void) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         setTimeout(() => {
             fn()
             resolve()
@@ -28,7 +28,10 @@ function delayFn(time: number, fn: () => void) {
 
 function expectNoActionsRunning() {
     const obs = mobx.observable.box(1)
-    const d = mobx.reaction(() => obs.get(), () => {})
+    const d = mobx.reaction(
+        () => obs.get(),
+        () => {}
+    )
     expect(() => obs.set(2)).toThrow(
         "changing observed observable values outside actions is not allowed"
     )
@@ -39,9 +42,13 @@ test("it should support async actions", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
-    const f = actionAsync(async function(initial) {
+    const f = actionAsync(async function (initial) {
         x.a = initial // this runs in action
         x.a = await task(delay(100, 3))
         await task(delay(100, 0))
@@ -61,9 +68,13 @@ test("it should support try catch in async", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
-    const f = actionAsync(async function(initial) {
+    const f = actionAsync(async function (initial) {
         x.a = initial // this runs in action
         try {
             x.a = await task(delayThrow(100, 5))
@@ -116,7 +127,7 @@ test("it should support async action in classes", async () => {
     class X {
         a = 1
 
-        f = actionAsync(async function(initial) {
+        f = actionAsync(async function (initial) {
             this.a = initial // this runs in action
             try {
                 this.a = await task(delayThrow(100, 5))
@@ -129,11 +140,15 @@ test("it should support async action in classes", async () => {
         })
     }
     mobx.decorate(X, {
-        a: mobx.observable
+        a: mobx.observable,
     })
 
     const x = new X()
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
     const v = await x.f(2)
     expect(v).toBe(5)
@@ -165,7 +180,11 @@ test("it should support async action in classes with a method decorator", async 
     }
 
     const x = new X()
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
     const v = await x.f(2)
     expect(v).toBe(5)
@@ -183,7 +202,7 @@ test("it should support async action in classes with a field decorator", async (
         @mobx.observable a = 1
 
         @actionAsync
-        f = async initial => {
+        f = async (initial) => {
             this.a = initial // this runs in action
             try {
                 this.a = await task(delayThrow(100, 5))
@@ -197,7 +216,11 @@ test("it should support async action in classes with a field decorator", async (
     }
 
     const x = new X()
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
     const v = await x.f(2)
     expect(v).toBe(5)
@@ -211,21 +234,21 @@ test("it should support logging", async () => {
     const events = []
     const x = mobx.observable({ a: 1 })
 
-    const innerF = actionAsync("innerF", async initial => {
+    const innerF = actionAsync("innerF", async (initial) => {
         x.a = initial // this runs in action
         x.a = await task(delay(100, 3))
         x.a = 4
         return x.a
     })
 
-    const f = actionAsync("f", async initial => {
+    const f = actionAsync("f", async (initial) => {
         x.a = initial
         x.a = await task(innerF(2))
         x.a = 5
         x.a = await task(delay(100, 3))
         return x.a
     })
-    const d = mobx.spy(ev => events.push(ev))
+    const d = mobx.spy((ev) => events.push(ev))
 
     await f(1)
     expect(stripEvents(events)).toMatchSnapshot()
@@ -234,7 +257,7 @@ test("it should support logging", async () => {
 })
 
 function stripEvents(events) {
-    return events.map(e => {
+    return events.map((e) => {
         delete e.object
         delete e.fn
         delete e.time
@@ -246,9 +269,13 @@ test("it should support async actions within async actions", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
-    const innerF = actionAsync(async initial => {
+    const innerF = actionAsync(async (initial) => {
         x.a = initial // this runs in action
         x.a = await task(delay(100, 3))
         await task(delay(100, 0))
@@ -256,7 +283,7 @@ test("it should support async actions within async actions", async () => {
         return x.a
     })
 
-    const f1 = actionAsync(async initial => {
+    const f1 = actionAsync(async (initial) => {
         x.a = await task(innerF(initial))
         x.a = await task(delay(100, 5))
         await task(delay(100, 0))
@@ -274,9 +301,13 @@ test("it should support async actions within async actions that are awaited late
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
-    const innerF = actionAsync(async initial => {
+    const innerF = actionAsync(async (initial) => {
         x.a = initial // this runs in action
         x.a = await task(delay(10, 3))
         await task(delay(30, 0))
@@ -284,7 +315,7 @@ test("it should support async actions within async actions that are awaited late
         return 7
     })
 
-    const f1 = actionAsync(async initial => {
+    const f1 = actionAsync(async (initial) => {
         const futureInnerF = innerF(initial)
         x.a = await task(delay(20, 4))
         await task(delay(10, 0))
@@ -303,9 +334,13 @@ test("it should support async actions within async actions that throw", async ()
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
-    const innerF = actionAsync(async function(initial) {
+    const innerF = actionAsync(async function (initial) {
         x.a = initial // this runs in action
         x.a = await task(delay(100, 3))
         await task(delay(100, 0))
@@ -313,7 +348,7 @@ test("it should support async actions within async actions that throw", async ()
         throw "err"
     })
 
-    const f = actionAsync(async function(initial) {
+    const f = actionAsync(async function (initial) {
         x.a = await task(innerF(initial))
         x.a = await task(delay(100, 5))
         await task(delay(100, 0))
@@ -350,7 +385,7 @@ test("dangling promises created indirectly inside the action should be ok", asyn
 
     const f1 = actionAsync(async () => {
         await task(
-            new Promise(resolve => {
+            new Promise((resolve) => {
                 setTimeout(() => {
                     danglingP = delay(100, 1) // indirect dangling promise
                     resolve()
@@ -393,7 +428,11 @@ test("dangling promises created directly inside the action without using task sh
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
     let danglingP
 
@@ -416,7 +455,11 @@ test("it should support recursive async", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 10 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
     const f1 = actionAsync(async () => {
         if (x.a <= 0) return
@@ -433,7 +476,11 @@ test("it should support parallel async", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
     const f1 = actionAsync(async () => {
         x.a = 2
@@ -470,7 +517,7 @@ test("it should support parallel async", async () => {
         delayFn(26, expectNoActionsRunning),
         delayFn(35, expectNoActionsRunning),
         delayFn(44, expectNoActionsRunning),
-        delayFn(46, expectNoActionsRunning)
+        delayFn(46, expectNoActionsRunning),
     ])
     expect(values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     expectNoActionsRunning()
@@ -480,7 +527,11 @@ test("calling async actions that do not await should be ok", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
     const f1 = actionAsync("f1", async () => {
         x.a++
@@ -504,7 +555,11 @@ test("complex case", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
     const f1 = actionAsync("f1", async (fn: any) => {
         x.a++
@@ -539,7 +594,11 @@ test("immediately resolved promises", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
     const f1 = actionAsync("f1", async () => {
         await task(Promise.resolve(""))
@@ -562,7 +621,11 @@ test("reusing promises", async () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        (v) => values.push(v),
+        { fireImmediately: true }
+    )
 
     const p = delay(10, 2)
 
@@ -582,7 +645,7 @@ test("reusing promises", async () => {
 test("actions that throw in parallel", async () => {
     mobx.configure({ enforceActions: "observed" })
 
-    const r = shouldThrow =>
+    const r = (shouldThrow) =>
         new Promise((resolve, reject) => {
             setTimeout(() => {
                 if (shouldThrow) {

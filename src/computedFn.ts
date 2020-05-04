@@ -5,7 +5,7 @@ import {
     computed,
     onBecomeUnobserved,
     _isComputingDerivation,
-    isAction
+    isAction,
 } from "mobx"
 
 /**
@@ -56,7 +56,7 @@ export function computedFn<T extends (...args: any[]) => any>(
             : keepAliveOrOptions
     const d = new DeepMap<IComputedValue<any>>()
 
-    return function(...args: Parameters<T>): ReturnType<T> {
+    return function (...args: Parameters<T>): ReturnType<T> {
         const self = this
         const entry = d.entry(args)
         // cache hit, return
@@ -78,7 +78,7 @@ export function computedFn<T extends (...args: any[]) => any>(
             },
             {
                 ...opts,
-                name: `computedFn(${fn.name}#${++i})`
+                name: `computedFn(${fn.name}#${++i})`,
             }
         )
         entry.set(c)

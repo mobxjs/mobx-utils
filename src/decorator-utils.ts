@@ -34,7 +34,7 @@ export function decorateMethod(
             value: decorateFn(prop, descriptor.value),
             enumerable: false,
             configurable: true, // See #1477
-            writable: true // for typescript, this must be writable, otherwise it cannot inherit :/ (see inheritable actions test)
+            writable: true, // for typescript, this must be writable, otherwise it cannot inherit :/ (see inheritable actions test)
         }
     }
 
@@ -47,7 +47,7 @@ export function decorateMethod(
         initializer() {
             // N.B: we can't immediately invoke initializer; this would be wrong
             return decorateFn(prop, initializer!.call(this))
-        }
+        },
     }
 }
 
@@ -65,6 +65,6 @@ export function decorateField(
         },
         set(value) {
             addHiddenProp(this, prop, decorateFn(prop, value))
-        }
+        },
     })
 }

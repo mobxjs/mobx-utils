@@ -7,22 +7,22 @@ test("transform1", () => {
     let state = m.observable({
         todos: [
             {
-                title: "coffee"
-            }
+                title: "coffee",
+            },
         ],
-        name: "michel"
+        name: "michel",
     })
 
     let mapped
     let unloaded = []
 
-    let transformState = createTransformer(function(state: any) {
+    let transformState = createTransformer(function (state: any) {
         stateCalc++
         return state.name + state.todos.map(transformTodo).join(",")
     })
 
     let transformTodo = createTransformer(
-        function(todo: any) {
+        function (todo: any) {
             todoCalc++
             return todo.title.toUpperCase()
         },
@@ -31,7 +31,7 @@ test("transform1", () => {
         }
     )
 
-    m.autorun(function() {
+    m.autorun(function () {
         mapped = transformState(state)
     })
 
@@ -79,7 +79,7 @@ test("createTransformer as off-instance computed", () => {
     // observable in closure
     let capitalize = m.observable.box(false)
 
-    let _computeDisplayName = person => {
+    let _computeDisplayName = (person) => {
         runs++ // count the runs
         let res = person.firstName + " " + person.lastName
         if (capitalize.get()) return res.toUpperCase()
@@ -91,19 +91,19 @@ test("createTransformer as off-instance computed", () => {
 
     let person1 = m.observable({
         firstName: "Mickey",
-        lastName: "Mouse"
+        lastName: "Mouse",
     })
 
     let person2 = m.observable({
         firstName: "Donald",
-        lastName: "Duck"
+        lastName: "Duck",
     })
 
     let persons = m.observable([])
     let displayNames = []
 
     let disposer = m.autorun(() => {
-        displayNames = persons.map(p => displayName(p))
+        displayNames = persons.map((p) => displayName(p))
     })
 
     expect(runs).toBe(0)
@@ -150,7 +150,7 @@ test("transform into reactive graph", () => {
     function Folder(name) {
         m.extendObservable(this, {
             name: name,
-            children: []
+            children: [],
         })
     }
 
@@ -171,26 +171,26 @@ test("transform into reactive graph", () => {
             },
             get children() {
                 _childrenRecalc++
-                return this.baseFolder.children.map(transformFolder).filter(function(folder) {
+                return this.baseFolder.children.map(transformFolder).filter(function (folder) {
                     return folder.isVisible === true
                 })
-            }
+            },
         })
     }
 
     let state: any = m.observable({
-        filter: null
+        filter: null,
     })
 
     let _transformCount = 0
-    let transformFolder = createTransformer(function(folder) {
+    let transformFolder = createTransformer(function (folder) {
         _transformCount++
         // console.log("Transform", folder.name)
         return new DerivedFolder(state, folder)
     })
 
     state.root = new Folder("/")
-    m.autorun(function() {
+    m.autorun(function () {
         state.derived = transformFolder(state.root)
         state.derived.children
     })
@@ -249,7 +249,7 @@ test("transform tree (modifying tree incrementally)", () => {
     let renderNodeCount = 0
 
     let transformNode = createTransformer(
-        function(node) {
+        function (node) {
             nodeCreateCount++
             return new DisplayNode(node)
         },
@@ -259,7 +259,7 @@ test("transform tree (modifying tree incrementally)", () => {
     )
 
     // transform nodes to renderedNodes
-    m.autorun(function() {
+    m.autorun(function () {
         // KM: ideally, I would like to do an assignment here, but it creates a cycle and would need to preserve ms.modifiers.structure:
         //
         // state.renderedNodes = state.root ? state.root.map(transformNode) : [];
@@ -270,7 +270,7 @@ test("transform tree (modifying tree incrementally)", () => {
     })
 
     // render
-    m.autorun(function() {
+    m.autorun(function () {
         renderCount++
         renderNodeCount += state.renderedNodes.length
     })
@@ -317,11 +317,11 @@ test("transform tree (modifying tree incrementally)", () => {
     expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
-        "root-child-2"
+        "root-child-2",
     ])
 
     // add first child to second child
-    node = state.root.find(function(node) {
+    node = state.root.find(function (node) {
         return node.name === "root-child-2"
     })
     node.addChild(new TreeNode("root-child-2-child-1"))
@@ -335,11 +335,11 @@ test("transform tree (modifying tree incrementally)", () => {
         "root",
         "root-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // add first child to first child
-    node = state.root.find(function(node) {
+    node = state.root.find(function (node) {
         return node.name === "root-child-1"
     })
     node.addChild(new TreeNode("root-child-1-child-1"))
@@ -354,11 +354,11 @@ test("transform tree (modifying tree incrementally)", () => {
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // remove children from first child
-    node = state.root.find(function(node) {
+    node = state.root.find(function (node) {
         return node.name === "root-child-1"
     })
     node.children.splice(0)
@@ -372,11 +372,11 @@ test("transform tree (modifying tree incrementally)", () => {
         "root",
         "root-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // remove children from first child with no children should be a no-op
-    node = state.root.find(function(node) {
+    node = state.root.find(function (node) {
         return node.name === "root-child-1"
     })
     node.children.splice(0)
@@ -390,7 +390,7 @@ test("transform tree (modifying tree incrementally)", () => {
         "root",
         "root-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // remove children from root
@@ -424,7 +424,7 @@ test("transform tree (modifying tree incrementally)", () => {
     let renderNodeCount = 0
 
     let transformNode = createTransformer(
-        function(node) {
+        function (node) {
             nodeCreateCount++
             return new DisplayNode(node)
         },
@@ -434,13 +434,13 @@ test("transform tree (modifying tree incrementally)", () => {
     )
 
     // transform nodes to renderedNodes
-    m.autorun(function() {
+    m.autorun(function () {
         let renderedNodes = state.root ? state.root.map(transformNode) : []
         state.renderedNodes.replace(renderedNodes)
     })
 
     // render
-    m.autorun(function() {
+    m.autorun(function () {
         renderCount++
         renderNodeCount += state.renderedNodes.length
     })
@@ -478,7 +478,7 @@ test("transform tree (modifying tree incrementally)", () => {
         "root-1-child-1b",
         "root-1-child-1b-child-1",
         "root-1-child-2b",
-        "root-1-child-2b-child-1"
+        "root-1-child-2b-child-1",
     ])
 
     // remove root-1
@@ -511,7 +511,7 @@ test("transform tree (modifying tree incrementally)", () => {
         "root-2-child-1",
         "root-2-child-1-child-1",
         "root-2-child-2",
-        "root-2-child-2-child-1"
+        "root-2-child-2-child-1",
     ])
 
     // teardown
@@ -535,7 +535,7 @@ test("transform tree (modifying expanded)", () => {
     let renderNodeCount = 0
 
     let transformNode = createTransformer(
-        function(node) {
+        function (node) {
             nodeCreateCount++
             return new DisplayNode(node)
         },
@@ -545,24 +545,24 @@ test("transform tree (modifying expanded)", () => {
     )
 
     // transform nodes to renderedNodes
-    m.autorun(function() {
+    m.autorun(function () {
         let renderedNodes = state.root ? state.root.transform(transformNode) : []
         state.renderedNodes.replace(renderedNodes)
     })
 
     // render
-    m.autorun(function() {
+    m.autorun(function () {
         renderCount++
         renderNodeCount += state.renderedNodes.length
     })
 
     // patch for collapsed
-    TreeNode.prototype.transform = function(iteratee, results) {
+    TreeNode.prototype.transform = function (iteratee, results) {
         if (this.parent && state.collapsed.has(this.parent.path())) return results || [] // not visible
 
         results = results || []
         results.push(iteratee(this))
-        this.children.forEach(function(child) {
+        this.children.forEach(function (child) {
             child.transform(iteratee, results)
         })
         return results
@@ -586,7 +586,7 @@ test("transform tree (modifying expanded)", () => {
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     ////////////////////////////////////
@@ -616,7 +616,7 @@ test("transform tree (modifying expanded)", () => {
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // toggle child-1 collapsed
@@ -631,7 +631,7 @@ test("transform tree (modifying expanded)", () => {
         "root",
         "root-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // toggle child-2-child-1 collapsed should be a no-op
@@ -646,7 +646,7 @@ test("transform tree (modifying expanded)", () => {
         "root",
         "root-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // teardown
@@ -671,7 +671,7 @@ test("transform tree (modifying render observable)", () => {
     let renderIconCalc = 0
 
     let transformNode = createTransformer(
-        function(node) {
+        function (node) {
             nodeCreateCount++
             return new DisplayNode(node)
         },
@@ -681,24 +681,24 @@ test("transform tree (modifying render observable)", () => {
     )
 
     // transform nodes to renderedNodes
-    m.autorun(function() {
+    m.autorun(function () {
         let renderedNodes = state.root ? state.root.transform(transformNode) : []
         state.renderedNodes.replace(renderedNodes)
     })
 
     // render
-    m.autorun(function() {
+    m.autorun(function () {
         renderCount++
         renderNodeCount += state.renderedNodes.length
     })
 
     // custom transform
-    TreeNode.prototype.transform = function(iteratee, results) {
+    TreeNode.prototype.transform = function (iteratee, results) {
         node.icon.get() // icon dependency
 
         results = results || []
         results.push(iteratee(this))
-        this.children.forEach(function(child) {
+        this.children.forEach(function (child) {
             child.transform(iteratee, results)
         })
         return results
@@ -722,7 +722,7 @@ test("transform tree (modifying render observable)", () => {
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     ////////////////////////////////////
@@ -742,7 +742,7 @@ test("transform tree (modifying render observable)", () => {
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // teardown
@@ -767,7 +767,7 @@ test("transform tree (modifying render-only observable)", () => {
     let renderIconCalc = 0
 
     let transformNode = createTransformer(
-        function(node) {
+        function (node) {
             nodeCreateCount++
             return new DisplayNode(node)
         },
@@ -777,18 +777,18 @@ test("transform tree (modifying render-only observable)", () => {
     )
 
     // transform nodes to renderedNodes
-    m.autorun(function() {
+    m.autorun(function () {
         let renderedNodes = state.root ? state.root.map(transformNode) : []
         state.renderedNodes.replace(renderedNodes)
     })
 
     // render
-    m.autorun(function() {
+    m.autorun(function () {
         renderCount++
         renderNodeCount += state.renderedNodes.length
 
-        state.renderedNodes.forEach(function(renderedNode) {
-            m.autorun(function() {
+        state.renderedNodes.forEach(function (renderedNode) {
+            m.autorun(function () {
                 renderIconCalc++
                 renderedNode.node.icon.get() // icon dependency
             })
@@ -814,7 +814,7 @@ test("transform tree (modifying render-only observable)", () => {
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     ////////////////////////////////////
@@ -835,7 +835,7 @@ test("transform tree (modifying render-only observable)", () => {
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // teardown
@@ -860,7 +860,7 @@ test("transform tree (static tags / global filter only)", () => {
     let renderNodeCount = 0
 
     let transformNode = createTransformer(
-        function(node) {
+        function (node) {
             nodeCreateCount++
             return new DisplayNode(node)
         },
@@ -870,13 +870,13 @@ test("transform tree (static tags / global filter only)", () => {
     )
 
     // transform nodes to renderedNodes
-    m.autorun(function() {
+    m.autorun(function () {
         let renderedNodes = state.root ? state.root.transform(transformNode) : []
         state.renderedNodes.replace(renderedNodes)
     })
 
     // render
-    m.autorun(function() {
+    m.autorun(function () {
         renderCount++
         renderNodeCount += state.renderedNodes.length
     })
@@ -885,11 +885,11 @@ test("transform tree (static tags / global filter only)", () => {
     state.tags = m.observable.array([])
 
     // custom transform
-    TreeNode.prototype.transform = function(iteratee, results) {
+    TreeNode.prototype.transform = function (iteratee, results) {
         results = results || []
         if (!state.tags.length || intersection(state.tags, this.tags).length)
             results.push(iteratee(this))
-        this.children.forEach(function(child) {
+        this.children.forEach(function (child) {
             child.transform(iteratee, results)
         })
         return results
@@ -913,7 +913,7 @@ test("transform tree (static tags / global filter only)", () => {
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     ////////////////////////////////////
@@ -942,7 +942,7 @@ test("transform tree (static tags / global filter only)", () => {
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // add search tag
@@ -958,7 +958,7 @@ test("transform tree (static tags / global filter only)", () => {
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // remove search tags
@@ -992,7 +992,7 @@ test("transform tree (dynamic tags - peek / rebuild)", () => {
     let renderNodeCount = 0
 
     let transformNode = createTransformer(
-        function(node) {
+        function (node) {
             nodeCreateCount++
             return new DisplayNode(node)
         },
@@ -1002,13 +1002,13 @@ test("transform tree (dynamic tags - peek / rebuild)", () => {
     )
 
     // transform nodes to renderedNodes
-    m.autorun(function() {
+    m.autorun(function () {
         let renderedNodes = state.root ? state.root.transform(transformNode) : []
         state.renderedNodes.replace(renderedNodes)
     })
 
     // render
-    m.autorun(function() {
+    m.autorun(function () {
         renderCount++
         renderNodeCount += state.renderedNodes.length
     })
@@ -1017,11 +1017,11 @@ test("transform tree (dynamic tags - peek / rebuild)", () => {
     state.tags = m.observable.array([])
 
     // custom transform
-    TreeNode.prototype.transform = function(iteratee, results) {
+    TreeNode.prototype.transform = function (iteratee, results) {
         results = results || []
         if (!state.tags.length || intersection(state.tags, this.tags).length)
             results.push(iteratee(this))
-        this.children.forEach(function(child) {
+        this.children.forEach(function (child) {
             child.transform(iteratee, results)
         })
         return results
@@ -1049,7 +1049,7 @@ test("transform tree (dynamic tags - peek / rebuild)", () => {
         "root-child-1",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     ////////////////////////////////////
@@ -1077,24 +1077,24 @@ test("transform tree (dynamic tags - peek / rebuild)", () => {
     expect(state.renderedNodes.map(pluckFn("node.name"))).toEqual([
         "root",
         "root-child-1",
-        "root-child-2"
+        "root-child-2",
     ])
 
     // perform multiple search tag operations
-    m.transaction(function() {
+    m.transaction(function () {
         state.root.tags.shift() // no-op
         state.root
-            .find(function(node) {
+            .find(function (node) {
                 return node.name === "root-child-1"
             })
             .tags.splice(0)
         state.root
-            .find(function(node) {
+            .find(function (node) {
                 return node.name === "root-child-1-child-1"
             })
             .tags.push(2)
         state.root
-            .find(function(node) {
+            .find(function (node) {
                 return node.name === "root-child-2-child-1"
             })
             .tags.push(2)
@@ -1109,7 +1109,7 @@ test("transform tree (dynamic tags - peek / rebuild)", () => {
         "root",
         "root-child-1-child-1",
         "root-child-2",
-        "root-child-2-child-1"
+        "root-child-2-child-1",
     ])
 
     // teardown
@@ -1128,19 +1128,19 @@ test("transform with primitive key", () => {
         m.extendObservable(this, {
             get name() {
                 return "Bob" + this.num
-            }
+            },
         })
     }
 
     let observableBobs = m.observable([])
     let bobs = []
 
-    let bobFactory = createTransformer(function(key) {
+    let bobFactory = createTransformer(function (key) {
         return new Bob()
     })
 
-    m.autorun(function() {
-        bobs = observableBobs.map(function(bob) {
+    m.autorun(function () {
+        bobs = observableBobs.map(function (bob) {
             return bobFactory(bob)
         })
     })
@@ -1167,7 +1167,7 @@ test("transform with primitive key", () => {
 
 // https://github.com/mobxjs/mobx-utils/issues/134
 test("transform with mixed key types", () => {
-    const identityTransformer = createTransformer(a => a)
+    const identityTransformer = createTransformer((a) => a)
 
     let transformedStringKey
     let transformedNumberKey
@@ -1182,7 +1182,7 @@ test("transform with mixed key types", () => {
 import * as intersection from "lodash.intersection"
 
 function pluckFn(key) {
-    return function(obj) {
+    return function (obj) {
         let keys = key.split("."),
             value = obj
         for (let i = 0, l = keys.length; i < l; i++) {
@@ -1203,14 +1203,14 @@ function createTestSet(): any {
     let state = (testSet.state = m.observable({
         root: null,
         renderedNodes: m.observable.array(),
-        collapsed: m.observable.map() // KM: ideally, I would like to use a set
+        collapsed: m.observable.map(), // KM: ideally, I would like to use a set
     }))
 
     let stats = (testSet.stats = {
-        refCount: 0
+        refCount: 0,
     })
 
-    let TreeNode = (testSet.TreeNode = function(name, extensions) {
+    let TreeNode = (testSet.TreeNode = function (name, extensions) {
         this.children = m.observable.array()
         this.icon = m.observable.box("folder")
 
@@ -1224,19 +1224,19 @@ function createTestSet(): any {
             }
         }
     })
-    TreeNode.prototype.addChild = function(node) {
+    TreeNode.prototype.addChild = function (node) {
         node.parent = this
         this.children.push(node)
     }
-    TreeNode.prototype.addChildren = function(nodes) {
+    TreeNode.prototype.addChildren = function (nodes) {
         let _this = this
-        nodes.map(function(node) {
+        nodes.map(function (node) {
             node.parent = _this
         })
         this.children.splice.apply(this.children, [this.children.length, 0].concat(nodes))
     }
 
-    TreeNode.prototype.path = function() {
+    TreeNode.prototype.path = function () {
         let node = this,
             parts = []
         while (node) {
@@ -1246,16 +1246,16 @@ function createTestSet(): any {
         return parts.join("/")
     }
 
-    TreeNode.prototype.map = function(iteratee, results) {
+    TreeNode.prototype.map = function (iteratee, results) {
         results = results || []
         results.push(iteratee(this))
-        this.children.forEach(function(child) {
+        this.children.forEach(function (child) {
             child.map(iteratee, results)
         })
         return results
     }
 
-    TreeNode.prototype.find = function(predicate) {
+    TreeNode.prototype.find = function (predicate) {
         if (predicate(this)) return this
 
         let result
@@ -1266,15 +1266,15 @@ function createTestSet(): any {
         return null
     }
 
-    let DisplayNode = (testSet.DisplayNode = function(node) {
+    let DisplayNode = (testSet.DisplayNode = function (node) {
         stats.refCount++
         this.node = node
     })
-    DisplayNode.prototype.destroy = function() {
+    DisplayNode.prototype.destroy = function () {
         stats.refCount--
     }
 
-    DisplayNode.prototype.toggleCollapsed = function() {
+    DisplayNode.prototype.toggleCollapsed = function () {
         let path = this.node.path()
         state.collapsed.has(path) ? state.collapsed.delete(path) : state.collapsed.set(path, true) // KM: ideally, I would like to use a set
     }
@@ -1287,13 +1287,13 @@ it("should throw error when passed invalid param type", () => {
     const validParams = [[], {}, jest.fn(), 1, "string"]
     const invalidParams = [null, undefined, Symbol("A"), true]
 
-    validParams.forEach(obj => {
+    validParams.forEach((obj) => {
         expect(() => {
             transformedFn(obj)
         }).not.toThrowError()
     })
 
-    invalidParams.forEach(obj => {
+    invalidParams.forEach((obj) => {
         expect(() => {
             transformedFn(obj)
         }).toThrowErrorMatchingSnapshot()
@@ -1302,28 +1302,28 @@ it("should throw error when passed invalid param type", () => {
 test("should respect onCleanup argument", () => {
     let state = m.observable({
         todos: [{ title: "coffee" }],
-        name: "michel"
+        name: "michel",
     })
     let mapped
     let unloaded = []
     let objectName
-    let transformState = createTransformer(function(state: any) {
+    let transformState = createTransformer(function (state: any) {
         return state.name + state.todos.map(transformTodo).join(",")
     })
     let transformTodo = createTransformer(
-        function(todo: any) {
+        function (todo: any) {
             return todo.title.toUpperCase()
         },
         {
-            onCleanup: function(text, value) {
+            onCleanup: function (text, value) {
                 unloaded.push([text, value])
             },
-            debugNameGenerator: function(todo) {
+            debugNameGenerator: function (todo) {
                 return todo.title.toUpperCase() + "-DEBUG"
-            }
+            },
         }
     )
-    m.autorun(function() {
+    m.autorun(function () {
         mapped = transformState(state)
     })
     state.todos.shift()
@@ -1333,21 +1333,21 @@ test("should respect onCleanup argument", () => {
 test("should respect debugNameGenerator argument", () => {
     let state = m.observable.map({
         title: "coffee",
-        name: "michel"
+        name: "michel",
     })
     let mapped
     let objectName
     let transformTodo = createTransformer(
-        function(state: any) {
+        function (state: any) {
             return state.get("title").toUpperCase()
         },
         {
-            debugNameGenerator: function(state) {
+            debugNameGenerator: function (state) {
                 return state.get("title").toUpperCase() + "-DEBUG"
-            }
+            },
         }
     )
-    m.autorun(function() {
+    m.autorun(function () {
         mapped = transformTodo(state)
     })
     state.set("name", "BISCUIT")
@@ -1358,8 +1358,8 @@ test("should respect debugNameGenerator argument", () => {
 test("supports computed value options", () => {
     const events: number[][] = []
     const xs = m.observable([1, 2, 3])
-    const xsLessThan = createTransformer(n => xs.filter(x => x < n), {
-        equals: m.comparer.structural
+    const xsLessThan = createTransformer((n) => xs.filter((x) => x < n), {
+        equals: m.comparer.structural,
     })
 
     m.autorun(() => events.push(xsLessThan(3)))

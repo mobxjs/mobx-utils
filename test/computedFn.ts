@@ -6,20 +6,20 @@ import {
     action,
     getDependencyTree,
     comparer,
-    getObserverTree
+    getObserverTree,
 } from "mobx"
 
 const john = {
     name: "john",
-    age: 15
+    age: 15,
 }
 const jane = {
     name: "jane",
-    age: 45
+    age: 45,
 }
 const able = {
     name: "able",
-    age: 12
+    age: 12,
 }
 
 class Store {
@@ -29,7 +29,7 @@ class Store {
 
     filter(age: number, firstLetter: string) {
         this.events.push(`f ${age} ${firstLetter}`)
-        return this.persons.filter(p => {
+        return this.persons.filter((p) => {
             return p.age > age && (!firstLetter || p.name[0] === firstLetter)
         })
     }
@@ -55,7 +55,7 @@ test("basics - kept alive", () => {
         events.push(
             s
                 .filter(1, "j")
-                .map(p => p.name)
+                .map((p) => p.name)
                 .join("-")
         )
     })
@@ -78,7 +78,7 @@ test("basics - kept alive", () => {
         "john-jable",
         "f 1 j",
         "john",
-        "f 20 "
+        "f 20 ",
     ])
 })
 
@@ -99,14 +99,14 @@ test("basics - auto suspend", () => {
     expect(events.splice(0)).toEqual([
         "f 20 ",
         "f 1 j",
-        "f 20 " //suspended
+        "f 20 ", //suspended
     ])
 
     const d = autorun(() => {
         events.push(
             s
                 .filter(1, "j")
-                .map(p => p.name)
+                .map((p) => p.name)
                 .join("-")
         )
     })
@@ -132,7 +132,7 @@ test("basics - auto suspend", () => {
         "john",
         "unobserved persons", // all suspended!
         "f 20 ",
-        "f 20 "
+        "f 20 ",
     ])
 })
 
@@ -147,7 +147,7 @@ test("make sure the fn is cached", () => {
             expect(this).toBe(store)
             events.push("calc " + x)
             return this.a * this.b * x
-        })
+        }),
     })
 
     const d = autorun(() => {
@@ -165,7 +165,7 @@ test("make sure the fn is cached", () => {
 test("supports options", () => {
     const events: number[][] = []
     const xs = observable([1, 2, 3])
-    const xsLessThan = computedFn(n => xs.filter(x => x < n), { equals: comparer.structural })
+    const xsLessThan = computedFn((n) => xs.filter((x) => x < n), { equals: comparer.structural })
 
     autorun(() => events.push(xsLessThan(3)))
     expect(events).toEqual([[1, 2]])

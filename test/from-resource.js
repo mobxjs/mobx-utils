@@ -9,11 +9,11 @@ function Record(name) {
     this.data = { name: name }
     this.subscriptions = []
 }
-Record.prototype.updateName = function(newName) {
+Record.prototype.updateName = function (newName) {
     this.data.name = newName
-    this.subscriptions.forEach(f => f())
+    this.subscriptions.forEach((f) => f())
 }
-Record.prototype.subscribe = function(cb) {
+Record.prototype.subscribe = function (cb) {
     this.subscriptions.push(cb)
     return () => {
         const idx = this.subscriptions.indexOf(cb)
@@ -25,7 +25,7 @@ Record.prototype.subscribe = function(cb) {
 function createObservable(record) {
     let subscription
     return utils.fromResource(
-        sink => {
+        (sink) => {
             sink(record.data)
             subscription = record.subscribe(() => {
                 sink(record.data)
@@ -38,7 +38,7 @@ function createObservable(record) {
 test("basics", () => {
     let base = console.warn // eslint-disable-line no-console
     let warn = []
-    console.warn = msg => warn.push(msg) // eslint-disable-line no-console
+    console.warn = (msg) => warn.push(msg) // eslint-disable-line no-console
 
     var me = new Record("michel")
     var me$ = createObservable(me)
@@ -69,7 +69,7 @@ test("basics", () => {
     // test warning
     expect(me$.current().name).toBe("noa") // happens to be visible through the data reference, but no autorun tragger
     expect(warn).toEqual([
-        "Called `get` of a subscribingObservable outside a reaction. Current value will be returned but no new subscription has started"
+        "Called `get` of a subscribingObservable outside a reaction. Current value will be returned but no new subscription has started",
     ])
 
     // resubscribe

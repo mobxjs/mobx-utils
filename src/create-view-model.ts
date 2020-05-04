@@ -11,7 +11,7 @@ import {
     computed,
     keys,
     _getAdministration,
-    $mobx
+    $mobx,
 } from "mobx"
 import { invariant, getAllMethodsAndProperties } from "./utils"
 
@@ -75,7 +75,7 @@ export class ViewModel<T> implements IViewModel<T> {
                     } else {
                         this.localValues.delete(key)
                     }
-                })
+                }),
             })
         })
     }

@@ -6,7 +6,7 @@ import { map } from "rxjs/operators"
 test("to observable - should push the initial value by default", () => {
     const user = mobx.observable({
         firstName: "C.S",
-        lastName: "Lewis"
+        lastName: "Lewis",
     })
 
     mobx.configure({ enforceActions: "never" })
@@ -14,8 +14,8 @@ test("to observable - should push the initial value by default", () => {
     let values = []
 
     const sub = from(utils.toStream(() => user.firstName + user.lastName, true))
-        .pipe(map(x => x.toUpperCase()))
-        .subscribe(v => values.push(v))
+        .pipe(map((x) => x.toUpperCase()))
+        .subscribe((v) => values.push(v))
 
     user.firstName = "John"
 
@@ -34,7 +34,7 @@ test("to observable - should push the initial value by default", () => {
 test("to observable - should not push the initial value", () => {
     const user = mobx.observable({
         firstName: "C.S",
-        lastName: "Lewis"
+        lastName: "Lewis",
     })
 
     mobx.configure({ enforceActions: "never" })
@@ -42,8 +42,8 @@ test("to observable - should not push the initial value", () => {
     let values = []
 
     const sub = from(utils.toStream(() => user.firstName + user.lastName))
-        .pipe(map(x => x.toUpperCase()))
-        .subscribe(v => values.push(v))
+        .pipe(map((x) => x.toUpperCase()))
+        .subscribe((v) => values.push(v))
 
     user.firstName = "John"
 
@@ -59,7 +59,7 @@ test("to observable - should not push the initial value", () => {
     expect(values).toEqual(["JOHNLEWIS", "JANEJACK"])
 })
 
-test("from observable", done => {
+test("from observable", (done) => {
     mobx.configure({ enforceActions: "observed" })
     const fromStream = utils.fromStream(interval(10), -1)
     const values = []

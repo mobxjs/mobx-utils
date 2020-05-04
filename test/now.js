@@ -3,7 +3,7 @@
 const utils = require("../src/mobx-utils")
 const mobx = require("mobx")
 
-test("now should tick", done => {
+test("now should tick", (done) => {
     const values = []
     const d = mobx.autorun(() => {
         utils.now(100)
@@ -19,7 +19,7 @@ test("now should tick", done => {
     }, 500)
 })
 
-test("now should be up to date outside reaction, #40", done => {
+test("now should be up to date outside reaction, #40", (done) => {
     const d1 = utils.now(1000)
     expect(typeof d1 === "number").toBeTruthy()
     setTimeout(() => {
