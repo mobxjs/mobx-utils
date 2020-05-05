@@ -6,6 +6,7 @@ import {
     IObservableArray,
     transaction,
     ObservableMap,
+    Lambda,
 } from "mobx"
 
 interface GrouperItemInfo {
@@ -24,6 +25,9 @@ interface GrouperItemInfo {
  *
  * No guarantees are made about the order of items in the grouped arrays.
  *
+ * The resulting map of arrays is read-only. clear(), set(), delete() are not supported and
+ * modifying the group arrays will lead to undefined behavior.
+ *
  * @example
  * const slices = observable([
  *     { day: "mo", hours: 12 },
@@ -36,19 +40,44 @@ interface GrouperItemInfo {
  * slices[0].day = "we" // outputs 0, [{ day: "we", hours: 12 }]
  */
 export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<T>> {
-    private readonly _keyToName: (group: G) => string
-
-    private readonly _groupBy: (x: T) => G
-
-    private readonly _ogmInfoKey: string
-
+    /**
+     * Base observable array which is being sorted into groups.
+     */
     private readonly _base: IObservableArray<T>
 
+    /**
+     * The ObservableGroupMap needs to track some state per-item. This is the name/symbol of the
+     * property used to attach the state.
+     */
+    private readonly _ogmInfoKey: string
+
+    /**
+     * The function used to group the items.
+     */
+    private readonly _groupBy: (x: T) => G
+
+    /**
+     * This function is used to generate the mobx debug names of the observable group arrays.
+     */
+    private readonly _keyToName: (group: G) => string
+
+    private readonly _disposeBaseObserver: Lambda
+
+    /**
+     * Create a new ObservableGroupMap. This immediately observes all members of the array. Call
+     * #dispose() to stop tracking.
+     *
+     * @param base The array to sort into groups.
+     * @param groupBy The function used for grouping.
+     * @param options Object with properties:
+     *  `name`: Debug name of this ObservableGroupMap.
+     *  `keyToName`: Function to create the debug names of the observable group arrays.
+     */
     constructor(
         base: IObservableArray<T>,
         groupBy: (x: T) => G,
         {
-            name,
+            name = "ogm" + ((Math.random() * 1000) | 0),
             keyToName = (x) => "" + x,
         }: { name?: string; keyToName?: (group: G) => string } = {}
     ) {
@@ -65,7 +94,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
             this._addItem(base[i])
         }
 
-        observe(base, (change) => {
+        this._disposeBaseObserver = observe(base, (change) => {
             if ("splice" === change.type) {
                 transaction(() => {
                     for (const removed of change.removed) {
@@ -98,14 +127,18 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         throw new Error("not supported")
     }
 
+    /**
+     * Disposes all observers created during construction and removes state added to base array
+     * items.
+     */
     public dispose() {
+        this._disposeBaseObserver()
         for (let i = 0; i < this._base.length; i++) {
             const item = this._base[i]
             const grouperItemInfo: GrouperItemInfo = (item as any)[this._ogmInfoKey]
             grouperItemInfo.reaction()
 
             delete (item as any)[this._ogmInfoKey]
-            this._addItem(item)
         }
     }
 
