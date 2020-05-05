@@ -36,6 +36,28 @@ describe("ObservableGroupMap", () => {
         done()
     })
 
+    it("updates groups correctly when an item is added to the base (new group)", (done) => {
+        base.push({ day: "we", hours: 3 })
+        assert.deepEqual(json(ogm), {
+            mo: [{ day: "mo", hours: 12 }],
+            tu: [{ day: "tu", hours: 2 }],
+            we: [{ day: "we", hours: 3 }],
+        })
+        done()
+    })
+
+    it("updates groups correctly when an item is added to the base (existing group)", (done) => {
+        base.push({ day: "tu", hours: 3 })
+        assert.deepEqual(json(ogm), {
+            mo: [{ day: "mo", hours: 12 }],
+            tu: [
+                { day: "tu", hours: 2 },
+                { day: "tu", hours: 3 },
+            ],
+        })
+        done()
+    })
+
     it("moves item from group array to new one when groupBy value changes to a new one", (done) => {
         base[1].day = "we"
         assert.deepEqual(json(ogm), {

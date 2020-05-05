@@ -36,108 +36,13 @@ interface GrouperItemInfo {
  * slices[0].day = "we" // outputs 0, [{ day: "we", hours: 12 }]
  */
 export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<T>> {
-    private readonly keyToName: (group: G) => string
+    private readonly _keyToName: (group: G) => string
 
-    private readonly groupBy: (x: T) => G
+    private readonly _groupBy: (x: T) => G
 
-    private readonly grouperInfoKey: string
+    private readonly _ogmInfoKey: string
 
-    private readonly base: IObservableArray<T>
-
-    clear(): void {
-        throw new Error("not supported")
-    }
-
-    delete(_key: G): boolean {
-        throw new Error("not supported")
-    }
-
-    set(_key: G, _value: IObservableArray<T>): this {
-        throw new Error("not supported")
-    }
-
-    private _getGroupArr(key: G) {
-        let result = super.get(key)
-        if (undefined === result) {
-            result = observable([], { name: `GroupArray[${this.keyToName(key)}]` })
-            super.set(key, result)
-        }
-        return result
-    }
-
-    private _removeFromGroupArr(key: G, itemIndex: number) {
-        const arr = this.get(key)!
-        if (1 === arr.length) {
-            super.delete(key)
-        } else if (itemIndex === arr.length - 1) {
-            // last position in array
-            arr.length--
-        } else {
-            arr[itemIndex] = arr[arr.length - 1]
-            ;(arr[itemIndex] as any)[this.grouperInfoKey].grouperArrIndex = itemIndex
-            arr.length--
-        }
-    }
-
-    private checkState() {
-        for (const key of Array.from(this.keys())) {
-            const arr = this.get(key as any)!
-            for (let i = 0; i < arr!.length; i++) {
-                const item = arr[i]
-                const info: GrouperItemInfo = (item as any)[this.grouperInfoKey]
-                if (info.grouperArrIndex != i) {
-                    throw new Error(info.grouperArrIndex + " " + i)
-                }
-                if (info.groupByValue != key) {
-                    throw new Error(info.groupByValue + " " + key)
-                }
-            }
-        }
-    }
-
-    private _addItem(item: any) {
-        const groupByValue = this.groupBy(item)
-        const groupArr = this._getGroupArr(groupByValue)
-        const value: GrouperItemInfo = {
-            groupByValue: groupByValue,
-            grouperArrIndex: groupArr.length,
-            reaction: reaction(
-                () => this.groupBy(item),
-                (newGroupByValue, _r) => {
-                    console.log("new group by value ", newGroupByValue)
-                    const grouperItemInfo = (item as any)[this.grouperInfoKey]
-                    this._removeFromGroupArr(
-                        grouperItemInfo.groupByValue,
-                        grouperItemInfo.grouperArrIndex
-                    )
-
-                    const newGroupArr = this._getGroupArr(newGroupByValue)
-                    const newGrouperArrIndex = newGroupArr.length
-                    newGroupArr.push(item)
-                    grouperItemInfo.groupByValue = newGroupByValue
-                    grouperItemInfo.grouperArrIndex = newGrouperArrIndex
-                    this.checkState()
-                }
-            ),
-        }
-        Object.defineProperty(item, this.grouperInfoKey, {
-            configurable: true,
-            enumerable: false,
-            value,
-        })
-        groupArr.push(item)
-        this.checkState()
-    }
-
-    private _removeItem(item: any) {
-        this.checkState()
-        const grouperItemInfo: GrouperItemInfo = (item as any)[this.grouperInfoKey]
-        this._removeFromGroupArr(grouperItemInfo.groupByValue, grouperItemInfo.grouperArrIndex)
-        grouperItemInfo.reaction()
-
-        delete (item as any)[this.grouperInfoKey]
-        this.checkState()
-    }
+    private readonly _base: IObservableArray<T>
 
     constructor(
         base: IObservableArray<T>,
@@ -148,17 +53,16 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         }: { name?: string; keyToName?: (group: G) => string } = {}
     ) {
         super()
-        this.keyToName = keyToName
-        this.groupBy = groupBy
-        this.grouperInfoKey =
+        this._keyToName = keyToName
+        this._groupBy = groupBy
+        this._ogmInfoKey =
             "function" == typeof Symbol
                 ? ((Symbol("grouperInfo" + name) as unknown) as string)
                 : "__grouperInfo" + name
-        this.base = base
+        this._base = base
 
         for (let i = 0; i < base.length; i++) {
-            const item = base[i]
-            this._addItem(item)
+            this._addItem(base[i])
         }
 
         observe(base, (change) => {
@@ -181,14 +85,90 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
             }
         })
     }
-    dispose() {
-        for (let i = 0; i < this.base.length; i++) {
-            const item = this.base[i]
-            const grouperItemInfo: GrouperItemInfo = (item as any)[this.grouperInfoKey]
+
+    public clear(): void {
+        throw new Error("not supported")
+    }
+
+    public delete(_key: G): boolean {
+        throw new Error("not supported")
+    }
+
+    public set(_key: G, _value: IObservableArray<T>): this {
+        throw new Error("not supported")
+    }
+
+    public dispose() {
+        for (let i = 0; i < this._base.length; i++) {
+            const item = this._base[i]
+            const grouperItemInfo: GrouperItemInfo = (item as any)[this._ogmInfoKey]
             grouperItemInfo.reaction()
 
-            delete (item as any)[this.grouperInfoKey]
+            delete (item as any)[this._ogmInfoKey]
             this._addItem(item)
         }
+    }
+
+    private _getGroupArr(key: G) {
+        let result = super.get(key)
+        if (undefined === result) {
+            result = observable([], { name: `GroupArray[${this._keyToName(key)}]` })
+            super.set(key, result)
+        }
+        return result
+    }
+
+    private _removeFromGroupArr(key: G, itemIndex: number) {
+        const arr = this.get(key)!
+        if (1 === arr.length) {
+            super.delete(key)
+        } else if (itemIndex === arr.length - 1) {
+            // last position in array
+            arr.length--
+        } else {
+            arr[itemIndex] = arr[arr.length - 1]
+            ;(arr[itemIndex] as any)[this._ogmInfoKey].grouperArrIndex = itemIndex
+            arr.length--
+        }
+    }
+
+    private _addItem(item: any) {
+        const groupByValue = this._groupBy(item)
+        const groupArr = this._getGroupArr(groupByValue)
+        const value: GrouperItemInfo = {
+            groupByValue: groupByValue,
+            grouperArrIndex: groupArr.length,
+            reaction: reaction(
+                () => this._groupBy(item),
+                (newGroupByValue, _r) => {
+                    console.log("new group by value ", newGroupByValue)
+                    const grouperItemInfo = (item as any)[this._ogmInfoKey]
+                    this._removeFromGroupArr(
+                        grouperItemInfo.groupByValue,
+                        grouperItemInfo.grouperArrIndex
+                    )
+
+                    const newGroupArr = this._getGroupArr(newGroupByValue)
+                    const newGrouperArrIndex = newGroupArr.length
+                    newGroupArr.push(item)
+                    grouperItemInfo.groupByValue = newGroupByValue
+                    grouperItemInfo.grouperArrIndex = newGrouperArrIndex
+                }
+            ),
+        }
+        Object.defineProperty(item, this._ogmInfoKey, {
+            configurable: true,
+            enumerable: false,
+            value,
+        })
+        groupArr.push(item)
+    }
+
+    private _removeItem(item: any) {
+        const grouperItemInfo: GrouperItemInfo = (item as any)[this._ogmInfoKey]
+        this._removeFromGroupArr(grouperItemInfo.groupByValue, grouperItemInfo.grouperArrIndex)
+        grouperItemInfo.reaction()
+
+        delete (item as any)[this._ogmInfoKey]
     }
 }
