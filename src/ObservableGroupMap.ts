@@ -12,7 +12,7 @@ import {
 interface GrouperItemInfo {
     groupByValue: any
     reaction: IReactionDisposer
-    grouperArrIndex: number
+    groupArrIndex: number
 }
 
 /**
@@ -86,8 +86,8 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         this._groupBy = groupBy
         this._ogmInfoKey =
             "function" == typeof Symbol
-                ? ((Symbol("grouperInfo" + name) as unknown) as string)
-                : "__grouperInfo" + name
+                ? ((Symbol("ogmInfo" + name) as unknown) as string)
+                : "__ogmInfo" + name
         this._base = base
 
         for (let i = 0; i < base.length; i++) {
@@ -170,7 +170,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         const groupArr = this._getGroupArr(groupByValue)
         const value: GrouperItemInfo = {
             groupByValue: groupByValue,
-            grouperArrIndex: groupArr.length,
+            groupArrIndex: groupArr.length,
             reaction: reaction(
                 () => this._groupBy(item),
                 (newGroupByValue, _r) => {
@@ -199,7 +199,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
 
     private _removeItem(item: any) {
         const grouperItemInfo: GrouperItemInfo = (item as any)[this._ogmInfoKey]
-        this._removeFromGroupArr(grouperItemInfo.groupByValue, grouperItemInfo.grouperArrIndex)
+        this._removeFromGroupArr(grouperItemInfo.groupByValue, grouperItemInfo.groupArrIndex)
         grouperItemInfo.reaction()
 
         delete (item as any)[this._ogmInfoKey]
