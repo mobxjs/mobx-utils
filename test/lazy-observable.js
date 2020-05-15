@@ -112,3 +112,19 @@ test("lazy observable pending", (done) => {
         done()
     }, 150)
 })
+
+test("lazy observable pending can be observed", async () => {
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+    const lo = utils.lazyObservable((sink) => sleep(100).then(sink))
+
+    const pendingValues = []
+
+    mobx.autorun(() => pendingValues.push(lo.pending))
+
+    lo.current()
+
+    await sleep(150)
+
+    expect(pendingValues).toEqual([false, true, false])
+})
