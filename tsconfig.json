@@ -5,16 +5,11 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "experimentalDecorators": true,
+        "downlevelIteration": true,
         "noEmit": true,
         "rootDir": ".",
-        "lib": [
-            "dom", "es2015", "scripthost"
-        ]
+        "lib": ["dom", "es2015", "scripthost"]
     },
-    "include": [
-        "**/*.ts"
-    ],
-    "exclude": [
-        "/node_modules"
-    ]
+    "include": ["**/*.ts"],
+    "exclude": ["/node_modules"]
 }
