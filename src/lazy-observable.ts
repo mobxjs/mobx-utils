@@ -53,7 +53,9 @@ export function lazyObservable<T>(
     let currentFnc = () => {
         if (!started) {
             started = true
-            pending.set(true)
+            _allowStateChanges(true, () => {
+                pending.set(true)
+            })
             fetch((newValue: T) => {
                 _allowStateChanges(true, () => {
                     value.set(newValue)
