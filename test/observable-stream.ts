@@ -85,3 +85,19 @@ test("from observable", (done) => {
         done()
     }, 35)
 })
+
+test("from observable with initialValue of a different type", async () => {
+    mobx.configure({ enforceActions: "observed" })
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+    const fromStream = utils.fromStream(interval(10), "start")
+    const values: (number | string)[] = []
+    const stopAutorun = mobx.autorun(() => values.push(fromStream.current))
+
+    await sleep(35)
+    expect(fromStream.current).toBe(2)
+    expect(values).toEqual(["start", 0, 1, 2])
+    fromStream.dispose()
+    stopAutorun()
+    mobx.configure({ enforceActions: "never" })
+})

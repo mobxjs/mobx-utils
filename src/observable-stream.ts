@@ -11,9 +11,9 @@ function self() {
 }
 
 export interface IStreamObserver<T> {
-    next(value: T): void
-    error(error: any): void
-    complete(): void
+    next?(value: T): void
+    error?(error: any): void
+    complete?(): void
 }
 
 export interface ISubscription {
@@ -21,8 +21,8 @@ export interface ISubscription {
 }
 
 export interface IObservableStream<T> {
-    subscribe(observer: IStreamObserver<T>): ISubscription
-    subscribe(observer: (value: T) => void): ISubscription
+    subscribe(observer?: IStreamObserver<T> | null): ISubscription
+    subscribe(observer?: ((value: T) => void) | null): ISubscription
     //   [Symbol.observable](): IObservable;
 }
 
@@ -55,26 +55,38 @@ export function toStream<T>(
 ): IObservableStream<T> {
     const computedValue = computed(expression)
     return {
-        subscribe(observer: any): ISubscription {
+        subscribe(observer?: IStreamObserver<T> | ((value: T) => void) | null): ISubscription {
+            if ("function" === typeof observer) {
+                return {
+                    unsubscribe: computedValue.observe(
+                        ({ newValue }: { newValue: T }) => observer(newValue),
+                        fireImmediately
+                    ),
+                }
+            }
+            if (observer && "object" === typeof observer && observer.next) {
+                return {
+                    unsubscribe: computedValue.observe(
+                        ({ newValue }: { newValue: T }) => observer.next!(newValue),
+                        fireImmediately
+                    ),
+                }
+            }
             return {
-                unsubscribe: computedValue.observe(
-                    typeof observer === "function"
-                        ? ({ newValue }: { newValue: T }) => observer(newValue)
-                        : ({ newValue }: { newValue: T }) => observer.next(newValue),
-                    fireImmediately
-                ),
+                unsubscribe: () => {},
             }
         },
         [observableSymbol()]: self,
     }
 }
 
-class StreamListener<T, I> implements IStreamObserver<T | I> {
-    @observable.ref current: T | I = this.initialValue
-    subscription: ISubscription
+class StreamListener<T> implements IStreamObserver<T> {
+    @observable.ref current!: T
+    subscription!: ISubscription
 
-    constructor(observable: IObservableStream<T>, private readonly initialValue: I) {
+    constructor(observable: IObservableStream<T>, initialValue: T) {
         runInAction(() => {
+            this.current = initialValue
             this.subscription = observable.subscribe(this)
         })
     }
@@ -118,14 +130,19 @@ class StreamListener<T, I> implements IStreamObserver<T | I> {
  *     console.log("distance moved", debouncedClickDelta.current)
  * })
  */
-export function fromStream<T, I = undefined>(
+export function fromStream<T>(observable: IObservableStream<T>): IStreamListener<T | undefined>
+export function fromStream<T, I>(
     observable: IObservableStream<T>,
-    initialValue: T | I = undefined
-): IStreamListener<T, I> {
+    initialValue: I
+): IStreamListener<T | I>
+export function fromStream<T>(
+    observable: IObservableStream<T>,
+    initialValue: T = undefined as any
+): IStreamListener<T> {
     return new StreamListener(observable, initialValue)
 }
 
-export interface IStreamListener<T, I = undefined> {
-    current: T | I
+export interface IStreamListener<T> {
+    current: T
     dispose(): void
 }
