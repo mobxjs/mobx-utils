@@ -81,14 +81,18 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
     -   [Examples](#examples-16)
 -   [ObservableGroupMap](#observablegroupmap)
     -   [Examples](#examples-17)
+    -   [dispose](#dispose)
+-   [ObservableGroupMap](#observablegroupmap-1)
+    -   [Parameters](#parameters-18)
+    -   [dispose](#dispose-1)
 -   [ObservableMap](#observablemap)
 -   [computedFn](#computedfn)
-    -   [Parameters](#parameters-18)
+    -   [Parameters](#parameters-19)
     -   [Examples](#examples-18)
 -   [DeepMapEntry](#deepmapentry)
 -   [DeepMap](#deepmap)
 -   [actionAsync](#actionasync)
-    -   [Parameters](#parameters-19)
+    -   [Parameters](#parameters-20)
     -   [Examples](#examples-19)
 
 ## fromPromise
@@ -753,6 +757,9 @@ when there is an actual change, so this is far more efficient than, for example
 
 No guarantees are made about the order of items in the grouped arrays.
 
+The resulting map of arrays is read-only. clear(), set(), delete() are not supported and
+modifying the group arrays will lead to undefined behavior.
+
 ### Examples
 
 ```javascript
@@ -766,6 +773,30 @@ autorun(() => console.log(
     slicesByDay.get("we"))) // outputs 1, undefined
 slices[0].day = "we" // outputs 0, [{ day: "we", hours: 12 }]
 ```
+
+### dispose
+
+Disposes all observers created during construction and removes state added to base array
+items.
+
+## ObservableGroupMap
+
+Create a new ObservableGroupMap. This immediately observes all members of the array. Call
+\#dispose() to stop tracking.
+
+### Parameters
+
+-   `base`  The array to sort into groups.
+-   `groupBy`  The function used for grouping.
+-   `_a`  
+-   `options`  Object with properties:
+     `name`: Debug name of this ObservableGroupMap.
+     `keyToName`: Function to create the debug names of the observable group arrays.
+
+### dispose
+
+Disposes all observers created during construction and removes state added to base array
+items.
 
 ## ObservableMap
 
