@@ -1,8 +1,8 @@
 # 5.6.0
 
-* #245 Add [ObservableGroupMap](https://github.com/mobxjs/mobx-utils#observablegroupmap).
-* #250 Fix #249: lazyObservable: pending.set not wrapped in allowStateChanges.
-* #251 Fix fromStream initialValue not typed correctly. 
+* [#245](https://github.com/mobxjs/mobx-utils/pull/245) Add [ObservableGroupMap](https://github.com/mobxjs/mobx-utils#observablegroupmap).
+* [#250](https://github.com/mobxjs/mobx-utils/pull/250) Fix [#249](https://github.com/mobxjs/mobx-utils/issues/249): lazyObservable: pending.set not wrapped in allowStateChanges.
+* [#251](https://github.com/mobxjs/mobx-utils/pull/251) Fix fromStream initialValue not typed correctly. 
 
 # 5.5.7
 
