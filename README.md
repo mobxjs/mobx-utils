@@ -168,45 +168,41 @@ const fetchResult = fromPromise(fetch("http://someurl"))
 
 // combine with when..
 when(
-    () => fetchResult.state !== "pending",
-    () => {
-        console.log("Got ", fetchResult.value)
-    }
+  () => fetchResult.state !== "pending",
+  () => {
+    console.log("Got ", fetchResult.value)
+  }
 )
 
 // or a mobx-react component..
 const myComponent = observer(({ fetchResult }) => {
-    switch (fetchResult.state) {
-        case "pending":
-            return <div>Loading...</div>
-        case "rejected":
-            return <div>Ooops... {fetchResult.value}</div>
-        case "fulfilled":
-            return <div>Gotcha: {fetchResult.value}</div>
-    }
+  switch(fetchResult.state) {
+     case "pending": return <div>Loading...</div>
+     case "rejected": return <div>Ooops... {fetchResult.value}</div>
+     case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
+  }
 })
 
 // or using the case method instead of switch:
 
 const myComponent = observer(({ fetchResult }) =>
-    fetchResult.case({
-        pending: () => <div>Loading...</div>,
-        rejected: (error) => <div>Ooops.. {error}</div>,
-        fulfilled: (value) => <div>Gotcha: {value}</div>,
-    })
-)
+  fetchResult.case({
+    pending:   () => <div>Loading...</div>,
+    rejected:  error => <div>Ooops.. {error}</div>,
+    fulfilled: value => <div>Gotcha: {value}</div>,
+  }))
 
 // chain additional handler(s) to the resolve/reject:
 
-fetchResult
-    .then(
-        (result) => doSomeTransformation(result),
-        (rejectReason) => console.error("fetchResult was rejected, reason: " + rejectReason)
-    )
-    .then((transformedResult) => console.log("transformed fetchResult: " + transformedResult))
+fetchResult.then(
+  (result) =>  doSomeTransformation(result),
+  (rejectReason) => console.error('fetchResult was rejected, reason: ' + rejectReason)
+).then(
+  (transformedResult) => console.log('transformed fetchResult: ' + transformedResult)
+)
 ```
 
-Returns **IPromiseBasedObservable&lt;T>**
+Returns **IPromiseBasedObservable&lt;T>** 
 
 ## isPromiseBasedObservable
 
@@ -214,9 +210,9 @@ Returns true if the provided value is a promise-based observable.
 
 ### Parameters
 
--   `value` any
+-   `value`  any
 
-Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
 
 ## moveItem
 
@@ -224,19 +220,19 @@ Moves an item from one position to another, checking that the indexes given are 
 
 ### Parameters
 
--   `target` **ObservableArray&lt;T>**
--   `fromIndex` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**
--   `toIndex` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**
+-   `target` **ObservableArray&lt;T>** 
+-   `fromIndex` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
+-   `toIndex` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
 
 ### Examples
 
 ```javascript
 const source = observable([1, 2, 3])
 moveItem(source, 0, 1)
-console.log(source.map((x) => x)) // [2, 1, 3]
+console.log(source.map(x => x)) // [2, 1, 3]
 ```
 
-Returns **ObservableArray&lt;T>**
+Returns **ObservableArray&lt;T>** 
 
 ## lazyObservable
 
@@ -251,21 +247,21 @@ so make sure that you don't dereference to early.
 
 ### Parameters
 
--   `fetch`
+-   `fetch`  
 -   `initialValue` **T** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
 
 ### Examples
 
 ```javascript
-const userProfile = lazyObservable((sink) => fetch("/myprofile").then((profile) => sink(profile)))
+const userProfile = lazyObservable(
+  sink => fetch("/myprofile").then(profile => sink(profile))
+)
 
 // use the userProfile in a React component:
 const Profile = observer(({ userProfile }) =>
-    userProfile.current() === undefined ? (
-        <div>Loading user profile...</div>
-    ) : (
-        <div>{userProfile.current().displayName}</div>
-    )
+  userProfile.current() === undefined
+  ? <div>Loading user profile...</div>
+  : <div>{userProfile.current().displayName}</div>
 )
 
 // triggers refresh the userProfile
@@ -295,29 +291,29 @@ which comes from an imaginary database and notifies when it has changed.
 
 ### Parameters
 
--   `subscriber`
--   `unsubscriber` **IDisposer** (optional, default `NOOP`)
+-   `subscriber`  
+-   `unsubscriber` **IDisposer**  (optional, default `NOOP`)
 -   `initialValue` **T** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
 
 ### Examples
 
 ```javascript
 function createObservableUser(dbUserRecord) {
-    let currentSubscription
-    return fromResource(
-        (sink) => {
-            // sink the current state
-            sink(dbUserRecord.fields)
-            // subscribe to the record, invoke the sink callback whenever new data arrives
-            currentSubscription = dbUserRecord.onUpdated(() => {
-                sink(dbUserRecord.fields)
-            })
-        },
-        () => {
-            // the user observable is not in use at the moment, unsubscribe (for now)
-            dbUserRecord.unsubscribe(currentSubscription)
-        }
-    )
+  let currentSubscription;
+  return fromResource(
+    (sink) => {
+      // sink the current state
+      sink(dbUserRecord.fields)
+      // subscribe to the record, invoke the sink callback whenever new data arrives
+      currentSubscription = dbUserRecord.onUpdated(() => {
+        sink(dbUserRecord.fields)
+      })
+    },
+    () => {
+      // the user observable is not in use at the moment, unsubscribe (for now)
+      dbUserRecord.unsubscribe(currentSubscription)
+    }
+  )
 }
 
 // usage:
@@ -325,12 +321,14 @@ const myUserObservable = createObservableUser(myDatabaseConnector.query("name = 
 
 // use the observable in autorun
 autorun(() => {
-    // printed everytime the database updates its records
-    console.log(myUserObservable.current().displayName)
+  // printed everytime the database updates its records
+  console.log(myUserObservable.current().displayName)
 })
 
 // ... or a component
-const userComponent = observer(({ user }) => <div>{user.current().displayName}</div>)
+const userComponent = observer(({ user }) =>
+  <div>{user.current().displayName}</div>
+)
 ```
 
 ## toStream
@@ -341,23 +339,24 @@ emitting when new values become available. The expressions respect (trans)action
 
 ### Parameters
 
--   `expression`
+-   `expression`  
 -   `fireImmediately` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** (by default false)
 
 ### Examples
 
 ```javascript
 const user = observable({
-    firstName: "C.S",
-    lastName: "Lewis",
+  firstName: "C.S",
+  lastName: "Lewis"
 })
 
-Rx.Observable.from(mobxUtils.toStream(() => user.firstname + user.lastName))
-    .scan((nameChanges) => nameChanges + 1, 0)
-    .subscribe((nameChanges) => console.log("Changed name ", nameChanges, "times"))
+Rx.Observable
+  .from(mobxUtils.toStream(() => user.firstname + user.lastName))
+  .scan(nameChanges => nameChanges + 1, 0)
+  .subscribe(nameChanges => console.log("Changed name ", nameChanges, "times"))
 ```
 
-Returns **IObservableStream&lt;T>**
+Returns **IObservableStream&lt;T>** 
 
 ## StreamListener
 
@@ -369,17 +368,16 @@ Takes an initial value as second optional argument
 
 ### Parameters
 
--   `observable` **IObservableStream&lt;T>**
--   `initialValue`
+-   `observable` **IObservableStream&lt;T>** 
+-   `initialValue`  
 
 ### Examples
 
 ```javascript
-const debouncedClickDelta = MobxUtils.fromStream(
-    Rx.Observable.fromEvent(button, "click")
-        .throttleTime(1000)
-        .map((event) => event.clientX)
-        .scan((count, clientX) => count + clientX, 0)
+const debouncedClickDelta = MobxUtils.fromStream(Rx.Observable.fromEvent(button, 'click')
+    .throttleTime(1000)
+    .map(event => event.clientX)
+    .scan((count, clientX) => count + clientX, 0)
 )
 
 autorun(() => {
@@ -413,17 +411,17 @@ Note that if you read a non-dirty property, viewmodel only proxies the read to t
 
 ### Parameters
 
--   `model` **T**
+-   `model` **T** 
 
 ### Examples
 
 ```javascript
 class Todo {
-    @observable title = "Test"
+  @observable title = "Test"
 }
 
 const model = new Todo()
-const viewModel = createViewModel(model)
+const viewModel = createViewModel(model);
 
 autorun(() => console.log(viewModel.model.title, ",", viewModel.title))
 // prints "Test, Test"
@@ -445,8 +443,8 @@ Like normal `when`, except that this `when` will automatically dispose if the co
 
 ### Parameters
 
--   `expr`
--   `action`
+-   `expr`  
+-   `action`  
 -   `timeout` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount when spends waiting before giving up (optional, default `10000`)
 -   `onTimeout` **any** the ontimeout handler will be called if the condition wasn't met within the given time (optional, default `()=>{}`)
 
@@ -481,8 +479,8 @@ and lazily re-evaluates the expression if needed outside a reaction while not in
 
 ### Parameters
 
--   `_1`
--   `_2`
+-   `_1`  
+-   `_2`  
 -   `target` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an object that has a computed property, created by `@computed` or `extendObservable`
 -   `property` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the property to keep alive
 
@@ -490,10 +488,8 @@ and lazily re-evaluates the expression if needed outside a reaction while not in
 
 ```javascript
 const obj = observable({
-    number: 3,
-    doubler: function () {
-        return this.number * 2
-    },
+  number: 3,
+  doubler: function() { return this.number * 2 }
 })
 const stop = keepAlive(obj, "doubler")
 ```
@@ -504,8 +500,8 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ### Parameters
 
--   `_1`
--   `_2`
+-   `_1`  
+-   `_2`  
 -   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
 
 ### Examples
@@ -529,16 +525,16 @@ once for each item added to the observable array, optionally deboucing the actio
 ### Parameters
 
 -   `observableArray` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
--   `processor`
+-   `processor`  
 -   `debounce` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
 
 ### Examples
 
 ```javascript
 const pendingNotifications = observable([])
-const stop = queueProcessor(pendingNotifications, (msg) => {
-    // show Desktop notification
-    new Notification(msg)
+const stop = queueProcessor(pendingNotifications, msg => {
+  // show Desktop notification
+  new Notification(msg);
 })
 
 // usage:
@@ -558,7 +554,7 @@ chunks and/or single items into reasonable chunks of work.
 ### Parameters
 
 -   `observableArray` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
--   `processor`
+-   `processor`  
 -   `debounce` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
 -   `maxChunkSize` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optionally do not call on full array but smaller chunks. With 0 it will process the full array. (optional, default `0`)
 
@@ -566,14 +562,9 @@ chunks and/or single items into reasonable chunks of work.
 
 ```javascript
 const trackedActions = observable([])
-const stop = chunkProcessor(
-    trackedActions,
-    (chunkOfMax10Items) => {
-        sendTrackedActionsToServer(chunkOfMax10Items)
-    },
-    100,
-    10
-)
+const stop = chunkProcessor(trackedActions, chunkOfMax10Items => {
+  sendTrackedActionsToServer(chunkOfMax10Items);
+}, 100, 10)
 
 // usage:
 trackedActions.push("scrolled")
@@ -607,7 +598,7 @@ Countdown example: <https://jsfiddle.net/mweststrate/na0qdmkw/>
 const start = Date.now()
 
 autorun(() => {
-    console.log("Seconds elapsed: ", (mobxUtils.now() - start) / 1000)
+  console.log("Seconds elapsed: ", (mobxUtils.now() - start) / 1000)
 })
 ```
 
@@ -618,7 +609,7 @@ _deprecated_ this functionality can now be found as `flow` in the mobx package. 
 `asyncAction` takes a generator function and automatically wraps all parts of the process in actions. See the examples below.
 `asyncAction` can be used both as decorator or to wrap functions.
 
--   It is important that `asyncAction should always be used with a generator function (recognizable as`function\_`or`\_name\` syntax)
+-   It is important that `asyncAction should always be used with a generator function (recognizable as`function_`or`_name\` syntax)
 -   Each yield statement should return a Promise. The generator function will continue as soon as the promise settles, with the settled value
 -   When the generator function finishes, you can return a normal value. The `asyncAction` wrapped function will always produce a promise delivering that value.
 
@@ -634,29 +625,29 @@ The `yield` number indicates the progress of the generator. `init` indicates spa
 
 `asyncActions` requires `Promise` and `generators` to be available on the target environment. Polyfill `Promise` if needed. Both TypeScript and Babel can compile generator functions down to ES5.
 
-N.B. due to a [babel limitation](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy/issues/26), in Babel generatos cannot be combined with decorators. See also [#70](https://github.com/mobxjs/mobx-utils/issues/70)
+ N.B. due to a [babel limitation](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy/issues/26), in Babel generatos cannot be combined with decorators. See also [#70](https://github.com/mobxjs/mobx-utils/issues/70)
 
 ### Parameters
 
--   `arg1`
--   `arg2`
+-   `arg1`  
+-   `arg2`  
 
 ### Examples
 
 ```javascript
-import { asyncAction } from "mobx-utils"
+import {asyncAction} from "mobx-utils"
 
 let users = []
 
 const fetchUsers = asyncAction("fetchUsers", function* (url) {
-    const start = Date.now()
-    const data = yield window.fetch(url)
-    users = yield data.json()
-    return start - Date.now()
+  const start = Date.now()
+  const data = yield window.fetch(url)
+  users = yield data.json()
+  return start - Date.now()
 })
 
-fetchUsers("http://users.com").then((time) => {
-    console.dir("Got users", users, "in ", time, "ms")
+fetchUsers("http://users.com").then(time => {
+  console.dir("Got users", users, "in ", time, "ms")
 })
 ```
 
@@ -686,7 +677,7 @@ class Store {
 }
 ```
 
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)**
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
 
 ## whenAsync
 
@@ -696,7 +687,7 @@ Like normal `when`, except that this `when` will return a promise that resolves 
 
 ### Parameters
 
--   `fn`
+-   `fn`  
 -   `timeout` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount of time to wait, before the promise rejects
 
 ### Examples
@@ -717,16 +708,16 @@ instead it will only rerenders when the current todo is (de)selected.
 
 ### Parameters
 
--   `expr`
+-   `expr`  
 
 ### Examples
 
 ```javascript
 const Todo = observer((props) => {
-    const todo = props.todo
-    const isSelected = mobxUtils.expr(() => props.viewState.selection === todo)
+    const todo = props.todo;
+    const isSelected = mobxUtils.expr(() => props.viewState.selection === todo);
     return <div className={isSelected ? "todo todo-selected" : "todo"}>{todo.title}</div>
-})
+});
 ```
 
 ## deepObserve
@@ -745,14 +736,14 @@ deepObserve cannot be used on computed values.
 
 ### Parameters
 
--   `target`
--   `listener`
+-   `target`  
+-   `listener`  
 
 ### Examples
 
 ```javascript
 const disposer = deepObserve(target, (change, path) => {
-    console.dir(change)
+   console.dir(change)
 })
 ```
 
@@ -778,7 +769,9 @@ const slices = observable([
     { day: "tu", hours: 2 },
 ])
 const slicesByDay = new ObservableGroupMap(slices, (slice) => slice.day)
-autorun(() => console.log(slicesByDay.get("mo")?.length ?? 0, slicesByDay.get("we"))) // outputs 1, undefined
+autorun(() => console.log(
+    slicesByDay.get("mo")?.length ?? 0,
+    slicesByDay.get("we"))) // outputs 1, undefined
 slices[0].day = "we" // outputs 0, [{ day: "we", hours: 12 }]
 ```
 
@@ -794,12 +787,12 @@ Create a new ObservableGroupMap. This immediately observes all members of the ar
 
 ### Parameters
 
--   `base` The array to sort into groups.
--   `groupBy` The function used for grouping.
--   `_a`
--   `options` Object with properties:
-    `name`: Debug name of this ObservableGroupMap.
-    `keyToName`: Function to create the debug names of the observable group arrays.
+-   `base`  The array to sort into groups.
+-   `groupBy`  The function used for grouping.
+-   `_a`  
+-   `options`  Object with properties:
+     `name`: Debug name of this ObservableGroupMap.
+     `keyToName`: Function to create the debug names of the observable group arrays.
 
 ### dispose
 
@@ -827,24 +820,24 @@ Note that this might introduce memory leaks!
 
 ### Parameters
 
--   `fn`
--   `keepAliveOrOptions`
+-   `fn`  
+-   `keepAliveOrOptions`  
 
 ### Examples
 
 ```javascript
 const store = observable({
-    a: 1,
-    b: 2,
-    c: 3,
-    m: computedFn(function (x) {
-        return this.a * this.b * x
-    }),
+a: 1,
+b: 2,
+c: 3,
+m: computedFn(function(x) {
+return this.a * this.b * x
+})
 })
 
 const d = autorun(() => {
-    // store.m(3) will be cached as long as this autorun is running
-    console.log(store.m(3) * store.c)
+// store.m(3) will be cached as long as this autorun is running
+console.log((store.m(3) * store.c))
 })
 ```
 
@@ -873,23 +866,23 @@ The `step` number indicates the code block that is now being executed.
 
 ### Parameters
 
--   `arg1`
--   `arg2`
--   `arg3`
+-   `arg1`  
+-   `arg2`  
+-   `arg3`  
 
 ### Examples
 
 ```javascript
-import { actionAsync, task } from "mobx-utils"
+import {actionAsync, task} from "mobx-utils"
 
 let users = []
 
 const fetchUsers = actionAsync("fetchUsers", async (url) => {
-    const start = Date.now()
-    // note the use of task when awaiting!
-    const data = await task(window.fetch(url))
-    users = await task(data.json())
-    return start - Date.now()
+  const start = Date.now()
+  // note the use of task when awaiting!
+  const data = await task(window.fetch(url))
+  users = await task(data.json())
+  return start - Date.now()
 })
 
 const time = await fetchUsers("http://users.com")
