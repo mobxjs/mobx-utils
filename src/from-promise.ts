@@ -1,5 +1,5 @@
-import { IObservableValue, action, extendObservable } from "mobx"
-import { IDENTITY, invariant } from "./utils"
+import { action, extendObservable } from "mobx"
+import { invariant } from "./utils"
 
 export type PromiseState = "pending" | "fulfilled" | "rejected"
 
