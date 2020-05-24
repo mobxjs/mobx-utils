@@ -47,7 +47,7 @@ interface GroupItemInfo {
  *     slicesByDay.get("we"))) // outputs 1, undefined
  * slices[0].day = "we" // outputs 0, [{ day: "we", hours: 12 }]
  */
-export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<T & GroupItem>> {
+export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<T>> {
     /**
      * Base observable array which is being sorted into groups.
      */
@@ -134,11 +134,6 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         throw new Error("not supported")
     }
 
-    public get(key: G): IObservableArray<T> | undefined {
-        // override get to return IObservableArray<T> instead of IObservableArray<T & GroupItem>
-        return super.get(key)
-    }
-
     /**
      * Disposes all observers created during construction and removes state added to base array
      * items.
@@ -164,7 +159,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
     }
 
     private _removeFromGroupArr(key: G, itemIndex: number) {
-        const arr = super.get(key)!
+        const arr: IObservableArray<T & GroupItem> = super.get(key)!
         if (1 === arr.length) {
             super.delete(key)
         } else if (itemIndex === arr.length - 1) {
