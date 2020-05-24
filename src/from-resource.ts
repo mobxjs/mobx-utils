@@ -73,9 +73,18 @@ export interface IResource<T> {
  */
 export function fromResource<T>(
     subscriber: (sink: (newValue: T) => void) => void,
+    unsubscriber?: IDisposer
+): IResource<T | undefined>
+export function fromResource<T>(
+    subscriber: (sink: (newValue: T) => void) => void,
+    unsubscriber: IDisposer | undefined,
+    initialValue: T
+): IResource<T>
+export function fromResource<T>(
+    subscriber: (sink: (newValue: T) => void) => void,
     unsubscriber: IDisposer = NOOP,
-    initialValue: T = undefined
-): IResource<T> {
+    initialValue: T | undefined = undefined
+): IResource<T | undefined> {
     let isActive = false
     let isDisposed = false
     let value = initialValue

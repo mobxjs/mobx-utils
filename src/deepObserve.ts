@@ -17,10 +17,11 @@ type IChange = IObjectDidChange | IArrayChange | IArraySplice | IMapDidChange
 type Entry = {
     dispose: IDisposer
     path: string
-    parent?: Entry
+    parent: Entry | undefined
 }
 
-function buildPath(entry: Entry): string {
+function buildPath(entry: Entry | undefined): string {
+    if (!entry) return "ROOT"
     const res: string[] = []
     while (entry.parent) {
         res.push(entry.path)
@@ -58,7 +59,7 @@ export function deepObserve<T = any>(
     const entrySet = new WeakMap<any, Entry>()
 
     function genericListener(change: IChange) {
-        const entry = entrySet.get(change.object)
+        const entry = entrySet.get(change.object)!
         processChange(change, entry)
         listener(change, buildPath(entry), target)
     }
@@ -98,20 +99,18 @@ export function deepObserve<T = any>(
         }
     }
 
-    function observeRecursively(thing: any, parent: Entry, path: string) {
+    function observeRecursively(thing: any, parent: Entry | undefined, path: string) {
         if (isRecursivelyObservable(thing)) {
-            if (entrySet.has(thing)) {
-                const entry = entrySet.get(thing)
+            const entry = entrySet.get(thing)
+            if (entry) {
                 if (entry.parent !== parent || entry.path !== path)
                     // MWE: this constraint is artificial, and this tool could be made to work with cycles,
                     // but it increases administration complexity, has tricky edge cases and the meaning of 'path'
                     // would become less clear. So doesn't seem to be needed for now
                     throw new Error(
-                        `The same observable object cannot appear twice in the same tree, trying to assign it to '${buildPath(
-                            parent
-                        )}/${path}', but it already exists at '${buildPath(entry.parent)}/${
-                            entry.path
-                        }'`
+                        `The same observable object cannot appear twice in the same tree,` +
+                            ` trying to assign it to '${buildPath(parent)}/${path}',` +
+                            ` but it already exists at '${buildPath(entry.parent)}/${entry.path}'`
                     )
             } else {
                 const entry = {

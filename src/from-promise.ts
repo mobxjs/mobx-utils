@@ -13,10 +13,10 @@ type CaseHandlers<U, T> = {
     rejected?: (e: any) => U
 }
 
-export type IBasePromiseBasedObservable<T> = {
+export interface IBasePromiseBasedObservable<T> extends PromiseLike<T> {
     isPromiseBasedObservable: true
     case<U>(handlers: CaseHandlers<U, T>, defaultFulfilled?: boolean): U
-} & PromiseLike<T>
+}
 
 export type IPendingPromise = {
     readonly state: "pending"
@@ -36,7 +36,10 @@ export type IRejectedPromise = {
 export type IPromiseBasedObservable<T> = IBasePromiseBasedObservable<T> &
     (IPendingPromise | IFulfilledPromise<T> | IRejectedPromise)
 
-function caseImpl<U, T>(handlers: CaseHandlers<U, T>): U {
+function caseImpl<U, T>(
+    this: IPromiseBasedObservable<T>,
+    handlers: CaseHandlers<U, T>
+): U | T | undefined {
     switch (this.state) {
         case PENDING:
             return handlers.pending && handlers.pending(this.value)
@@ -45,50 +48,6 @@ function caseImpl<U, T>(handlers: CaseHandlers<U, T>): U {
         case FULFILLED:
             return handlers.fulfilled ? handlers.fulfilled(this.value) : this.value
     }
-}
-
-function createObservablePromise(origPromise: any, oldPromise?: any) {
-    invariant(arguments.length <= 2, "fromPromise expects up to two arguments")
-    invariant(
-        typeof origPromise === "function" ||
-            (typeof origPromise === "object" &&
-                origPromise &&
-                typeof origPromise.then === "function"),
-        "Please pass a promise or function to fromPromise"
-    )
-    if (origPromise.isPromiseBasedObservable === true) return origPromise
-
-    if (typeof origPromise === "function") {
-        // If it is a (reject, resolve function, wrap it)
-        origPromise = new Promise(origPromise as any)
-    }
-
-    const promise = origPromise as any
-    origPromise.then(
-        action("observableFromPromise-resolve", (value: any) => {
-            promise.value = value
-            promise.state = FULFILLED
-        }),
-        action("observableFromPromise-reject", (reason: any) => {
-            promise.value = reason
-            promise.state = REJECTED
-        })
-    )
-
-    promise.isPromiseBasedObservable = true
-    promise.case = caseImpl
-    const oldData = oldPromise && oldPromise.state === FULFILLED ? oldPromise.value : undefined
-    extendObservable(
-        promise,
-        {
-            value: oldData,
-            state: PENDING,
-        },
-        {},
-        { deep: false }
-    )
-
-    return promise
 }
 
 /**
@@ -189,25 +148,80 @@ function createObservablePromise(origPromise: any, oldPromise?: any) {
  * @param {IThenable<T>} oldPromise? The previously observed promise
  * @returns {IPromiseBasedObservable<T>}
  */
-export const fromPromise: {
-    <T>(promise: PromiseLike<T>, oldPromise?: PromiseLike<T>): IPromiseBasedObservable<T>
-    reject<T>(reason: any): IRejectedPromise & IBasePromiseBasedObservable<T>
-    resolve<T>(value?: T): IFulfilledPromise<T> & IBasePromiseBasedObservable<T>
-} = createObservablePromise as any
+export function fromPromise<T>(
+    origPromise: PromiseLike<T>,
+    oldPromise?: PromiseLike<T>
+): IPromiseBasedObservable<T> {
+    invariant(arguments.length <= 2, "fromPromise expects up to two arguments")
+    invariant(
+        typeof origPromise === "function" ||
+            (typeof origPromise === "object" &&
+                origPromise &&
+                typeof origPromise.then === "function"),
+        "Please pass a promise or function to fromPromise"
+    )
+    if ((origPromise as any).isPromiseBasedObservable === true) return origPromise as any
 
-fromPromise.reject = action("fromPromise.reject", function (reason: any) {
-    const p: any = fromPromise(Promise.reject(reason))
-    p.state = REJECTED
-    p.value = reason
-    return p
-}) as any
+    if (typeof origPromise === "function") {
+        // If it is a (reject, resolve function, wrap it)
+        origPromise = new Promise(origPromise as any)
+    }
 
-fromPromise.resolve = action("fromPromise.resolve", function (value: any = undefined) {
-    const p: any = fromPromise(Promise.resolve(value))
-    p.state = FULFILLED
-    p.value = value
-    return p
-}) as any
+    const promise = origPromise as any
+    origPromise.then(
+        action("observableFromPromise-resolve", (value: any) => {
+            promise.value = value
+            promise.state = FULFILLED
+        }),
+        action("observableFromPromise-reject", (reason: any) => {
+            promise.value = reason
+            promise.state = REJECTED
+        })
+    )
+
+    promise.isPromiseBasedObservable = true
+    promise.case = caseImpl
+    const oldData =
+        oldPromise && (oldPromise as any).state === FULFILLED
+            ? (oldPromise as any).value
+            : undefined
+    extendObservable(
+        promise,
+        {
+            value: oldData,
+            state: PENDING,
+        },
+        {},
+        { deep: false }
+    )
+
+    return promise
+}
+export namespace fromPromise {
+    export const reject = action("fromPromise.reject", function <T>(
+        reason: any
+    ): IRejectedPromise & IBasePromiseBasedObservable<T> {
+        const p: any = fromPromise(Promise.reject(reason))
+        p.state = REJECTED
+        p.value = reason
+        return p
+    })
+
+    function resolveBase<T>(
+        value?: T
+    ): IFulfilledPromise<T | undefined> & IBasePromiseBasedObservable<T>
+    function resolveBase<T>(value: T): IFulfilledPromise<T> & IBasePromiseBasedObservable<T>
+    function resolveBase<T>(
+        value: T | undefined = undefined
+    ): IFulfilledPromise<T | undefined> & IBasePromiseBasedObservable<T | undefined> {
+        const p: any = fromPromise(Promise.resolve(value))
+        p.state = FULFILLED
+        p.value = value
+        return p
+    }
+
+    export const resolve = action("fromPromise.resolve", resolveBase)
+}
 
 /**
  * Returns true if the provided value is a promise-based observable.

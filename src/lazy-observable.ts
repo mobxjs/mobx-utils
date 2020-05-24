@@ -39,16 +39,23 @@ export interface ILazyObservable<T> {
  *     current(): T,
  *     refresh(): T,
  *     reset(): T
- *     pendind: boolean
+ *     pending: boolean
  * }}
  */
 
 export function lazyObservable<T>(
+    fetch: (sink: (newValue: T) => void) => void
+): ILazyObservable<T | undefined>
+export function lazyObservable<T>(
     fetch: (sink: (newValue: T) => void) => void,
-    initialValue: T = undefined
-): ILazyObservable<T> {
+    initialValue: T
+): ILazyObservable<T>
+export function lazyObservable<T>(
+    fetch: (sink: (newValue: T) => void) => void,
+    initialValue: T | undefined = undefined
+): ILazyObservable<T | undefined> {
     let started = false
-    const value = observable.box(initialValue, { deep: false })
+    const value = observable.box<T | undefined>(initialValue, { deep: false })
     const pending = observable.box(false)
     let currentFnc = () => {
         if (!started) {
