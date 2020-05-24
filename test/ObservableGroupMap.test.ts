@@ -66,4 +66,21 @@ describe("ObservableGroupMap", () => {
         })
         done()
     })
+
+    it("works correctly with example from #255", (done) => {
+        const data = observable([
+            { id: 1, a: "x" },
+            { id: 2, a: "x" },
+            { id: 3, a: "x" },
+            { id: 4, a: "x" },
+        ])
+
+        const ogm = new ObservableGroupMap(data, (e) => e.a)
+
+        data.replace([{ id: 5, a: "x" }])
+        assert.deepEqual(json(ogm), {
+            x: [{ id: 5, a: "x" }],
+        })
+        done()
+    })
 })
