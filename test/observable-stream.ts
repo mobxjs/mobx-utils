@@ -61,7 +61,7 @@ test("to observable - should not push the initial value", () => {
 
 test("from observable", (done) => {
     mobx.configure({ enforceActions: "observed" })
-    const fromStream = utils.fromStream(interval(10), -1)
+    const fromStream = utils.fromStream(interval(20), -1)
     const values: number[] = []
     const d = mobx.autorun(() => {
         values.push(fromStream.current)
@@ -69,32 +69,32 @@ test("from observable", (done) => {
 
     setTimeout(() => {
         expect(fromStream.current).toBe(-1)
-    }, 5)
+    }, 10)
     setTimeout(() => {
         expect(fromStream.current).toBe(0)
-    }, 15)
+    }, 30)
     setTimeout(() => {
         expect(fromStream.current).toBe(1)
         fromStream.dispose()
-    }, 25)
+    }, 50)
     setTimeout(() => {
         expect(fromStream.current).toBe(1)
         expect(values).toEqual([-1, 0, 1])
         d()
         mobx.configure({ enforceActions: "never" })
         done()
-    }, 35)
+    }, 70)
 })
 
 test("from observable with initialValue of a different type", async () => {
     mobx.configure({ enforceActions: "observed" })
     const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-    const fromStream = utils.fromStream(interval(10), "start")
+    const fromStream = utils.fromStream(interval(20), "start")
     const values: (number | string)[] = []
     const stopAutorun = mobx.autorun(() => values.push(fromStream.current))
 
-    await sleep(35)
+    await sleep(70)
     expect(fromStream.current).toBe(2)
     expect(values).toEqual(["start", 0, 1, 2])
     fromStream.dispose()
