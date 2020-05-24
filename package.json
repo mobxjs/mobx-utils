@@ -86,10 +86,7 @@
     ]
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.{ts,tsx,js,jsx}": "prettier --write"
   },
   "husky": {
     "hooks": {
