@@ -33,65 +33,57 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 -   [moveItem](#moveitem)
     -   [Parameters](#parameters-2)
     -   [Examples](#examples-1)
--   [lazyObservable](#lazyobservable)
+-   [toStream](#tostream)
     -   [Parameters](#parameters-3)
     -   [Examples](#examples-2)
--   [fromResource](#fromresource)
-    -   [Parameters](#parameters-4)
-    -   [Examples](#examples-3)
--   [toStream](#tostream)
-    -   [Parameters](#parameters-5)
-    -   [Examples](#examples-4)
 -   [StreamListener](#streamlistener)
 -   [ViewModel](#viewmodel)
 -   [createViewModel](#createviewmodel)
+    -   [Parameters](#parameters-4)
+    -   [Examples](#examples-3)
+-   [whenWithTimeout](#whenwithtimeout)
+    -   [Parameters](#parameters-5)
+    -   [Examples](#examples-4)
+-   [keepAlive](#keepalive)
     -   [Parameters](#parameters-6)
     -   [Examples](#examples-5)
--   [whenWithTimeout](#whenwithtimeout)
+-   [keepAlive](#keepalive-1)
     -   [Parameters](#parameters-7)
     -   [Examples](#examples-6)
--   [keepAlive](#keepalive)
+-   [queueProcessor](#queueprocessor)
     -   [Parameters](#parameters-8)
     -   [Examples](#examples-7)
--   [keepAlive](#keepalive-1)
+-   [chunkProcessor](#chunkprocessor)
     -   [Parameters](#parameters-9)
     -   [Examples](#examples-8)
--   [queueProcessor](#queueprocessor)
+-   [now](#now)
     -   [Parameters](#parameters-10)
     -   [Examples](#examples-9)
--   [chunkProcessor](#chunkprocessor)
+-   [asyncAction](#asyncaction)
     -   [Parameters](#parameters-11)
     -   [Examples](#examples-10)
--   [now](#now)
+-   [whenAsync](#whenasync)
     -   [Parameters](#parameters-12)
     -   [Examples](#examples-11)
--   [asyncAction](#asyncaction)
+-   [expr](#expr)
     -   [Parameters](#parameters-13)
     -   [Examples](#examples-12)
--   [whenAsync](#whenasync)
+-   [deepObserve](#deepobserve)
     -   [Parameters](#parameters-14)
     -   [Examples](#examples-13)
--   [expr](#expr)
+-   [ObservableGroupMap](#observablegroupmap)
     -   [Parameters](#parameters-15)
     -   [Examples](#examples-14)
--   [deepObserve](#deepobserve)
+    -   [dispose](#dispose)
+-   [ObservableMap](#observablemap)
+-   [computedFn](#computedfn)
     -   [Parameters](#parameters-16)
     -   [Examples](#examples-15)
--   [ObservableMap](#observablemap)
--   [ObservableGroupMap](#observablegroupmap)
-    -   [Examples](#examples-16)
-    -   [dispose](#dispose)
--   [ObservableGroupMap](#observablegroupmap-1)
-    -   [Parameters](#parameters-17)
-    -   [dispose](#dispose-1)
--   [computedFn](#computedfn)
-    -   [Parameters](#parameters-18)
-    -   [Examples](#examples-17)
 -   [DeepMapEntry](#deepmapentry)
 -   [DeepMap](#deepmap)
 -   [actionAsync](#actionasync)
-    -   [Parameters](#parameters-19)
-    -   [Examples](#examples-18)
+    -   [Parameters](#parameters-17)
+    -   [Examples](#examples-16)
 
 ## fromPromise
 
@@ -117,8 +109,9 @@ This is useful to replace one promise based observable with another, without goi
 
 ### Parameters
 
--   `promise` **IThenable&lt;T>** The promise which will be observed
+-   `origPromise`  
 -   `oldPromise` **IThenable&lt;T>** ? The previously observed promise
+-   `promise` **IThenable&lt;T>** The promise which will be observed
 
 ### Examples
 
@@ -230,103 +223,6 @@ console.log(source.map(x => x)) // [2, 1, 3]
 ```
 
 Returns **ObservableArray&lt;T>** 
-
-## lazyObservable
-
-`lazyObservable` creates an observable around a `fetch` method that will not be invoked
-until the observable is needed the first time.
-The fetch method receives a `sink` callback which can be used to replace the
-current value of the lazyObservable. It is allowed to call `sink` multiple times
-to keep the lazyObservable up to date with some external resource.
-
-Note that it is the `current()` call itself which is being tracked by MobX,
-so make sure that you don't dereference to early.
-
-### Parameters
-
--   `fetch`  
--   `initialValue` **T** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
-
-### Examples
-
-```javascript
-const userProfile = lazyObservable(
-  sink => fetch("/myprofile").then(profile => sink(profile))
-)
-
-// use the userProfile in a React component:
-const Profile = observer(({ userProfile }) =>
-  userProfile.current() === undefined
-  ? <div>Loading user profile...</div>
-  : <div>{userProfile.current().displayName}</div>
-)
-
-// triggers refresh the userProfile
-userProfile.refresh()
-```
-
-## fromResource
-
-`fromResource` creates an observable whose current state can be inspected using `.current()`,
-and which can be kept in sync with some external datasource that can be subscribed to.
-
-The created observable will only subscribe to the datasource if it is in use somewhere,
-(un)subscribing when needed. To enable `fromResource` to do that two callbacks need to be provided,
-one to subscribe, and one to unsubscribe. The subscribe callback itself will receive a `sink` callback, which can be used
-to update the current state of the observable, allowing observes to react.
-
-Whatever is passed to `sink` will be returned by `current()`. The values passed to the sink will not be converted to
-observables automatically, but feel free to do so.
-It is the `current()` call itself which is being tracked,
-so make sure that you don't dereference to early.
-
-For inspiration, an example integration with the apollo-client on [github](https://github.com/apollostack/apollo-client/issues/503#issuecomment-241101379),
-or the [implementation](https://github.com/mobxjs/mobx-utils/blob/1d17cf7f7f5200937f68cc0b5e7ec7f3f71dccba/src/now.ts#L43-L57) of `mobxUtils.now`
-
-The following example code creates an observable that connects to a `dbUserRecord`,
-which comes from an imaginary database and notifies when it has changed.
-
-### Parameters
-
--   `subscriber`  
--   `unsubscriber` **IDisposer**  (optional, default `NOOP`)
--   `initialValue` **T** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
-
-### Examples
-
-```javascript
-function createObservableUser(dbUserRecord) {
-  let currentSubscription;
-  return fromResource(
-    (sink) => {
-      // sink the current state
-      sink(dbUserRecord.fields)
-      // subscribe to the record, invoke the sink callback whenever new data arrives
-      currentSubscription = dbUserRecord.onUpdated(() => {
-        sink(dbUserRecord.fields)
-      })
-    },
-    () => {
-      // the user observable is not in use at the moment, unsubscribe (for now)
-      dbUserRecord.unsubscribe(currentSubscription)
-    }
-  )
-}
-
-// usage:
-const myUserObservable = createObservableUser(myDatabaseConnector.query("name = 'Michel'"))
-
-// use the observable in autorun
-autorun(() => {
-  // printed everytime the database updates its records
-  console.log(myUserObservable.current().displayName)
-})
-
-// ... or a component
-const userComponent = observer(({ user }) =>
-  <div>{user.current().displayName}</div>
-)
-```
 
 ## toStream
 
@@ -445,27 +341,6 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-### Parameters
-
--   `_1`  
--   `_2`  
--   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
-
-### Examples
-
-```javascript
-const number = observable(3)
-const doubler = computed(() => number.get() * 2)
-const stop = keepAlive(doubler)
-// doubler will now stay in sync reactively even when there are no further observers
-stop()
-// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
-```
-
-Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
-
-## keepAlive
-
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
 `keepAlive` marks a computed value as always in use, meaning that it will always fresh, but never disposed automatically.
@@ -485,6 +360,27 @@ const obj = observable({
   doubler: function() { return this.number * 2 }
 })
 const stop = keepAlive(obj, "doubler")
+```
+
+Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
+
+## keepAlive
+
+### Parameters
+
+-   `_1`  
+-   `_2`  
+-   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
+
+### Examples
+
+```javascript
+const number = observable(3)
+const doubler = computed(() => number.get() * 2)
+const stop = keepAlive(doubler)
+// doubler will now stay in sync reactively even when there are no further observers
+stop()
+// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
 ```
 
 Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
@@ -719,8 +615,6 @@ const disposer = deepObserve(target, (change, path) => {
 })
 ```
 
-## ObservableMap
-
 ## ObservableGroupMap
 
 Reactively sorts a base observable array into multiple observable arrays based on the value of a
@@ -728,12 +622,20 @@ Reactively sorts a base observable array into multiple observable arrays based o
 
 This observes the individual computed groupBy values and only updates the source and dest arrays
 when there is an actual change, so this is far more efficient than, for example
-`base.filter(i => groupBy(i) === 'we')`.
+`base.filter(i => groupBy(i) === 'we')`. Call #dispose() to stop tracking.
 
 No guarantees are made about the order of items in the grouped arrays.
 
 The resulting map of arrays is read-only. clear(), set(), delete() are not supported and
 modifying the group arrays will lead to undefined behavior.
+
+### Parameters
+
+-   `base` **[array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** The array to sort into groups.
+-   `groupBy` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** The function used for grouping.
+-   `options`  Object with properties:
+     `name`: Debug name of this ObservableGroupMap.
+     `keyToName`: Function to create the debug names of the observable group arrays.
 
 ### Examples
 
@@ -754,32 +656,15 @@ slices[0].day = "we" // outputs 0, [{ day: "we", hours: 12 }]
 Disposes all observers created during construction and removes state added to base array
 items.
 
-## ObservableGroupMap
-
-Create a new ObservableGroupMap. This immediately observes all members of the array. Call
-\#dispose() to stop tracking.
-
-### Parameters
-
--   `base`  The array to sort into groups.
--   `groupBy`  The function used for grouping.
--   `_a`  
--   `options`  Object with properties:
-     `name`: Debug name of this ObservableGroupMap.
-     `keyToName`: Function to create the debug names of the observable group arrays.
-
-### dispose
-
-Disposes all observers created during construction and removes state added to base array
-items.
+## ObservableMap
 
 ## computedFn
 
-computedFn takes a function with an arbitrarily amount of arguments,
-and memoized the output of the function based on the arguments passed in.
+computedFn takes a function with an arbitrary amount of arguments,
+and memoizes the output of the function based on the arguments passed in.
 
 computedFn(fn) returns a function with the very same signature. There is no limit on the amount of arguments
-that is accepted. However, the amount of arguments must be consistent and default arguments are not supported.
+that is accepted. However, the amount of arguments must be constant and default arguments are not supported.
 
 By default the output of a function call will only be memoized as long as the
 output is being observed.
@@ -809,7 +694,7 @@ return this.a * this.b * x
 
 const d = autorun(() => {
 // store.m(3) will be cached as long as this autorun is running
-console.log((store.m(3) * store.c))
+console.log(store.m(3) * store.c)
 })
 ```
 
