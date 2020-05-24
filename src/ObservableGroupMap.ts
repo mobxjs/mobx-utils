@@ -9,7 +9,15 @@ import {
     Lambda,
 } from "mobx"
 
-interface GrouperItemInfo {
+// ObservableGroupMaps actually each use their own symbol, so that an item can be tracked by
+// multiple OGMs. We declare this here so we can type the arrays properly.
+declare const OGM_INFO_KEY: unique symbol
+
+interface GroupItem {
+    [OGM_INFO_KEY]?: GroupItemInfo
+}
+
+interface GroupItemInfo {
     groupByValue: any
     reaction: IReactionDisposer
     groupArrIndex: number
@@ -39,17 +47,17 @@ interface GrouperItemInfo {
  *     slicesByDay.get("we"))) // outputs 1, undefined
  * slices[0].day = "we" // outputs 0, [{ day: "we", hours: 12 }]
  */
-export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<T>> {
+export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<T & GroupItem>> {
     /**
      * Base observable array which is being sorted into groups.
      */
-    private readonly _base: IObservableArray<T>
+    private readonly _base: IObservableArray<T & GroupItem>
 
     /**
      * The ObservableGroupMap needs to track some state per-item. This is the name/symbol of the
      * property used to attach the state.
      */
-    private readonly _ogmInfoKey: string
+    private readonly _ogmInfoKey: typeof OGM_INFO_KEY
 
     /**
      * The function used to group the items.
@@ -84,17 +92,16 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         super()
         this._keyToName = keyToName
         this._groupBy = groupBy
-        this._ogmInfoKey =
-            "function" == typeof Symbol
-                ? ((Symbol("ogmInfo" + name) as unknown) as string)
-                : "__ogmInfo" + name
+        this._ogmInfoKey = ("function" == typeof Symbol
+            ? Symbol("ogmInfo" + name)
+            : "__ogmInfo" + name) as any
         this._base = base
 
         for (let i = 0; i < base.length; i++) {
             this._addItem(base[i])
         }
 
-        this._disposeBaseObserver = observe(base, (change) => {
+        this._disposeBaseObserver = observe(this._base, (change) => {
             if ("splice" === change.type) {
                 transaction(() => {
                     for (const removed of change.removed) {
@@ -127,6 +134,11 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         throw new Error("not supported")
     }
 
+    public get(key: G): IObservableArray<T> | undefined {
+        // override get to return IObservableArray<T> instead of IObservableArray<T & GroupItem>
+        return super.get(key)
+    }
+
     /**
      * Disposes all observers created during construction and removes state added to base array
      * items.
@@ -135,10 +147,10 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         this._disposeBaseObserver()
         for (let i = 0; i < this._base.length; i++) {
             const item = this._base[i]
-            const grouperItemInfo: GrouperItemInfo = (item as any)[this._ogmInfoKey]
+            const grouperItemInfo: GroupItemInfo = item[this._ogmInfoKey]
             grouperItemInfo.reaction()
 
-            delete (item as any)[this._ogmInfoKey]
+            delete item[this._ogmInfoKey]
         }
     }
 
@@ -152,7 +164,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
     }
 
     private _removeFromGroupArr(key: G, itemIndex: number) {
-        const arr = this.get(key)!
+        const arr = super.get(key)!
         if (1 === arr.length) {
             super.delete(key)
         } else if (itemIndex === arr.length - 1) {
@@ -160,32 +172,32 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
             arr.length--
         } else {
             arr[itemIndex] = arr[arr.length - 1]
-            ;(arr[itemIndex] as any)[this._ogmInfoKey].grouperArrIndex = itemIndex
+            arr[itemIndex][this._ogmInfoKey].groupArrIndex = itemIndex
             arr.length--
         }
     }
 
-    private _addItem(item: any) {
+    private _addItem(item: T & GroupItem) {
         const groupByValue = this._groupBy(item)
         const groupArr = this._getGroupArr(groupByValue)
-        const value: GrouperItemInfo = {
+        const value: GroupItemInfo = {
             groupByValue: groupByValue,
             groupArrIndex: groupArr.length,
             reaction: reaction(
                 () => this._groupBy(item),
                 (newGroupByValue, _r) => {
                     console.log("new group by value ", newGroupByValue)
-                    const grouperItemInfo = (item as any)[this._ogmInfoKey]
+                    const grouperItemInfo = item[this._ogmInfoKey]!
                     this._removeFromGroupArr(
                         grouperItemInfo.groupByValue,
-                        grouperItemInfo.grouperArrIndex
+                        grouperItemInfo.groupArrIndex
                     )
 
                     const newGroupArr = this._getGroupArr(newGroupByValue)
-                    const newGrouperArrIndex = newGroupArr.length
+                    const newGroupArrIndex = newGroupArr.length
                     newGroupArr.push(item)
                     grouperItemInfo.groupByValue = newGroupByValue
-                    grouperItemInfo.grouperArrIndex = newGrouperArrIndex
+                    grouperItemInfo.groupArrIndex = newGroupArrIndex
                 }
             ),
         }
@@ -197,11 +209,11 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         groupArr.push(item)
     }
 
-    private _removeItem(item: any) {
-        const grouperItemInfo: GrouperItemInfo = (item as any)[this._ogmInfoKey]
+    private _removeItem(item: GroupItem) {
+        const grouperItemInfo = item[this._ogmInfoKey]
         this._removeFromGroupArr(grouperItemInfo.groupByValue, grouperItemInfo.groupArrIndex)
         grouperItemInfo.reaction()
 
-        delete (item as any)[this._ogmInfoKey]
+        delete item[this._ogmInfoKey]
     }
 }
