@@ -75,7 +75,7 @@ export class DeepMapEntry<T> {
 export class DeepMap<T> {
     private store = new Map<any, any>()
     private argsLength = -1
-    private last: DeepMapEntry<T>
+    private last: DeepMapEntry<T> | undefined
 
     entry(args: any[]): DeepMapEntry<T> {
         if (this.argsLength === -1) this.argsLength = args.length

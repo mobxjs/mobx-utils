@@ -65,7 +65,7 @@ export class ViewModel<T> implements IViewModel<T> {
                 ...additionalDescriptor,
                 configurable: true,
                 get: () => {
-                    if (isComputedProp(model, key)) return this.localComputedValues.get(key).get()
+                    if (isComputedProp(model, key)) return this.localComputedValues.get(key)!.get()
                     if (this.isPropertyDirty(key)) return this.localValues.get(key)
                     else return this.model[key as keyof T]
                 },
@@ -87,7 +87,7 @@ export class ViewModel<T> implements IViewModel<T> {
     @action.bound
     submit() {
         keys(this.localValues).forEach((key: keyof T) => {
-            const source = this.localValues.get(key)
+            const source = this.localValues.get(key)!
             const destination = this.model[key]
             if (isObservableArray(destination)) {
                 destination.replace(source as any)

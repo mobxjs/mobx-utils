@@ -53,7 +53,7 @@ let inOrderExecution: () => Promise<void>
 
 const actionAsyncContextStack: IActionAsyncContext[] = []
 
-export async function task<R>(value: R | PromiseLike<R>): Promise<R> {
+export async function task<R>(this: any, value: R | PromiseLike<R>): Promise<R> {
     const ctx = actionAsyncContextStack[actionAsyncContextStack.length - 1]
 
     if (!ctx) {

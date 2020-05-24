@@ -42,9 +42,9 @@ export function createTransformer<A, B>(
 
     // Memoizes: object id -> reactive view that applies transformer to the object
     let views: { [id: number]: IComputedValue<B> } = {}
-    let onCleanup: Function = undefined
+    let onCleanup: Function | undefined = undefined
     let keepAlive: boolean = false
-    let debugNameGenerator: Function = undefined
+    let debugNameGenerator: Function | undefined = undefined
     if (typeof arg2 === "object") {
         onCleanup = arg2.onCleanup
         keepAlive = arg2.keepAlive !== undefined ? arg2.keepAlive : false

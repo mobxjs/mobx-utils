@@ -6,10 +6,6 @@ function observableSymbol() {
     return (typeof Symbol === "function" && Symbol.observable) || "@@observable"
 }
 
-function self() {
-    return this
-}
-
 export interface IStreamObserver<T> {
     next?(value: T): void
     error?(error: any): void
@@ -76,7 +72,9 @@ export function toStream<T>(
                 unsubscribe: () => {},
             }
         },
-        [observableSymbol()]: self,
+        [observableSymbol()]: function (this: any) {
+            return this
+        },
     }
 }
 

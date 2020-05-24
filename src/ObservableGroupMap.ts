@@ -147,7 +147,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         this._disposeBaseObserver()
         for (let i = 0; i < this._base.length; i++) {
             const item = this._base[i]
-            const grouperItemInfo: GroupItemInfo = item[this._ogmInfoKey]
+            const grouperItemInfo: GroupItemInfo = item[this._ogmInfoKey]!
             grouperItemInfo.reaction()
 
             delete item[this._ogmInfoKey]
@@ -172,7 +172,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
             arr.length--
         } else {
             arr[itemIndex] = arr[arr.length - 1]
-            arr[itemIndex][this._ogmInfoKey].groupArrIndex = itemIndex
+            arr[itemIndex][this._ogmInfoKey]!.groupArrIndex = itemIndex
             arr.length--
         }
     }
@@ -210,7 +210,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
     }
 
     private _removeItem(item: GroupItem) {
-        const grouperItemInfo = item[this._ogmInfoKey]
+        const grouperItemInfo = item[this._ogmInfoKey]!
         this._removeFromGroupArr(grouperItemInfo.groupByValue, grouperItemInfo.groupArrIndex)
         grouperItemInfo.reaction()
 

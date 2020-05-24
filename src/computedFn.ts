@@ -9,21 +9,21 @@ import {
 } from "mobx"
 
 /**
- * computedFn takes a function with an arbitrarily amount of arguments, 
- * and memoized the output of the function based on the arguments passed in. 
- * 
+ * computedFn takes a function with an arbitrary amount of arguments,
+ * and memoizes the output of the function based on the arguments passed in.
+ *
  * computedFn(fn) returns a function with the very same signature. There is no limit on the amount of arguments
- * that is accepted. However, the amount of arguments must be consistent and default arguments are not supported.
- * 
- * By default the output of a function call will only be memoized as long as the 
- * output is being observed. 
- * 
- * The function passes into `computedFn` should be pure, not be an action and only be relying on 
+ * that is accepted. However, the amount of arguments must be constant and default arguments are not supported.
+ *
+ * By default the output of a function call will only be memoized as long as the
+ * output is being observed.
+ *
+ * The function passes into `computedFn` should be pure, not be an action and only be relying on
  * observables.
- * 
+ *
  * Setting `keepAlive` to `true` will cause the output to be forcefully cached forever.
  * Note that this might introduce memory leaks!
- * 
+ *
  * @example
  * const store = observable({
     a: 1,
@@ -36,16 +36,16 @@ import {
 
   const d = autorun(() => {
     // store.m(3) will be cached as long as this autorun is running
-    console.log((store.m(3) * store.c))
+    console.log(store.m(3) * store.c)
   })
- * 
- * @param fn 
+ *
+ * @param fn
  * @param keepAliveOrOptions
  */
 export function computedFn<T extends (...args: any[]) => any>(
     fn: T,
     keepAliveOrOptions: IComputedValueOptions<ReturnType<T>> | boolean = false
-) {
+): T {
     if (isAction(fn)) throw new Error("computedFn shouldn't be used on actions")
 
     let memoWarned = false
@@ -56,8 +56,7 @@ export function computedFn<T extends (...args: any[]) => any>(
             : keepAliveOrOptions
     const d = new DeepMap<IComputedValue<any>>()
 
-    return function (...args: Parameters<T>): ReturnType<T> {
-        const self = this
+    return function (this: any, ...args: any[]): any {
         const entry = d.entry(args)
         // cache hit, return
         if (entry.exists()) return entry.get().get()
@@ -69,12 +68,12 @@ export function computedFn<T extends (...args: any[]) => any>(
                 )
                 memoWarned = true
             }
-            return fn.apply(self, args)
+            return fn.apply(this, args)
         }
         // create new entry
         const c = computed(
             () => {
-                return fn.apply(self, args)
+                return fn.apply(this, args)
             },
             {
                 ...opts,
@@ -89,5 +88,5 @@ export function computedFn<T extends (...args: any[]) => any>(
             })
         // return current val
         return c.get()
-    }
+    } as any
 }
