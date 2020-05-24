@@ -1,5 +1,4 @@
-import { IDENTITY } from "./utils"
-import { observable, action, _allowStateChanges, IObservableValue } from "mobx"
+import { observable, action, _allowStateChanges } from "mobx"
 
 export interface ILazyObservable<T> {
     current(): T
