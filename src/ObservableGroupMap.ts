@@ -160,7 +160,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
             arr.length--
         } else {
             arr[itemIndex] = arr[arr.length - 1]
-            ;(arr[itemIndex] as any)[this._ogmInfoKey].grouperArrIndex = itemIndex
+            ;(arr[itemIndex] as any)[this._ogmInfoKey].groupArrIndex = itemIndex
             arr.length--
         }
     }
@@ -178,14 +178,14 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
                     const grouperItemInfo = (item as any)[this._ogmInfoKey]
                     this._removeFromGroupArr(
                         grouperItemInfo.groupByValue,
-                        grouperItemInfo.grouperArrIndex
+                        grouperItemInfo.groupArrIndex
                     )
 
                     const newGroupArr = this._getGroupArr(newGroupByValue)
-                    const newGrouperArrIndex = newGroupArr.length
+                    const newGroupArrIndex = newGroupArr.length
                     newGroupArr.push(item)
                     grouperItemInfo.groupByValue = newGroupByValue
-                    grouperItemInfo.grouperArrIndex = newGrouperArrIndex
+                    grouperItemInfo.groupArrIndex = newGroupArrIndex
                 }
             ),
         }
