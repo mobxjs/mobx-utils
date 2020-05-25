@@ -33,57 +33,63 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 -   [moveItem](#moveitem)
     -   [Parameters](#parameters-2)
     -   [Examples](#examples-1)
--   [toStream](#tostream)
+-   [lazyObservable](#lazyobservable)
     -   [Parameters](#parameters-3)
     -   [Examples](#examples-2)
+-   [fromResource](#fromresource)
+    -   [Parameters](#parameters-4)
+    -   [Examples](#examples-3)
+-   [toStream](#tostream)
+    -   [Parameters](#parameters-5)
+    -   [Examples](#examples-4)
 -   [StreamListener](#streamlistener)
 -   [ViewModel](#viewmodel)
 -   [createViewModel](#createviewmodel)
-    -   [Parameters](#parameters-4)
-    -   [Examples](#examples-3)
--   [whenWithTimeout](#whenwithtimeout)
-    -   [Parameters](#parameters-5)
-    -   [Examples](#examples-4)
--   [keepAlive](#keepalive)
     -   [Parameters](#parameters-6)
     -   [Examples](#examples-5)
--   [keepAlive](#keepalive-1)
+-   [whenWithTimeout](#whenwithtimeout)
     -   [Parameters](#parameters-7)
     -   [Examples](#examples-6)
--   [queueProcessor](#queueprocessor)
+-   [keepAlive](#keepalive)
     -   [Parameters](#parameters-8)
     -   [Examples](#examples-7)
--   [chunkProcessor](#chunkprocessor)
+-   [keepAlive](#keepalive-1)
     -   [Parameters](#parameters-9)
     -   [Examples](#examples-8)
--   [now](#now)
+-   [queueProcessor](#queueprocessor)
     -   [Parameters](#parameters-10)
     -   [Examples](#examples-9)
--   [asyncAction](#asyncaction)
+-   [chunkProcessor](#chunkprocessor)
     -   [Parameters](#parameters-11)
     -   [Examples](#examples-10)
--   [whenAsync](#whenasync)
+-   [now](#now)
     -   [Parameters](#parameters-12)
     -   [Examples](#examples-11)
--   [expr](#expr)
+-   [asyncAction](#asyncaction)
     -   [Parameters](#parameters-13)
     -   [Examples](#examples-12)
--   [deepObserve](#deepobserve)
+-   [whenAsync](#whenasync)
     -   [Parameters](#parameters-14)
     -   [Examples](#examples-13)
--   [ObservableGroupMap](#observablegroupmap)
+-   [expr](#expr)
     -   [Parameters](#parameters-15)
     -   [Examples](#examples-14)
+-   [deepObserve](#deepobserve)
+    -   [Parameters](#parameters-16)
+    -   [Examples](#examples-15)
+-   [ObservableGroupMap](#observablegroupmap)
+    -   [Parameters](#parameters-17)
+    -   [Examples](#examples-16)
     -   [dispose](#dispose)
 -   [ObservableMap](#observablemap)
 -   [computedFn](#computedfn)
-    -   [Parameters](#parameters-16)
-    -   [Examples](#examples-15)
+    -   [Parameters](#parameters-18)
+    -   [Examples](#examples-17)
 -   [DeepMapEntry](#deepmapentry)
 -   [DeepMap](#deepmap)
 -   [actionAsync](#actionasync)
-    -   [Parameters](#parameters-17)
-    -   [Examples](#examples-16)
+    -   [Parameters](#parameters-19)
+    -   [Examples](#examples-18)
 
 ## fromPromise
 
@@ -223,6 +229,103 @@ console.log(source.map(x => x)) // [2, 1, 3]
 ```
 
 Returns **ObservableArray&lt;T>** 
+
+## lazyObservable
+
+`lazyObservable` creates an observable around a `fetch` method that will not be invoked
+until the observable is needed the first time.
+The fetch method receives a `sink` callback which can be used to replace the
+current value of the lazyObservable. It is allowed to call `sink` multiple times
+to keep the lazyObservable up to date with some external resource.
+
+Note that it is the `current()` call itself which is being tracked by MobX,
+so make sure that you don't dereference to early.
+
+### Parameters
+
+-   `fetch`  
+-   `initialValue` **T** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
+
+### Examples
+
+```javascript
+const userProfile = lazyObservable(
+  sink => fetch("/myprofile").then(profile => sink(profile))
+)
+
+// use the userProfile in a React component:
+const Profile = observer(({ userProfile }) =>
+  userProfile.current() === undefined
+  ? <div>Loading user profile...</div>
+  : <div>{userProfile.current().displayName}</div>
+)
+
+// triggers refresh the userProfile
+userProfile.refresh()
+```
+
+## fromResource
+
+`fromResource` creates an observable whose current state can be inspected using `.current()`,
+and which can be kept in sync with some external datasource that can be subscribed to.
+
+The created observable will only subscribe to the datasource if it is in use somewhere,
+(un)subscribing when needed. To enable `fromResource` to do that two callbacks need to be provided,
+one to subscribe, and one to unsubscribe. The subscribe callback itself will receive a `sink` callback, which can be used
+to update the current state of the observable, allowing observes to react.
+
+Whatever is passed to `sink` will be returned by `current()`. The values passed to the sink will not be converted to
+observables automatically, but feel free to do so.
+It is the `current()` call itself which is being tracked,
+so make sure that you don't dereference to early.
+
+For inspiration, an example integration with the apollo-client on [github](https://github.com/apollostack/apollo-client/issues/503#issuecomment-241101379),
+or the [implementation](https://github.com/mobxjs/mobx-utils/blob/1d17cf7f7f5200937f68cc0b5e7ec7f3f71dccba/src/now.ts#L43-L57) of `mobxUtils.now`
+
+The following example code creates an observable that connects to a `dbUserRecord`,
+which comes from an imaginary database and notifies when it has changed.
+
+### Parameters
+
+-   `subscriber`  
+-   `unsubscriber` **IDisposer**  (optional, default `NOOP`)
+-   `initialValue` **T** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
+
+### Examples
+
+```javascript
+function createObservableUser(dbUserRecord) {
+  let currentSubscription;
+  return fromResource(
+    (sink) => {
+      // sink the current state
+      sink(dbUserRecord.fields)
+      // subscribe to the record, invoke the sink callback whenever new data arrives
+      currentSubscription = dbUserRecord.onUpdated(() => {
+        sink(dbUserRecord.fields)
+      })
+    },
+    () => {
+      // the user observable is not in use at the moment, unsubscribe (for now)
+      dbUserRecord.unsubscribe(currentSubscription)
+    }
+  )
+}
+
+// usage:
+const myUserObservable = createObservableUser(myDatabaseConnector.query("name = 'Michel'"))
+
+// use the observable in autorun
+autorun(() => {
+  // printed everytime the database updates its records
+  console.log(myUserObservable.current().displayName)
+})
+
+// ... or a component
+const userComponent = observer(({ user }) =>
+  <div>{user.current().displayName}</div>
+)
+```
 
 ## toStream
 
@@ -388,7 +491,7 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 ## queueProcessor
 
 `queueProcessor` takes an observable array, observes it and calls `processor`
-once for each item added to the observable array, optionally deboucing the action
+once for each item added to the observable array, optionally debouncing the action
 
 ### Parameters
 

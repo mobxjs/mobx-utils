@@ -7,6 +7,15 @@ export interface IResource<T> {
     isAlive(): boolean
 }
 
+export function fromResource<T>(
+    subscriber: (sink: (newValue: T) => void) => void,
+    unsubscriber?: IDisposer
+): IResource<T | undefined>
+export function fromResource<T>(
+    subscriber: (sink: (newValue: T) => void) => void,
+    unsubscriber: IDisposer | undefined,
+    initialValue: T
+): IResource<T>
 /**
  * `fromResource` creates an observable whose current state can be inspected using `.current()`,
  * and which can be kept in sync with some external datasource that can be subscribed to.
@@ -71,15 +80,6 @@ export interface IResource<T> {
  *     isAlive(): boolean;
  * }}
  */
-export function fromResource<T>(
-    subscriber: (sink: (newValue: T) => void) => void,
-    unsubscriber?: IDisposer
-): IResource<T | undefined>
-export function fromResource<T>(
-    subscriber: (sink: (newValue: T) => void) => void,
-    unsubscriber: IDisposer | undefined,
-    initialValue: T
-): IResource<T>
 export function fromResource<T>(
     subscriber: (sink: (newValue: T) => void) => void,
     unsubscriber: IDisposer = NOOP,
