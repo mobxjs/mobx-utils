@@ -7,6 +7,13 @@ export interface ILazyObservable<T> {
     pending: boolean
 }
 
+export function lazyObservable<T>(
+    fetch: (sink: (newValue: T) => void) => void
+): ILazyObservable<T | undefined>
+export function lazyObservable<T>(
+    fetch: (sink: (newValue: T) => void) => void,
+    initialValue: T
+): ILazyObservable<T>
 /**
  * `lazyObservable` creates an observable around a `fetch` method that will not be invoked
  * until the observable is needed the first time.
@@ -41,14 +48,6 @@ export interface ILazyObservable<T> {
  *     pending: boolean
  * }}
  */
-
-export function lazyObservable<T>(
-    fetch: (sink: (newValue: T) => void) => void
-): ILazyObservable<T | undefined>
-export function lazyObservable<T>(
-    fetch: (sink: (newValue: T) => void) => void,
-    initialValue: T
-): ILazyObservable<T>
 export function lazyObservable<T>(
     fetch: (sink: (newValue: T) => void) => void,
     initialValue: T | undefined = undefined

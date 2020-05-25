@@ -77,13 +77,11 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 -   [deepObserve](#deepobserve)
     -   [Parameters](#parameters-16)
     -   [Examples](#examples-15)
--   [ObservableMap](#observablemap)
 -   [ObservableGroupMap](#observablegroupmap)
+    -   [Parameters](#parameters-17)
     -   [Examples](#examples-16)
     -   [dispose](#dispose)
--   [ObservableGroupMap](#observablegroupmap-1)
-    -   [Parameters](#parameters-17)
-    -   [dispose](#dispose-1)
+-   [ObservableMap](#observablemap)
 -   [computedFn](#computedfn)
     -   [Parameters](#parameters-18)
     -   [Examples](#examples-17)
@@ -117,8 +115,9 @@ This is useful to replace one promise based observable with another, without goi
 
 ### Parameters
 
--   `promise` **IThenable&lt;T>** The promise which will be observed
+-   `origPromise`  
 -   `oldPromise` **IThenable&lt;T>** ? The previously observed promise
+-   `promise` **IThenable&lt;T>** The promise which will be observed
 
 ### Examples
 
@@ -445,27 +444,6 @@ Returns **IDisposer** disposer function that can be used to cancel the when prem
 
 ## keepAlive
 
-### Parameters
-
--   `_1`  
--   `_2`  
--   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
-
-### Examples
-
-```javascript
-const number = observable(3)
-const doubler = computed(() => number.get() * 2)
-const stop = keepAlive(doubler)
-// doubler will now stay in sync reactively even when there are no further observers
-stop()
-// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
-```
-
-Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
-
-## keepAlive
-
 MobX normally suspends any computed value that is not in use by any reaction,
 and lazily re-evaluates the expression if needed outside a reaction while not in use.
 `keepAlive` marks a computed value as always in use, meaning that it will always fresh, but never disposed automatically.
@@ -489,10 +467,31 @@ const stop = keepAlive(obj, "doubler")
 
 Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
 
+## keepAlive
+
+### Parameters
+
+-   `_1`  
+-   `_2`  
+-   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
+
+### Examples
+
+```javascript
+const number = observable(3)
+const doubler = computed(() => number.get() * 2)
+const stop = keepAlive(doubler)
+// doubler will now stay in sync reactively even when there are no further observers
+stop()
+// normal behavior, doubler results will be recomputed if not observed but needed, but lazily
+```
+
+Returns **IDisposer** stops this keep alive so that the computed value goes back to normal behavior
+
 ## queueProcessor
 
 `queueProcessor` takes an observable array, observes it and calls `processor`
-once for each item added to the observable array, optionally deboucing the action
+once for each item added to the observable array, optionally debouncing the action
 
 ### Parameters
 
@@ -719,8 +718,6 @@ const disposer = deepObserve(target, (change, path) => {
 })
 ```
 
-## ObservableMap
-
 ## ObservableGroupMap
 
 Reactively sorts a base observable array into multiple observable arrays based on the value of a
@@ -728,12 +725,20 @@ Reactively sorts a base observable array into multiple observable arrays based o
 
 This observes the individual computed groupBy values and only updates the source and dest arrays
 when there is an actual change, so this is far more efficient than, for example
-`base.filter(i => groupBy(i) === 'we')`.
+`base.filter(i => groupBy(i) === 'we')`. Call #dispose() to stop tracking.
 
 No guarantees are made about the order of items in the grouped arrays.
 
 The resulting map of arrays is read-only. clear(), set(), delete() are not supported and
 modifying the group arrays will lead to undefined behavior.
+
+### Parameters
+
+-   `base` **[array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** The array to sort into groups.
+-   `groupBy` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** The function used for grouping.
+-   `options`  Object with properties:
+     `name`: Debug name of this ObservableGroupMap.
+     `keyToName`: Function to create the debug names of the observable group arrays.
 
 ### Examples
 
@@ -754,32 +759,15 @@ slices[0].day = "we" // outputs 0, [{ day: "we", hours: 12 }]
 Disposes all observers created during construction and removes state added to base array
 items.
 
-## ObservableGroupMap
-
-Create a new ObservableGroupMap. This immediately observes all members of the array. Call
-\#dispose() to stop tracking.
-
-### Parameters
-
--   `base`  The array to sort into groups.
--   `groupBy`  The function used for grouping.
--   `_a`  
--   `options`  Object with properties:
-     `name`: Debug name of this ObservableGroupMap.
-     `keyToName`: Function to create the debug names of the observable group arrays.
-
-### dispose
-
-Disposes all observers created during construction and removes state added to base array
-items.
+## ObservableMap
 
 ## computedFn
 
-computedFn takes a function with an arbitrarily amount of arguments,
-and memoized the output of the function based on the arguments passed in.
+computedFn takes a function with an arbitrary amount of arguments,
+and memoizes the output of the function based on the arguments passed in.
 
 computedFn(fn) returns a function with the very same signature. There is no limit on the amount of arguments
-that is accepted. However, the amount of arguments must be consistent and default arguments are not supported.
+that is accepted. However, the amount of arguments must be constant and default arguments are not supported.
 
 By default the output of a function call will only be memoized as long as the
 output is being observed.
@@ -809,7 +797,7 @@ return this.a * this.b * x
 
 const d = autorun(() => {
 // store.m(3) will be cached as long as this autorun is running
-console.log((store.m(3) * store.c))
+console.log(store.m(3) * store.c)
 })
 ```
 

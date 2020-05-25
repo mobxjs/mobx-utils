@@ -29,12 +29,18 @@ interface GroupItemInfo {
  *
  * This observes the individual computed groupBy values and only updates the source and dest arrays
  * when there is an actual change, so this is far more efficient than, for example
- * `base.filter(i => groupBy(i) === 'we')`.
+ * `base.filter(i => groupBy(i) === 'we')`. Call #dispose() to stop tracking.
  *
  * No guarantees are made about the order of items in the grouped arrays.
  *
  * The resulting map of arrays is read-only. clear(), set(), delete() are not supported and
  * modifying the group arrays will lead to undefined behavior.
+ *
+ * @param {array} base The array to sort into groups.
+ * @param {function} groupBy The function used for grouping.
+ * @param options Object with properties:
+ *  `name`: Debug name of this ObservableGroupMap.
+ *  `keyToName`: Function to create the debug names of the observable group arrays.
  *
  * @example
  * const slices = observable([
@@ -71,16 +77,6 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
 
     private readonly _disposeBaseObserver: Lambda
 
-    /**
-     * Create a new ObservableGroupMap. This immediately observes all members of the array. Call
-     * #dispose() to stop tracking.
-     *
-     * @param base The array to sort into groups.
-     * @param groupBy The function used for grouping.
-     * @param options Object with properties:
-     *  `name`: Debug name of this ObservableGroupMap.
-     *  `keyToName`: Function to create the debug names of the observable group arrays.
-     */
     constructor(
         base: IObservableArray<T>,
         groupBy: (x: T) => G,
