@@ -1,3 +1,7 @@
+# 5.6.1
+
+* [#256](https://github.com/mobxjs/mobx-utils/pull/256) Fix [#255](https://github.com/mobxjs/mobx-utils/issues/255)
+
 # 5.6.0
 
 * [#245](https://github.com/mobxjs/mobx-utils/pull/245) Add [ObservableGroupMap](https://github.com/mobxjs/mobx-utils#observablegroupmap).
