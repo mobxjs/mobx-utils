@@ -77,11 +77,17 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
 
     private readonly _disposeBaseObserver: Lambda
 
+    private static lastId: number
+    private static nextId() {
+        if (!this.lastId) return (this.lastId = 1)
+        return ++this.lastId
+    }
+
     constructor(
         base: IObservableArray<T>,
         groupBy: (x: T) => G,
         {
-            name = "ogm" + ((Math.random() * 1000) | 0),
+            name = `ogm${ObservableGroupMap.nextId()}`,
             keyToName = (x) => "" + x,
         }: { name?: string; keyToName?: (group: G) => string } = {}
     ) {
