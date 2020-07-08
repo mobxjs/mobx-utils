@@ -90,6 +90,9 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 -   [actionAsync](#actionasync)
     -   [Parameters](#parameters-19)
     -   [Examples](#examples-18)
+-   [createTransformer](#createtransformer)
+    -   [Parameters](#parameters-20)
+        [Examples](#examples[19])
 
 ## fromPromise
 
@@ -115,7 +118,7 @@ This is useful to replace one promise based observable with another, without goi
 
 ### Parameters
 
--   `origPromise`  
+-   `origPromise`
 -   `oldPromise` **IThenable&lt;T>** ? The previously observed promise
 -   `promise` **IThenable&lt;T>** The promise which will be observed
 
@@ -164,41 +167,45 @@ const fetchResult = fromPromise(fetch("http://someurl"))
 
 // combine with when..
 when(
-  () => fetchResult.state !== "pending",
-  () => {
-    console.log("Got ", fetchResult.value)
-  }
+    () => fetchResult.state !== "pending",
+    () => {
+        console.log("Got ", fetchResult.value)
+    }
 )
 
 // or a mobx-react component..
 const myComponent = observer(({ fetchResult }) => {
-  switch(fetchResult.state) {
-     case "pending": return <div>Loading...</div>
-     case "rejected": return <div>Ooops... {fetchResult.value}</div>
-     case "fulfilled": return <div>Gotcha: {fetchResult.value}</div>
-  }
+    switch (fetchResult.state) {
+        case "pending":
+            return <div>Loading...</div>
+        case "rejected":
+            return <div>Ooops... {fetchResult.value}</div>
+        case "fulfilled":
+            return <div>Gotcha: {fetchResult.value}</div>
+    }
 })
 
 // or using the case method instead of switch:
 
 const myComponent = observer(({ fetchResult }) =>
-  fetchResult.case({
-    pending:   () => <div>Loading...</div>,
-    rejected:  error => <div>Ooops.. {error}</div>,
-    fulfilled: value => <div>Gotcha: {value}</div>,
-  }))
+    fetchResult.case({
+        pending: () => <div>Loading...</div>,
+        rejected: (error) => <div>Ooops.. {error}</div>,
+        fulfilled: (value) => <div>Gotcha: {value}</div>,
+    })
+)
 
 // chain additional handler(s) to the resolve/reject:
 
-fetchResult.then(
-  (result) =>  doSomeTransformation(result),
-  (rejectReason) => console.error('fetchResult was rejected, reason: ' + rejectReason)
-).then(
-  (transformedResult) => console.log('transformed fetchResult: ' + transformedResult)
-)
+fetchResult
+    .then(
+        (result) => doSomeTransformation(result),
+        (rejectReason) => console.error("fetchResult was rejected, reason: " + rejectReason)
+    )
+    .then((transformedResult) => console.log("transformed fetchResult: " + transformedResult))
 ```
 
-Returns **IPromiseBasedObservable&lt;T>** 
+Returns **IPromiseBasedObservable&lt;T>**
 
 ## isPromiseBasedObservable
 
@@ -206,9 +213,9 @@ Returns true if the provided value is a promise-based observable.
 
 ### Parameters
 
--   `value`  any
+-   `value` any
 
-Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
+Returns **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
 
 ## moveItem
 
@@ -216,19 +223,19 @@ Moves an item from one position to another, checking that the indexes given are 
 
 ### Parameters
 
--   `target` **ObservableArray&lt;T>** 
--   `fromIndex` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
--   `toIndex` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
+-   `target` **ObservableArray&lt;T>**
+-   `fromIndex` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**
+-   `toIndex` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)**
 
 ### Examples
 
 ```javascript
 const source = observable([1, 2, 3])
 moveItem(source, 0, 1)
-console.log(source.map(x => x)) // [2, 1, 3]
+console.log(source.map((x) => x)) // [2, 1, 3]
 ```
 
-Returns **ObservableArray&lt;T>** 
+Returns **ObservableArray&lt;T>**
 
 ## lazyObservable
 
@@ -243,21 +250,21 @@ so make sure that you don't dereference to early.
 
 ### Parameters
 
--   `fetch`  
+-   `fetch`
 -   `initialValue` **T** optional initialValue that will be returned from `current` as long as the `sink` has not been called at least once (optional, default `undefined`)
 
 ### Examples
 
 ```javascript
-const userProfile = lazyObservable(
-  sink => fetch("/myprofile").then(profile => sink(profile))
-)
+const userProfile = lazyObservable((sink) => fetch("/myprofile").then((profile) => sink(profile)))
 
 // use the userProfile in a React component:
 const Profile = observer(({ userProfile }) =>
-  userProfile.current() === undefined
-  ? <div>Loading user profile...</div>
-  : <div>{userProfile.current().displayName}</div>
+    userProfile.current() === undefined ? (
+        <div>Loading user profile...</div>
+    ) : (
+        <div>{userProfile.current().displayName}</div>
+    )
 )
 
 // triggers refresh the userProfile
@@ -287,29 +294,29 @@ which comes from an imaginary database and notifies when it has changed.
 
 ### Parameters
 
--   `subscriber`  
--   `unsubscriber` **IDisposer**  (optional, default `NOOP`)
+-   `subscriber`
+-   `unsubscriber` **IDisposer** (optional, default `NOOP`)
 -   `initialValue` **T** the data that will be returned by `get()` until the `sink` has emitted its first data (optional, default `undefined`)
 
 ### Examples
 
 ```javascript
 function createObservableUser(dbUserRecord) {
-  let currentSubscription;
-  return fromResource(
-    (sink) => {
-      // sink the current state
-      sink(dbUserRecord.fields)
-      // subscribe to the record, invoke the sink callback whenever new data arrives
-      currentSubscription = dbUserRecord.onUpdated(() => {
-        sink(dbUserRecord.fields)
-      })
-    },
-    () => {
-      // the user observable is not in use at the moment, unsubscribe (for now)
-      dbUserRecord.unsubscribe(currentSubscription)
-    }
-  )
+    let currentSubscription
+    return fromResource(
+        (sink) => {
+            // sink the current state
+            sink(dbUserRecord.fields)
+            // subscribe to the record, invoke the sink callback whenever new data arrives
+            currentSubscription = dbUserRecord.onUpdated(() => {
+                sink(dbUserRecord.fields)
+            })
+        },
+        () => {
+            // the user observable is not in use at the moment, unsubscribe (for now)
+            dbUserRecord.unsubscribe(currentSubscription)
+        }
+    )
 }
 
 // usage:
@@ -317,14 +324,12 @@ const myUserObservable = createObservableUser(myDatabaseConnector.query("name = 
 
 // use the observable in autorun
 autorun(() => {
-  // printed everytime the database updates its records
-  console.log(myUserObservable.current().displayName)
+    // printed everytime the database updates its records
+    console.log(myUserObservable.current().displayName)
 })
 
 // ... or a component
-const userComponent = observer(({ user }) =>
-  <div>{user.current().displayName}</div>
-)
+const userComponent = observer(({ user }) => <div>{user.current().displayName}</div>)
 ```
 
 ## toStream
@@ -335,24 +340,23 @@ emitting when new values become available. The expressions respect (trans)action
 
 ### Parameters
 
--   `expression`  
+-   `expression`
 -   `fireImmediately` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** (by default false)
 
 ### Examples
 
 ```javascript
 const user = observable({
-  firstName: "C.S",
-  lastName: "Lewis"
+    firstName: "C.S",
+    lastName: "Lewis",
 })
 
-Rx.Observable
-  .from(mobxUtils.toStream(() => user.firstname + user.lastName))
-  .scan(nameChanges => nameChanges + 1, 0)
-  .subscribe(nameChanges => console.log("Changed name ", nameChanges, "times"))
+Rx.Observable.from(mobxUtils.toStream(() => user.firstname + user.lastName))
+    .scan((nameChanges) => nameChanges + 1, 0)
+    .subscribe((nameChanges) => console.log("Changed name ", nameChanges, "times"))
 ```
 
-Returns **IObservableStream&lt;T>** 
+Returns **IObservableStream&lt;T>**
 
 ## StreamListener
 
@@ -382,17 +386,17 @@ Note that if you read a non-dirty property, viewmodel only proxies the read to t
 
 ### Parameters
 
--   `model` **T** 
+-   `model` **T**
 
 ### Examples
 
 ```javascript
 class Todo {
-  @observable title = "Test"
+    @observable title = "Test"
 }
 
 const model = new Todo()
-const viewModel = createViewModel(model);
+const viewModel = createViewModel(model)
 
 autorun(() => console.log(viewModel.model.title, ",", viewModel.title))
 // prints "Test, Test"
@@ -414,8 +418,8 @@ Like normal `when`, except that this `when` will automatically dispose if the co
 
 ### Parameters
 
--   `expr`  
--   `action`  
+-   `expr`
+-   `action`
 -   `timeout` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount when spends waiting before giving up (optional, default `10000`)
 -   `onTimeout` **any** the ontimeout handler will be called if the condition wasn't met within the given time (optional, default `()=>{}`)
 
@@ -450,8 +454,8 @@ and lazily re-evaluates the expression if needed outside a reaction while not in
 
 ### Parameters
 
--   `_1`  
--   `_2`  
+-   `_1`
+-   `_2`
 -   `target` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an object that has a computed property, created by `@computed` or `extendObservable`
 -   `property` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the property to keep alive
 
@@ -459,8 +463,10 @@ and lazily re-evaluates the expression if needed outside a reaction while not in
 
 ```javascript
 const obj = observable({
-  number: 3,
-  doubler: function() { return this.number * 2 }
+    number: 3,
+    doubler: function () {
+        return this.number * 2
+    },
 })
 const stop = keepAlive(obj, "doubler")
 ```
@@ -471,8 +477,8 @@ Returns **IDisposer** stops this keep alive so that the computed value goes back
 
 ### Parameters
 
--   `_1`  
--   `_2`  
+-   `_1`
+-   `_2`
 -   `computedValue` **IComputedValue&lt;any>** created using the `computed` function
 
 ### Examples
@@ -496,16 +502,16 @@ once for each item added to the observable array, optionally debouncing the acti
 ### Parameters
 
 -   `observableArray` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
--   `processor`  
+-   `processor`
 -   `debounce` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
 
 ### Examples
 
 ```javascript
 const pendingNotifications = observable([])
-const stop = queueProcessor(pendingNotifications, msg => {
-  // show Desktop notification
-  new Notification(msg);
+const stop = queueProcessor(pendingNotifications, (msg) => {
+    // show Desktop notification
+    new Notification(msg)
 })
 
 // usage:
@@ -525,7 +531,7 @@ chunks and/or single items into reasonable chunks of work.
 ### Parameters
 
 -   `observableArray` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;T>** observable array instance to track
--   `processor`  
+-   `processor`
 -   `debounce` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional debounce time in ms. With debounce 0 the processor will run synchronously (optional, default `0`)
 -   `maxChunkSize` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optionally do not call on full array but smaller chunks. With 0 it will process the full array. (optional, default `0`)
 
@@ -533,9 +539,14 @@ chunks and/or single items into reasonable chunks of work.
 
 ```javascript
 const trackedActions = observable([])
-const stop = chunkProcessor(trackedActions, chunkOfMax10Items => {
-  sendTrackedActionsToServer(chunkOfMax10Items);
-}, 100, 10)
+const stop = chunkProcessor(
+    trackedActions,
+    (chunkOfMax10Items) => {
+        sendTrackedActionsToServer(chunkOfMax10Items)
+    },
+    100,
+    10
+)
 
 // usage:
 trackedActions.push("scrolled")
@@ -569,7 +580,7 @@ Countdown example: <https://jsfiddle.net/mweststrate/na0qdmkw/>
 const start = Date.now()
 
 autorun(() => {
-  console.log("Seconds elapsed: ", (mobxUtils.now() - start) / 1000)
+    console.log("Seconds elapsed: ", (mobxUtils.now() - start) / 1000)
 })
 ```
 
@@ -580,7 +591,7 @@ _deprecated_ this functionality can now be found as `flow` in the mobx package. 
 `asyncAction` takes a generator function and automatically wraps all parts of the process in actions. See the examples below.
 `asyncAction` can be used both as decorator or to wrap functions.
 
--   It is important that `asyncAction should always be used with a generator function (recognizable as`function_`or`_name\` syntax)
+-   It is important that `asyncAction should always be used with a generator function (recognizable as`function\_`or`\_name\` syntax)
 -   Each yield statement should return a Promise. The generator function will continue as soon as the promise settles, with the settled value
 -   When the generator function finishes, you can return a normal value. The `asyncAction` wrapped function will always produce a promise delivering that value.
 
@@ -596,29 +607,29 @@ The `yield` number indicates the progress of the generator. `init` indicates spa
 
 `asyncActions` requires `Promise` and `generators` to be available on the target environment. Polyfill `Promise` if needed. Both TypeScript and Babel can compile generator functions down to ES5.
 
- N.B. due to a [babel limitation](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy/issues/26), in Babel generatos cannot be combined with decorators. See also [#70](https://github.com/mobxjs/mobx-utils/issues/70)
+N.B. due to a [babel limitation](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy/issues/26), in Babel generatos cannot be combined with decorators. See also [#70](https://github.com/mobxjs/mobx-utils/issues/70)
 
 ### Parameters
 
--   `arg1`  
--   `arg2`  
+-   `arg1`
+-   `arg2`
 
 ### Examples
 
 ```javascript
-import {asyncAction} from "mobx-utils"
+import { asyncAction } from "mobx-utils"
 
 let users = []
 
 const fetchUsers = asyncAction("fetchUsers", function* (url) {
-  const start = Date.now()
-  const data = yield window.fetch(url)
-  users = yield data.json()
-  return start - Date.now()
+    const start = Date.now()
+    const data = yield window.fetch(url)
+    users = yield data.json()
+    return start - Date.now()
 })
 
-fetchUsers("http://users.com").then(time => {
-  console.dir("Got users", users, "in ", time, "ms")
+fetchUsers("http://users.com").then((time) => {
+    console.dir("Got users", users, "in ", time, "ms")
 })
 ```
 
@@ -648,7 +659,7 @@ class Store {
 }
 ```
 
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)**
 
 ## whenAsync
 
@@ -658,7 +669,7 @@ Like normal `when`, except that this `when` will return a promise that resolves 
 
 ### Parameters
 
--   `fn`  
+-   `fn`
 -   `timeout` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount of time to wait, before the promise rejects
 
 ### Examples
@@ -679,16 +690,16 @@ instead it will only rerenders when the current todo is (de)selected.
 
 ### Parameters
 
--   `expr`  
+-   `expr`
 
 ### Examples
 
 ```javascript
 const Todo = observer((props) => {
-    const todo = props.todo;
-    const isSelected = mobxUtils.expr(() => props.viewState.selection === todo);
+    const todo = props.todo
+    const isSelected = mobxUtils.expr(() => props.viewState.selection === todo)
     return <div className={isSelected ? "todo todo-selected" : "todo"}>{todo.title}</div>
-});
+})
 ```
 
 ## deepObserve
@@ -707,14 +718,14 @@ deepObserve cannot be used on computed values.
 
 ### Parameters
 
--   `target`  
--   `listener`  
+-   `target`
+-   `listener`
 
 ### Examples
 
 ```javascript
 const disposer = deepObserve(target, (change, path) => {
-   console.dir(change)
+    console.dir(change)
 })
 ```
 
@@ -736,9 +747,9 @@ modifying the group arrays will lead to undefined behavior.
 
 -   `base` **[array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** The array to sort into groups.
 -   `groupBy` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** The function used for grouping.
--   `options`  Object with properties:
-     `name`: Debug name of this ObservableGroupMap.
-     `keyToName`: Function to create the debug names of the observable group arrays.
+-   `options` Object with properties:
+    `name`: Debug name of this ObservableGroupMap.
+    `keyToName`: Function to create the debug names of the observable group arrays.
 
 ### Examples
 
@@ -748,9 +759,7 @@ const slices = observable([
     { day: "tu", hours: 2 },
 ])
 const slicesByDay = new ObservableGroupMap(slices, (slice) => slice.day)
-autorun(() => console.log(
-    slicesByDay.get("mo")?.length ?? 0,
-    slicesByDay.get("we"))) // outputs 1, undefined
+autorun(() => console.log(slicesByDay.get("mo")?.length ?? 0, slicesByDay.get("we"))) // outputs 1, undefined
 slices[0].day = "we" // outputs 0, [{ day: "we", hours: 12 }]
 ```
 
@@ -780,24 +789,24 @@ Note that this might introduce memory leaks!
 
 ### Parameters
 
--   `fn`  
--   `keepAliveOrOptions`  
+-   `fn`
+-   `keepAliveOrOptions`
 
 ### Examples
 
 ```javascript
 const store = observable({
-a: 1,
-b: 2,
-c: 3,
-m: computedFn(function(x) {
-return this.a * this.b * x
-})
+    a: 1,
+    b: 2,
+    c: 3,
+    m: computedFn(function (x) {
+        return this.a * this.b * x
+    }),
 })
 
 const d = autorun(() => {
-// store.m(3) will be cached as long as this autorun is running
-console.log(store.m(3) * store.c)
+    // store.m(3) will be cached as long as this autorun is running
+    console.log(store.m(3) * store.c)
 })
 ```
 
@@ -826,23 +835,23 @@ The `step` number indicates the code block that is now being executed.
 
 ### Parameters
 
--   `arg1`  
--   `arg2`  
--   `arg3`  
+-   `arg1`
+-   `arg2`
+-   `arg3`
 
 ### Examples
 
 ```javascript
-import {actionAsync, task} from "mobx-utils"
+import { actionAsync, task } from "mobx-utils"
 
 let users = []
 
 const fetchUsers = actionAsync("fetchUsers", async (url) => {
-  const start = Date.now()
-  // note the use of task when awaiting!
-  const data = await task(window.fetch(url))
-  users = await task(data.json())
-  return start - Date.now()
+    const start = Date.now()
+    // note the use of task when awaiting!
+    const data = await task(window.fetch(url))
+    users = await task(data.json())
+    return start - Date.now()
 })
 
 const time = await fetchUsers("http://users.com")
@@ -874,4 +883,195 @@ class Store {
     }
   }
 }
+```
+
+## createTransformer
+
+With `createTransformer` it is very easy to transform a complete data graph into another data graph.
+Transformation functions can be composed so that you can build a tree using lots of small transformations.
+The resulting data graph will never be stale, it will be kept in sync with the source by applying small patches to the result graph.
+This makes it very easy to achieve powerful patterns similar to sideways data loading, map-reduce, tracking state history using immutable data structures etc.
+
+`createTransformer` turns a function (that should transform value `A` into another value `B`) into a reactive and memoizing function.
+In other words, if the `transformation` function computes B given a specific A, the same B will be returned for all other future invocations of the transformation with the same A.
+However, if A changes, the transformation will be re-applied so that B is updated accordingly.
+And last but not least, if nobody is using the transformation of a specific A anymore, its entry will be removed from the memoization table.
+
+The optional `onCleanup` function can be used to get a notification when a transformation of an object is no longer needed.
+This can be used to dispose resources attached to the result object if needed.
+
+Always use transformations inside a reaction like `observer` or `autorun`.
+
+Transformations will, like any other computed value, fall back to lazy evaluation if not observed by something, which sort of defeats their purpose.
+
+### Parameters
+
+-   `transformation: (value: A) => B
+-   `onCleanup?: (result: B, value?: A) => void)`
+-
+
+`createTransformer<A, B>(transformation: (value: A) => B, onCleanup?: (result: B, value?: A) => void): (value: A) => B`
+
+## Examples
+
+This all might still be a bit vague, so here are two examples that explain this whole idea of transforming one data structure into another by using small, reactive functions:
+
+### Tracking mutable state using immutable, shared data structures.
+
+This example is taken from the [Reactive2015 conference demo](https://github.com/mobxjs/mobx-reactive2015-demo):
+
+```javascript
+/*
+    The store that holds our domain: boxes and arrows
+*/
+const store = observable({
+    boxes: [],
+    arrows: [],
+    selection: null,
+})
+
+/**
+    Serialize store to json upon each change and push it onto the states list
+*/
+const states = []
+
+autorun(() => {
+    states.push(serializeState(store))
+})
+
+const serializeState = createTransformer((store) => ({
+    boxes: store.boxes.map(serializeBox),
+    arrows: store.arrows.map(serializeArrow),
+    selection: store.selection ? store.selection.id : null,
+}))
+
+const serializeBox = createTransformer((box) => ({ ...box }))
+
+const serializeArrow = createTransformer((arrow) => ({
+    id: arrow.id,
+    to: arrow.to.id,
+    from: arrow.from.id,
+}))
+```
+
+In this example the state is serialized by composing three different transformation functions.
+The autorunner triggers the serialization of the `store` object, which in turn serializes all boxes and arrows.
+Let's take closer look at the life of an imaginary example box#3.
+
+1. The first time box#3 is passed by `map` to `serializeBox`,
+   the serializeBox transformation is executed and an entry containing box#3 and its serialized representation is added to the internal memoization table of `serializeBox`.
+2. Imagine that another box is added to the `store.boxes` list.
+   This would cause the `serializeState` function to re-compute, resulting in a complete remapping of all the boxes.
+   However, all the invocations of `serializeBox` will now return their old values from the memoization tables since their transformation functions didn't (need to) run again.
+3. Secondly, if somebody changes a property of box#3 this will cause the application of the `serializeBox` to box#3 to re-compute, just like any other reactive function in MobX.
+   Since the transformation will now produce a new Json object based on box#3, all observers of that specific transformation will be forced to run again as well.
+   That's the `serializeState` transformation in this case.
+   `serializeState` will now produce a new value in turn and map all the boxes again. But except for box#3, all other boxes will be returned from the memoization table.
+4. Finally, if box#3 is removed from `store.boxes`, `serializeState` will compute again.
+   But since it will no longer be using the application of `serializeBox` to box#3,
+   that reactive function will go back to non-reactive mode.
+   This signals the memoization table that the entry can be removed so that it is ready for GC.
+
+So effectively we have achieved state tracking using immutable, shared datas structures here.
+All boxes and arrows are mapped and reduced into single state tree.
+Each change will result in a new entry in the `states` array, but the different entries will share almost all of their box and arrow representations.
+
+### Transforming a datagraph into another reactive data graph
+
+Instead of returning plain values from a transformation function, it is also possible to return observable objects.
+This can be used to transform an observable data graph into a another observable data graph, which can be used to transform... you get the idea.
+
+Here is a small example that encodes a reactive file explorer that will update its representation upon each change.
+Data graphs that are built this way will in general react a lot faster and will consist of much more straight-forward code,
+compared to derived data graph that are updated using your own code. See the [performance tests](https://github.com/mobxjs/mobx/blob/3ea1f4af20a51a1cb30be3e4a55ec8f964a8c495/test/perf/transform-perf.js#L4) for some examples.
+
+Unlike the previous example, the `transformFolder` will only run once as long as a folder remains visible;
+the `DisplayFolder` objects track the associated `Folder` objects themselves.
+
+In the following example all mutations to the `state` graph will be processed automatically.
+Some examples:
+
+1. Changing the name of a folder will update its own `path` property and the `path` property of all its descendants.
+2. Collapsing a folder will remove all descendant `DisplayFolders` from the tree.
+3. Expanding a folder will restore them again.
+4. Setting a search filter will remove all nodes that do not match the filter, unless they have a descendant that matches the filter.
+5. Etc.
+
+```javascript
+import {extendObservable, observable, createTransformer, autorun} from "mobx"
+
+function Folder(parent, name) {
+	this.parent = parent;
+	extendObservable(this, {
+		name: name,
+		children: observable.shallow([]),
+	});
+}
+
+function DisplayFolder(folder, state) {
+	this.state = state;
+	this.folder = folder;
+	extendObservable(this, {
+		collapsed: false,
+		get name() {
+			return this.folder.name;
+		},
+		get isVisible() {
+			return !this.state.filter || this.name.indexOf(this.state.filter) !== -1 || this.children.some(child => child.isVisible);
+		},
+		get children() {
+			if (this.collapsed)
+				return [];
+			return this.folder.children.map(transformFolder).filter(function(child) {
+				return child.isVisible;
+			})
+		},
+		get path() {
+			return this.folder.parent === null ? this.name : transformFolder(this.folder.parent).path + "/" + this.name;
+		})
+	});
+}
+
+var state = observable({
+	root: new Folder(null, "root"),
+	filter: null,
+	displayRoot: null
+});
+
+var transformFolder = createTransformer(function (folder) {
+	return new DisplayFolder(folder, state);
+});
+
+
+// returns list of strings per folder
+var stringTransformer = createTransformer(function (displayFolder) {
+	var path = displayFolder.path;
+	return path + "\n" +
+		displayFolder.children.filter(function(child) {
+			return child.isVisible;
+		}).map(stringTransformer).join('');
+});
+
+function createFolders(parent, recursion) {
+	if (recursion === 0)
+		return;
+	for (var i = 0; i < 3; i++) {
+		var folder = new Folder(parent, i + '');
+		parent.children.push(folder);
+		createFolders(folder, recursion - 1);
+	}
+}
+
+createFolders(state.root, 2); // 3^2
+
+autorun(function() {
+    state.displayRoot = transformFolder(state.root);
+    state.text = stringTransformer(state.displayRoot)
+    console.log(state.text)
+});
+
+state.root.name = 'wow'; // change folder name
+state.displayRoot.children[1].collapsed = true; // collapse folder
+state.filter = "2"; // search
+state.filter = null; // unsearch
 ```
