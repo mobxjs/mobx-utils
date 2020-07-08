@@ -998,80 +998,89 @@ Some examples:
 5. Etc.
 
 ```javascript
-import {extendObservable, observable, createTransformer, autorun} from "mobx"
+import { extendObservable, observable, createTransformer, autorun } from "mobx"
 
 function Folder(parent, name) {
-	this.parent = parent;
-	extendObservable(this, {
-		name: name,
-		children: observable.shallow([]),
-	});
+    this.parent = parent
+    extendObservable(this, {
+        name: name,
+        children: observable.shallow([]),
+    })
 }
 
 function DisplayFolder(folder, state) {
-	this.state = state;
-	this.folder = folder;
-	extendObservable(this, {
-		collapsed: false,
-		get name() {
-			return this.folder.name;
-		},
-		get isVisible() {
-			return !this.state.filter || this.name.indexOf(this.state.filter) !== -1 || this.children.some(child => child.isVisible);
-		},
-		get children() {
-			if (this.collapsed)
-				return [];
-			return this.folder.children.map(transformFolder).filter(function(child) {
-				return child.isVisible;
-			})
-		},
-		get path() {
-			return this.folder.parent === null ? this.name : transformFolder(this.folder.parent).path + "/" + this.name;
-		})
-	});
+    this.state = state
+    this.folder = folder
+    extendObservable(this, {
+        collapsed: false,
+        get name() {
+            return this.folder.name
+        },
+        get isVisible() {
+            return (
+                !this.state.filter ||
+                this.name.indexOf(this.state.filter) !== -1 ||
+                this.children.some((child) => child.isVisible)
+            )
+        },
+        get children() {
+            if (this.collapsed) return []
+            return this.folder.children.map(transformFolder).filter(function (child) {
+                return child.isVisible
+            })
+        },
+        get path() {
+            return this.folder.parent === null
+                ? this.name
+                : transformFolder(this.folder.parent).path + "/" + this.name
+        },
+    })
 }
 
 var state = observable({
-	root: new Folder(null, "root"),
-	filter: null,
-	displayRoot: null
-});
+    root: new Folder(null, "root"),
+    filter: null,
+    displayRoot: null,
+})
 
 var transformFolder = createTransformer(function (folder) {
-	return new DisplayFolder(folder, state);
-});
-
+    return new DisplayFolder(folder, state)
+})
 
 // returns list of strings per folder
 var stringTransformer = createTransformer(function (displayFolder) {
-	var path = displayFolder.path;
-	return path + "\n" +
-		displayFolder.children.filter(function(child) {
-			return child.isVisible;
-		}).map(stringTransformer).join('');
-});
+    var path = displayFolder.path
+    return (
+        path +
+        "\n" +
+        displayFolder.children
+            .filter(function (child) {
+                return child.isVisible
+            })
+            .map(stringTransformer)
+            .join("")
+    )
+})
 
 function createFolders(parent, recursion) {
-	if (recursion === 0)
-		return;
-	for (var i = 0; i < 3; i++) {
-		var folder = new Folder(parent, i + '');
-		parent.children.push(folder);
-		createFolders(folder, recursion - 1);
-	}
+    if (recursion === 0) return
+    for (var i = 0; i < 3; i++) {
+        var folder = new Folder(parent, i + "")
+        parent.children.push(folder)
+        createFolders(folder, recursion - 1)
+    }
 }
 
-createFolders(state.root, 2); // 3^2
+createFolders(state.root, 2) // 3^2
 
-autorun(function() {
-    state.displayRoot = transformFolder(state.root);
+autorun(function () {
+    state.displayRoot = transformFolder(state.root)
     state.text = stringTransformer(state.displayRoot)
     console.log(state.text)
-});
+})
 
-state.root.name = 'wow'; // change folder name
-state.displayRoot.children[1].collapsed = true; // collapse folder
-state.filter = "2"; // search
-state.filter = null; // unsearch
+state.root.name = "wow" // change folder name
+state.displayRoot.children[1].collapsed = true // collapse folder
+state.filter = "2" // search
+state.filter = null // unsearch
 ```
