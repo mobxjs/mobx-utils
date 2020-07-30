@@ -30,3 +30,27 @@ test("now should be up to date outside reaction, #40", (done) => {
         done()
     }, 500)
 })
+
+test("now should be up to date when ticker is reactivated, #271", (done) => {
+    let d1
+    mobx.autorun((r) => {
+        d1 = utils.now(100)
+        r.dispose()
+    })
+
+    let d2
+    mobx.autorun(
+        (r) => {
+            d2 = utils.now(100)
+            r.dispose()
+        },
+        {
+            delay: 150,
+        }
+    )
+
+    setTimeout(() => {
+        expect(d1).toBeLessThan(d2)
+        done()
+    }, 200)
+})

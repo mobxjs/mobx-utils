@@ -47,6 +47,7 @@ function createIntervalTicker(interval: number): IResource<number> {
     let subscriptionHandle: any
     return fromResource<number>(
         (sink) => {
+            sink(Date.now())
             subscriptionHandle = setInterval(() => sink(Date.now()), interval)
         },
         () => {
@@ -57,9 +58,10 @@ function createIntervalTicker(interval: number): IResource<number> {
 }
 
 function createAnimationFrameTicker(): IResource<number> {
-    let subscriptionHandle: number
     const frameBasedTicker = fromResource<number>(
         (sink) => {
+            sink(Date.now())
+
             function scheduleTick() {
                 window.requestAnimationFrame(() => {
                     sink(Date.now())
