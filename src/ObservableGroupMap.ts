@@ -148,7 +148,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
     private _getGroupArr(key: G) {
         let result = super.get(key)
         if (undefined === result) {
-            result = observable([], { name: `GroupArray[${this._keyToName(key)}]` })
+            result = observable([], { name: `GroupArray[${this._keyToName(key)}]`, deep: false })
             super.set(key, result)
         }
         return result
