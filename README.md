@@ -732,6 +732,9 @@ No guarantees are made about the order of items in the grouped arrays.
 The resulting map of arrays is read-only. clear(), set(), delete() are not supported and
 modifying the group arrays will lead to undefined behavior.
 
+NB: ObservableGroupMap relies on `Symbol`s. If you are targeting a platform which doesn't
+support these natively, you will need to provide a polyfill.
+
 ### Parameters
 
 -   `base` **[array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** The array to sort into groups.
