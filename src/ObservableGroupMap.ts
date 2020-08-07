@@ -36,6 +36,9 @@ interface GroupItemInfo {
  * The resulting map of arrays is read-only. clear(), set(), delete() are not supported and
  * modifying the group arrays will lead to undefined behavior.
  *
+ * NB: ObservableGroupMap relies on `Symbol`s. If you are targeting a platform which doesn't
+ * support these natively, you will need to provide a polyfill.
+ *
  * @param {array} base The array to sort into groups.
  * @param {function} groupBy The function used for grouping.
  * @param options Object with properties:
@@ -88,9 +91,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         super()
         this._keyToName = keyToName
         this._groupBy = groupBy
-        this._ogmInfoKey = ("function" == typeof Symbol
-            ? Symbol("ogmInfo" + name)
-            : "__ogmInfo" + name) as any
+        this._ogmInfoKey = Symbol("ogmInfo" + name) as any
         this._base = base
 
         for (let i = 0; i < base.length; i++) {
