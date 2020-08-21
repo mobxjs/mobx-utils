@@ -5,9 +5,11 @@ Array [
   Array [
     "",
     Object {
+      "debugObjectName": "ObservableObject@4",
       "name": "a",
       "newValue": 3,
       "object": null,
+      "observableKind": "object",
       "type": "add",
     },
   ],
@@ -30,8 +32,10 @@ Array [
         },
       ],
       "addedCount": 2,
+      "debugObjectName": "ObservableArray@10",
       "index": 1,
       "object": null,
+      "observableKind": "array",
       "removed": Array [
         2,
       ],
@@ -42,9 +46,11 @@ Array [
   Array [
     "1",
     Object {
+      "debugObjectName": "ObservableArray@10[..]",
       "name": "x",
       "newValue": "a",
       "object": null,
+      "observableKind": "object",
       "oldValue": 1,
       "type": "update",
     },
@@ -52,9 +58,11 @@ Array [
   Array [
     "2",
     Object {
+      "debugObjectName": "ObservableArray@10[..]",
       "name": "x",
       "newValue": "b",
       "object": null,
+      "observableKind": "object",
       "oldValue": 2,
       "type": "update",
     },
@@ -62,9 +70,11 @@ Array [
   Array [
     "3",
     Object {
+      "debugObjectName": "ObservableArray@10[..]",
       "name": "x",
       "newValue": "c",
       "object": null,
+      "observableKind": "object",
       "oldValue": 3,
       "type": "update",
     },
@@ -74,8 +84,10 @@ Array [
     Object {
       "added": Array [],
       "addedCount": 0,
+      "debugObjectName": "ObservableArray@10",
       "index": 0,
       "object": null,
+      "observableKind": "array",
       "removed": Array [
         1,
         Object {
@@ -101,8 +113,10 @@ Array [
         },
       ],
       "addedCount": 1,
+      "debugObjectName": "ObservableArray@10",
       "index": 1,
       "object": null,
+      "observableKind": "array",
       "removed": Array [],
       "removedCount": 0,
       "type": "splice",
@@ -111,9 +125,11 @@ Array [
   Array [
     "0",
     Object {
+      "debugObjectName": "ObservableArray@10[..]",
       "name": "x",
       "newValue": "A",
       "object": null,
+      "observableKind": "object",
       "oldValue": "c",
       "type": "update",
     },
@@ -126,6 +142,7 @@ Array [
   Array [
     "",
     Object {
+      "debugObjectName": "ObservableObject@2",
       "name": "a",
       "newValue": 2,
       "object": Object {
@@ -136,6 +153,7 @@ Array [
         },
         Symbol(mobx administration): null,
       },
+      "observableKind": "object",
       "oldValue": 1,
       "type": "update",
     },
@@ -143,12 +161,14 @@ Array [
   Array [
     "b",
     Object {
+      "debugObjectName": "ObservableObject@2.b",
       "name": "z",
       "newValue": 4,
       "object": Object {
         "z": 4,
         Symbol(mobx administration): null,
       },
+      "observableKind": "object",
       "oldValue": 3,
       "type": "update",
     },
@@ -161,12 +181,14 @@ Array [
   Array [
     "a",
     Object {
+      "debugObjectName": "ObservableObject@6",
       "name": "b",
       "newValue": 2,
       "object": Object {
         "b": 2,
         Symbol(mobx administration): null,
       },
+      "observableKind": "object",
       "oldValue": 1,
       "type": "update",
     },
@@ -174,10 +196,12 @@ Array [
   Array [
     "",
     Object {
+      "debugObjectName": "ObservableObject@7",
       "name": "a",
       "object": Object {
         Symbol(mobx administration): null,
       },
+      "observableKind": "object",
       "oldValue": Object {
         "b": 2,
         Symbol(mobx administration): null,
@@ -193,9 +217,11 @@ Array [
   Array [
     "a/b",
     Object {
+      "debugObjectName": "ObservableObject@3.a.b",
       "name": "c",
       "newValue": 4,
       "object": null,
+      "observableKind": "object",
       "oldValue": 3,
       "type": "update",
     },
@@ -208,8 +234,10 @@ Array [
   Array [
     "",
     Object {
+      "debugObjectName": "ObservableObject@5",
       "name": "x",
       "object": null,
+      "observableKind": "object",
       "oldValue": 1,
       "type": "remove",
     },
@@ -222,30 +250,36 @@ Array [
   Array [
     "",
     Object {
+      "debugObjectName": "ObservableObject@11",
       "name": "x",
-      "newValue": Object {},
+      "newValue": Array [],
       "object": null,
+      "observableKind": "object",
       "type": "add",
     },
   ],
   Array [
     "x",
     Object {
+      "debugObjectName": "ObservableMap@12",
       "name": "a",
       "newValue": Object {
         "a": 1,
         Symbol(mobx administration): null,
       },
       "object": null,
+      "observableKind": "map",
       "type": "add",
     },
   ],
   Array [
     "x/a",
     Object {
+      "debugObjectName": "ObservableMap@12.a",
       "name": "a",
       "newValue": 2,
       "object": null,
+      "observableKind": "object",
       "oldValue": 1,
       "type": "update",
     },
@@ -253,9 +287,11 @@ Array [
   Array [
     "x",
     Object {
+      "debugObjectName": "ObservableMap@12",
       "name": "a",
       "newValue": 3,
       "object": null,
+      "observableKind": "map",
       "oldValue": Object {
         "a": 2,
         Symbol(mobx administration): null,
@@ -266,8 +302,10 @@ Array [
   Array [
     "x",
     Object {
+      "debugObjectName": "ObservableMap@12",
       "name": "a",
       "object": null,
+      "observableKind": "map",
       "oldValue": 3,
       "type": "delete",
     },

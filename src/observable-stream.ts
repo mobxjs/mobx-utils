@@ -1,4 +1,4 @@
-import { computed, observable, action, runInAction } from "mobx"
+import { computed, observable, action, runInAction, observe, makeObservable } from "mobx"
 
 declare var Symbol: any
 
@@ -54,16 +54,18 @@ export function toStream<T>(
         subscribe(observer?: IStreamObserver<T> | ((value: T) => void) | null): ISubscription {
             if ("function" === typeof observer) {
                 return {
-                    unsubscribe: computedValue.observe(
-                        ({ newValue }: { newValue: T }) => observer(newValue),
+                    unsubscribe: observe(
+                        computedValue,
+                        ({ newValue }: { newValue: any }) => observer(newValue),
                         fireImmediately
                     ),
                 }
             }
             if (observer && "object" === typeof observer && observer.next) {
                 return {
-                    unsubscribe: computedValue.observe(
-                        ({ newValue }: { newValue: T }) => observer.next!(newValue),
+                    unsubscribe: observe(
+                        computedValue,
+                        ({ newValue }: { newValue: any }) => observer.next!(newValue),
                         fireImmediately
                     ),
                 }
@@ -83,6 +85,7 @@ class StreamListener<T> implements IStreamObserver<T> {
     subscription!: ISubscription
 
     constructor(observable: IObservableStream<T>, initialValue: T) {
+        makeObservable(this)
         runInAction(() => {
             this.current = initialValue
             this.subscription = observable.subscribe(this)

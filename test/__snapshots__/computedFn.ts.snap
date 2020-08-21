@@ -4,7 +4,7 @@ exports[`make sure the fn is cached 1`] = `
 Object {
   "dependencies": Array [
     Object {
-      "name": "ObservableObject@10.m",
+      "name": "ObservableObject@10.m?",
     },
     Object {
       "dependencies": Array [

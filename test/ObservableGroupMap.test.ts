@@ -4,7 +4,7 @@ import * as assert from "assert"
 import { ObservableGroupMap } from "../src/mobx-utils"
 
 const json = <G>(ogm: ObservableGroupMap<string, G>): { [k: string]: G } =>
-    Array.from(ogm.keys()).reduce((r, k) => ((r[k] = ogm.get(k)?.toJS()), r), {} as any)
+    Array.from(ogm.keys()).reduce((r, k) => ((r[k] = ogm.get(k)?.slice()), r), {} as any)
 
 describe("ObservableGroupMap", () => {
     type Slice = { day: string; hours: number }

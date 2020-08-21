@@ -1,4 +1,4 @@
-import { IComputedValue, getAtom } from "mobx"
+import { IComputedValue, getAtom, observe } from "mobx"
 import { IDisposer } from "./utils"
 
 export function keepAlive(target: Object, property: string): IDisposer
@@ -37,5 +37,5 @@ export function keepAlive(_1: any, _2?: string) {
         throw new Error(
             "No computed provided, please provide an object created with `computed(() => expr)` or an object + property name"
         )
-    return computed.observe(() => {})
+    return observe(computed, () => {})
 }

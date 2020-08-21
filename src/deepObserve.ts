@@ -4,15 +4,14 @@ import {
     isObservableObject,
     isObservableArray,
     IObjectDidChange,
-    IArrayChange,
-    IArraySplice,
+    IArrayDidChange,
     IMapDidChange,
     values,
     entries,
 } from "mobx"
 import { IDisposer } from "./utils"
 
-type IChange = IObjectDidChange | IArrayChange | IArraySplice | IMapDidChange
+type IChange = IObjectDidChange | IArrayDidChange | IMapDidChange
 
 type Entry = {
     dispose: IDisposer

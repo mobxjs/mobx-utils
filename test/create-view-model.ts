@@ -12,6 +12,9 @@ class TodoClass {
     get usersCount(): number {
         return this.usersInterested.length
     }
+    constructor() {
+        mobx.makeObservable(this)
+    }
 }
 
 function Todo(title, done, usersInterested, unobservedProp) {

@@ -20,7 +20,7 @@ export function moveItem<T>(target: IObservableArray<T>, fromIndex: number, toIn
     if (fromIndex === toIndex) {
         return
     }
-    const oldItems = (target as any)[$mobx].values
+    const oldItems = target.slice()
     let newItems: T[]
     if (fromIndex < toIndex) {
         newItems = [
@@ -53,7 +53,7 @@ function checkIndex(target: IObservableArray<any>, index: number) {
     if (index < 0) {
         throw new Error(`[mobx.array] Index out of bounds: ${index} is negative`)
     }
-    const length = (target as any)[$mobx].values.length
+    const length = (target as any).length
     if (index >= length) {
         throw new Error(`[mobx.array] Index out of bounds: ${index} is not smaller than ${length}`)
     }
