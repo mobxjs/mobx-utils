@@ -47,49 +47,37 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 -   [createViewModel](#createviewmodel)
     -   [Parameters](#parameters-6)
     -   [Examples](#examples-5)
--   [whenWithTimeout](#whenwithtimeout)
+-   [keepAlive](#keepalive)
     -   [Parameters](#parameters-7)
     -   [Examples](#examples-6)
--   [keepAlive](#keepalive)
+-   [keepAlive](#keepalive-1)
     -   [Parameters](#parameters-8)
     -   [Examples](#examples-7)
--   [keepAlive](#keepalive-1)
+-   [queueProcessor](#queueprocessor)
     -   [Parameters](#parameters-9)
     -   [Examples](#examples-8)
--   [queueProcessor](#queueprocessor)
+-   [chunkProcessor](#chunkprocessor)
     -   [Parameters](#parameters-10)
     -   [Examples](#examples-9)
--   [chunkProcessor](#chunkprocessor)
+-   [now](#now)
     -   [Parameters](#parameters-11)
     -   [Examples](#examples-10)
--   [now](#now)
+-   [expr](#expr)
     -   [Parameters](#parameters-12)
     -   [Examples](#examples-11)
--   [asyncAction](#asyncaction)
+-   [deepObserve](#deepobserve)
     -   [Parameters](#parameters-13)
     -   [Examples](#examples-12)
--   [whenAsync](#whenasync)
+-   [ObservableGroupMap](#observablegroupmap)
     -   [Parameters](#parameters-14)
     -   [Examples](#examples-13)
--   [expr](#expr)
-    -   [Parameters](#parameters-15)
-    -   [Examples](#examples-14)
--   [deepObserve](#deepobserve)
-    -   [Parameters](#parameters-16)
-    -   [Examples](#examples-15)
--   [ObservableGroupMap](#observablegroupmap)
-    -   [Parameters](#parameters-17)
-    -   [Examples](#examples-16)
     -   [dispose](#dispose)
 -   [ObservableMap](#observablemap)
 -   [computedFn](#computedfn)
-    -   [Parameters](#parameters-18)
-    -   [Examples](#examples-17)
+    -   [Parameters](#parameters-15)
+    -   [Examples](#examples-14)
 -   [DeepMapEntry](#deepmapentry)
 -   [DeepMap](#deepmap)
--   [actionAsync](#actionasync)
-    -   [Parameters](#parameters-19)
-    -   [Examples](#examples-18)
 
 ## fromPromise
 
@@ -408,40 +396,6 @@ viewModel.reset()
 // prints "Get tea, Get tea", changes of the viewModel have been abandoned
 ```
 
-## whenWithTimeout
-
-Like normal `when`, except that this `when` will automatically dispose if the condition isn't met within a certain amount of time.
-
-### Parameters
-
--   `expr`  
--   `action`  
--   `timeout` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount when spends waiting before giving up (optional, default `10000`)
--   `onTimeout` **any** the ontimeout handler will be called if the condition wasn't met within the given time (optional, default `()=>{}`)
-
-### Examples
-
-```javascript
-test("expect store to load", t => {
-  const store = {
-    items: [],
-    loaded: false
-  }
-  fetchDataForStore((data) => {
-    store.items = data;
-    store.loaded = true;
-  })
-  whenWithTimeout(
-    () => store.loaded
-    () => t.end()
-    2000,
-    () => t.fail("store didn't load with 2 secs")
-  )
-})
-```
-
-Returns **IDisposer** disposer function that can be used to cancel the when prematurely. Neither action or onTimeout will be fired if disposed
-
 ## keepAlive
 
 MobX normally suspends any computed value that is not in use by any reaction,
@@ -572,102 +526,6 @@ autorun(() => {
   console.log("Seconds elapsed: ", (mobxUtils.now() - start) / 1000)
 })
 ```
-
-## asyncAction
-
-_deprecated_ this functionality can now be found as `flow` in the mobx package. However, `flow` is not applicable as decorator, where `asyncAction` still is.
-
-`asyncAction` takes a generator function and automatically wraps all parts of the process in actions. See the examples below.
-`asyncAction` can be used both as decorator or to wrap functions.
-
--   It is important that `asyncAction should always be used with a generator function (recognizable as`function_`or`_name\` syntax)
--   Each yield statement should return a Promise. The generator function will continue as soon as the promise settles, with the settled value
--   When the generator function finishes, you can return a normal value. The `asyncAction` wrapped function will always produce a promise delivering that value.
-
-When using the mobx devTools, an asyncAction will emit `action` events with names like:
-
--   `"fetchUsers - runid: 6 - init"`
--   `"fetchUsers - runid: 6 - yield 0"`
--   `"fetchUsers - runid: 6 - yield 1"`
-
-The `runId` represents the generator instance. In other words, if `fetchUsers` is invoked multiple times concurrently, the events with the same `runid` belong together.
-The `yield` number indicates the progress of the generator. `init` indicates spawning (it won't do anything, but you can find the original arguments of the `asyncAction` here).
-`yield 0` ... `yield n` indicates the code block that is now being executed. `yield 0` is before the first `yield`, `yield 1` after the first one etc. Note that yield numbers are not determined lexically but by the runtime flow.
-
-`asyncActions` requires `Promise` and `generators` to be available on the target environment. Polyfill `Promise` if needed. Both TypeScript and Babel can compile generator functions down to ES5.
-
- N.B. due to a [babel limitation](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy/issues/26), in Babel generatos cannot be combined with decorators. See also [#70](https://github.com/mobxjs/mobx-utils/issues/70)
-
-### Parameters
-
--   `arg1`  
--   `arg2`  
-
-### Examples
-
-```javascript
-import {asyncAction} from "mobx-utils"
-
-let users = []
-
-const fetchUsers = asyncAction("fetchUsers", function* (url) {
-  const start = Date.now()
-  const data = yield window.fetch(url)
-  users = yield data.json()
-  return start - Date.now()
-})
-
-fetchUsers("http://users.com").then(time => {
-  console.dir("Got users", users, "in ", time, "ms")
-})
-```
-
-```javascript
-import {asyncAction} from "mobx-utils"
-
-mobx.configure({ enforceActions: "observed" }) // don't allow state modifications outside actions
-
-class Store {
-	@observable githubProjects = []
-	@observable = "pending" // "pending" / "done" / "error"
-
-	@asyncAction
-	*fetchProjects() { // <- note the star, this a generator function!
-		this.githubProjects = []
-		this.state = "pending"
-		try {
-			const projects = yield fetchGithubProjectsSomehow() // yield instead of await
-			const filteredProjects = somePreprocessing(projects)
-			// the asynchronous blocks will automatically be wrapped actions
-			this.state = "done"
-			this.githubProjects = filteredProjects
-		} catch (error) {
-			this.state = "error"
-		}
-	}
-}
-```
-
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
-
-## whenAsync
-
-_deprecated_ whenAsync is deprecated, use mobx.when without effect instead.
-
-Like normal `when`, except that this `when` will return a promise that resolves when the expression becomes truthy
-
-### Parameters
-
--   `fn`  
--   `timeout` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum amount of time to wait, before the promise rejects
-
-### Examples
-
-```javascript
-await whenAsync(() => !state.someBoolean)
-```
-
-Returns **any** Promise for when an observable eventually matches some condition. Rejects if timeout is provided and has expired
 
 ## expr
 
@@ -807,74 +665,3 @@ console.log(store.m(3) * store.c)
 ## DeepMapEntry
 
 ## DeepMap
-
-## actionAsync
-
-Alternative syntax for async actions, similar to `flow` but more compatible with
-Typescript typings. Not to be confused with `asyncAction`, which is deprecated.
-
-`actionAsync` can be used either as a decorator or as a function.
-It takes an async function that internally must use `await task(promise)` rather than
-the standard `await promise`.
-
-When using the mobx devTools, an asyncAction will emit `action` events with names like:
-
--   `"fetchUsers - runid 6 - step 0"`
--   `"fetchUsers - runid 6 - step 1"`
--   `"fetchUsers - runid 6 - step 2"`
-
-The `runId` represents the action instance. In other words, if `fetchUsers` is invoked
-multiple times concurrently, the events with the same `runid` belong together.
-The `step` number indicates the code block that is now being executed.
-
-### Parameters
-
--   `arg1`  
--   `arg2`  
--   `arg3`  
-
-### Examples
-
-```javascript
-import {actionAsync, task} from "mobx-utils"
-
-let users = []
-
-const fetchUsers = actionAsync("fetchUsers", async (url) => {
-  const start = Date.now()
-  // note the use of task when awaiting!
-  const data = await task(window.fetch(url))
-  users = await task(data.json())
-  return start - Date.now()
-})
-
-const time = await fetchUsers("http://users.com")
-console.log("Got users", users, "in ", time, "ms")
-```
-
-```javascript
-import {actionAsync, task} from "mobx-utils"
-
-mobx.configure({ enforceActions: "observed" }) // don't allow state modifications outside actions
-
-class Store {
-  @observable githubProjects = []
-  @observable = "pending" // "pending" / "done" / "error"
-
-  @actionAsync
-  async fetchProjects() {
-    this.githubProjects = []
-    this.state = "pending"
-    try {
-      // note the use of task when awaiting!
-      const projects = await task(fetchGithubProjectsSomehow())
-      const filteredProjects = somePreprocessing(projects)
-      // the asynchronous blocks will automatically be wrapped actions
-      this.state = "done"
-      this.githubProjects = filteredProjects
-    } catch (error) {
-       this.state = "error"
-    }
-  }
-}
-```

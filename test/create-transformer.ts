@@ -62,8 +62,31 @@ test("transform1", () => {
     expect(unloaded.length).toBe(1)
     expect(unloaded[0][0]).toBe(tea)
     expect(unloaded[0][1]).toBe("TEA")
-    expect((tea as any)[m.$mobx].values.get("title").observers.size).toBe(0)
-    expect((state.todos[0] as any)[m.$mobx].values.get("title").observers.size).toBe(1)
+    expect(m.getObserverTree(tea, "title")).toMatchInlineSnapshot(`
+        Object {
+          "name": "ObservableObject@1.todos[..].title",
+        }
+    `)
+    expect(m.getObserverTree(state.todos[0], "title")).toMatchInlineSnapshot(`
+        Object {
+          "name": "ObservableObject@1.todos[..].title",
+          "observers": Array [
+            Object {
+              "name": "Transformer--memoizationId:3",
+              "observers": Array [
+                Object {
+                  "name": "Transformer--memoizationId:1",
+                  "observers": Array [
+                    Object {
+                      "name": "Autorun@2",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }
+    `)
 
     tea.title = "mint"
     expect(mapped).toBe("johnBISCUIT")

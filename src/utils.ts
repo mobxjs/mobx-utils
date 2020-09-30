@@ -12,13 +12,6 @@ export function invariant(cond: boolean, message = "Illegal state") {
     if (!cond) fail(message)
 }
 
-const deprecatedMessages: string[] = []
-export function deprecated(msg: string) {
-    if (deprecatedMessages.indexOf(msg) !== -1) return
-    deprecatedMessages.push(msg)
-    console.error("[mobx-utils] Deprecated: " + msg)
-}
-
 export function addHiddenProp(object: any, propName: string, value: any) {
     Object.defineProperty(object, propName, {
         enumerable: false,

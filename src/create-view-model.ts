@@ -12,6 +12,7 @@ import {
     keys,
     _getAdministration,
     $mobx,
+    makeObservable,
 } from "mobx"
 import { invariant, getAllMethodsAndProperties } from "./utils"
 
@@ -38,10 +39,11 @@ export class ViewModel<T> implements IViewModel<T> {
 
     @computed
     get changedValues() {
-        return this.localValues.toJS()
+        return new Map(this.localValues)
     }
 
     constructor(public model: T) {
+        makeObservable(this)
         invariant(isObservableObject(model), "createViewModel expects an observable object")
 
         // use this helper as Object.getOwnPropertyNames doesn't return getters
@@ -54,8 +56,8 @@ export class ViewModel<T> implements IViewModel<T> {
                 `The propertyname ${key} is reserved and cannot be used with viewModels`
             )
             if (isComputedProp(model, key)) {
-                const derivation = _getAdministration(model, key).derivation // Fixme: there is no clear api to get the derivation
-                this.localComputedValues.set(key, computed(derivation.bind(this)))
+                const derivation: () => any = _getAdministration(model, key).derivation // Fixme: there is no clear api to get the derivation
+                this.localComputedValues.set(key, computed(derivation.bind(this)) as any)
             }
 
             const descriptor = Object.getOwnPropertyDescriptor(model, key)
