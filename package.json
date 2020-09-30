@@ -42,7 +42,7 @@
     "lodash.clonedeep": "*",
     "lodash.clonedeepwith": "*",
     "lodash.intersection": "*",
-    "mobx": "^6.0.0-rc.3",
+    "mobx": "^6.0.0",
     "prettier": "^2.0.5",
     "rollup": "^2.10.8",
     "rxjs": "^6.5.5",
