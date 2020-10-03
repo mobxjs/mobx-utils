@@ -1,6 +1,6 @@
 {
   "name": "mobx-utils",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Utility functions and common patterns for MobX",
   "main": "mobx-utils.umd.js",
   "module": "mobx-utils.module.js",
@@ -45,10 +45,10 @@
     "mobx": "^6.0.0",
     "prettier": "^2.0.5",
     "rollup": "^2.10.8",
-    "rxjs": "^6.5.5",
+    "rxjs": "^6.6.3",
     "shelljs": "^0.8.4",
     "ts-jest": "^26.0.0",
-    "typescript": "^3.9.3"
+    "typescript": "^4.0.3"
   },
   "dependencies": {},
   "peerDependencies": {

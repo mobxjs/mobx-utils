@@ -71,8 +71,12 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 -   [ObservableGroupMap](#observablegroupmap)
     -   [Parameters](#parameters-14)
     -   [Examples](#examples-13)
-    -   [dispose](#dispose)
 -   [ObservableMap](#observablemap)
+-   [defineProperty](#defineproperty)
+-   [defineProperty](#defineproperty-1)
+-   [defineProperty](#defineproperty-2)
+-   [defineProperty](#defineproperty-3)
+-   [defineProperty](#defineproperty-4)
 -   [computedFn](#computedfn)
     -   [Parameters](#parameters-15)
     -   [Examples](#examples-14)
@@ -615,12 +619,29 @@ autorun(() => console.log(
 slices[0].day = "we" // outputs 0, [{ day: "we", hours: 12 }]
 ```
 
-### dispose
+## ObservableMap
+
+## defineProperty
+
+Base observable array which is being sorted into groups.
+
+## defineProperty
+
+The ObservableGroupMap needs to track some state per-item. This is the name/symbol of the
+property used to attach the state.
+
+## defineProperty
+
+The function used to group the items.
+
+## defineProperty
+
+This function is used to generate the mobx debug names of the observable group arrays.
+
+## defineProperty
 
 Disposes all observers created during construction and removes state added to base array
 items.
-
-## ObservableMap
 
 ## computedFn
 

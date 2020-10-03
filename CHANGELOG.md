@@ -1,3 +1,7 @@
+# 6.0.1
+
+* Fixed build issue causing decorators in the final build version not to be picked up correctly. Fixes [#279](https://github.com/mobxjs/mobx-utils/issues/279)
+
 # 6.0.0
 
 * [BREAKING] Dropped previously deprecated `asyncAction`. Use `mobx.flow` instead.
