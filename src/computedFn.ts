@@ -77,7 +77,7 @@ export function computedFn<T extends (...args: any[]) => any>(
             },
             {
                 ...opts,
-                name: `computedFn(${fn.name}#${++i})`,
+                name: `computedFn(${opts.name || fn.name}#${++i})`,
             }
         )
         entry.set(c)
