@@ -1,7 +1,7 @@
 import { autorun, computed } from "mobx"
 
 /**
- * Creates a Promise that resolves with an observed value when fulfills the conditions of a predicate.
+ * Creates a Promise that resolves with an observed value when it fulfills the conditions of a predicate.
  *
  * The generator function selects the to be observed value. If the generator creates an undefined value it is ignored.
  * If the generator creates a value, it will be passed to the predicate function that indicates if that value should
@@ -22,7 +22,7 @@ import { autorun, computed } from "mobx"
  * @param generator - selects the value to be observed
  * @param predicate - optional predicate to indicate when the observed value should resolve the promise. By default accepts all values.
  * @param abortSignal - singal to abort wait for the observed value change (using AbortSignal WebAPI)
- * @returns a Promise that resolves with the observed value when fulfills the conditions of the predicate
+ * @returns a Promise that resolves with the observed value when it fulfills the conditions of the predicate
  */
 export function toPromise<T>(
     generator: () => T | undefined,
