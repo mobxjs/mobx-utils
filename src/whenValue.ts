@@ -17,14 +17,14 @@ import { autorun, computed } from "mobx"
  * });
  *
  * //wait until store.foo contains the character "b"
- * await toPromise(()=>store.foo, (value)=>value.indexOf("b")>=0);
+ * await whenValue(()=>store.foo, (value)=>value.indexOf("b")>=0);
  *  *
  * @param generator - selects the value to be observed
  * @param predicate - optional predicate to indicate when the observed value should resolve the promise. By default accepts all values.
  * @param abortSignal - singal to abort wait for the observed value change (using AbortSignal WebAPI)
  * @returns a Promise that resolves with the observed value when it fulfills the conditions of the predicate
  */
-export function toPromise<T>(
+export function whenValue<T>(
     generator: () => T | undefined,
     predicate: (value: T) => boolean = () => true,
     abortSignal?: AbortSignal

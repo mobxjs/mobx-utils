@@ -1,10 +1,10 @@
 import { observable, runInAction } from "mobx"
-import { toPromise } from "../src/toPromise"
+import { whenValue } from "../src/whenValue"
 
 test("Should wait for value", async () => {
     const store = observable({ foo: "" })
 
-    const promise = toPromise(
+    const promise = whenValue(
         () => store.foo,
         (foo) => foo.indexOf("b") >= 0
     )
@@ -20,7 +20,7 @@ test("Should wait for value", async () => {
 test("Should ignore non matching value", async () => {
     const store = observable({ foo: "" })
 
-    const promise = toPromise(
+    const promise = whenValue(
         () => store.foo,
         (foo) => foo.indexOf("b") >= 0
     )
@@ -40,7 +40,7 @@ test("Should ignore non matching value", async () => {
 test("Should resolve when value becomes available", async () => {
     const store = observable({ foo: "", bar: undefined })
 
-    const promise = toPromise(() => store.bar)
+    const promise = whenValue(() => store.bar)
     setImmediate(() => {
         runInAction(() => {
             store.bar = undefined
@@ -57,7 +57,7 @@ test("Should resolve when value becomes available", async () => {
 test("Should resolve when item gets added to map", async () => {
     const store = observable(new Map<string, string>())
 
-    const promise = toPromise(() => store.get("but"))
+    const promise = whenValue(() => store.get("but"))
     setImmediate(() => {
         runInAction(() => {
             store.set("no no", "not this one")
@@ -74,7 +74,7 @@ test("Should resolve when item gets added to map", async () => {
 test("Should reject when generator throws error", async () => {
     const error = new Error("Yikes!")
 
-    const promise = toPromise(() => {
+    const promise = whenValue(() => {
         throw error
     })
 
@@ -86,7 +86,7 @@ test("Should reject when predicate throws error", async () => {
 
     const error = new Error("Yikes!")
 
-    const promise = toPromise(
+    const promise = whenValue(
         () => store.foo,
         (value) => {
             throw error
@@ -101,7 +101,7 @@ test("Should reject when aborted", async () => {
 
     const aborter = new AbortController()
 
-    const promise = toPromise(
+    const promise = whenValue(
         () => store.foo,
         (value) => value == "hello",
         aborter.signal

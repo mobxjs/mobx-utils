@@ -48,13 +48,12 @@
     "rxjs": "^6.6.3",
     "shelljs": "^0.8.4",
     "ts-jest": "^26.0.0",
-    "typescript": "^4.0.3"
-  },
-  "dependencies": {
+    "typescript": "^4.0.3",
     "abort-controller": "^3.0.0"
   },
   "peerDependencies": {
-    "mobx": "^6.0.0"
+    "mobx": "^6.0.0",
+    "abort-controller": "^3.0.0"
   },
   "keywords": [
     "mobx",
