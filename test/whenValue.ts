@@ -96,18 +96,28 @@ test("Should reject when predicate throws error", async () => {
     return expect(promise).rejects.toEqual(error)
 })
 
-test("Should reject when aborted", async () => {
+test("Should reject when cancelled", async () => {
     const store = observable({ foo: "bar" })
-
-    const aborter = new AbortController()
 
     const promise = whenValue(
         () => store.foo,
-        (value) => value == "hello",
-        aborter.signal
+        (value) => value == "hello"
     )
 
-    aborter.abort()
+    promise.cancel()
 
-    return expect(promise).rejects.toEqual(new Error("Aborted wait for observed value change"))
+    return expect(promise).rejects.toEqual("WHEN_VALUE_CANCELLED")
+})
+
+test("Cancel after resolve has no effect", async () => {
+    const store = observable({ foo: 10 })
+
+    const promise = whenValue(
+        () => store.foo,
+        (value) => value > 5
+    )
+
+    promise.cancel()
+
+    return expect(promise).resolves.toEqual(10)
 })

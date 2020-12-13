@@ -9,7 +9,7 @@ import { autorun, computed } from "mobx"
  *
  * Any error in the generator or predicate functions will reject the promise.
  *
- * An abort signal may be provided to cancel the wait for the observed value. This will reject the promise.
+ * The operation can be cancelled by the cancel operation added to the returned promise. This will reject the Promise.
  *
  * @example
  * const store = observed({
@@ -21,15 +21,15 @@ import { autorun, computed } from "mobx"
  *  *
  * @param generator - selects the value to be observed
  * @param predicate - optional predicate to indicate when the observed value should resolve the promise. By default accepts all values.
- * @param abortSignal - singal to abort wait for the observed value change (using AbortSignal WebAPI)
  * @returns a Promise that resolves with the observed value when it fulfills the conditions of the predicate
  */
 export function whenValue<T>(
     generator: () => T | undefined,
-    predicate: (value: T) => boolean = () => true,
-    abortSignal?: AbortSignal
-): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
+    predicate: (value: T) => boolean = () => true
+): Promise<T> & { cancel: () => void } {
+    let cancel: () => void = () => undefined
+
+    const p = new Promise<T>((resolve, reject) => {
         const disposer = autorun((reaction) => {
             try {
                 const value = computed(generator).get()
@@ -42,11 +42,14 @@ export function whenValue<T>(
                 reaction.dispose()
             }
         })
-        if (abortSignal) {
-            abortSignal.onabort = () => {
-                disposer()
-                reject(new Error("Aborted wait for observed value change"))
-            }
+
+        cancel = () => {
+            disposer()
+            reject("WHEN_VALUE_CANCELLED")
         }
     })
+
+    const res = p as any
+    res.cancel = cancel
+    return res
 }
