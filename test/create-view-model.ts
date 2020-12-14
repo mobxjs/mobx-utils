@@ -12,6 +12,13 @@ class TodoClass {
     get usersCount(): number {
         return this.usersInterested.length
     }
+    @mobx.computed
+    get prefixedTitle() {
+        return "Strong" + this.title
+    }
+    set prefixedTitle(value) {
+        this.title = value.substr(6)
+    }
     constructor() {
         mobx.makeObservable(this)
     }
@@ -25,6 +32,12 @@ function Todo(title, done, usersInterested, unobservedProp) {
         usersInterested: usersInterested,
         get usersCount() {
             return this.usersInterested.length
+        },
+        get prefixedTitle() {
+            return "Strong" + this.title
+        },
+        set prefixedTitle(value) {
+            this.title = value.substr(6)
         },
     })
 }
@@ -232,6 +245,34 @@ function tests(model) {
     expect(viewModel.isPropertyDirty("title")).toBe(false)
     expect(viewModel.isPropertyDirty("usersInterested")).toBe(false)
     expect(viewModel.isPropertyDirty("unobservedProp")).toBe(false)
+
+    // computed setters shall transparently be called on the view model
+    mobx.runInAction(() => {
+        viewModel.prefixedTitle = "FooBarCoffee"
+    })
+    expect(tr).toBe(
+        "cola:false,interested:Putin,Madonna,Tarzan,Rocky,unobservedProp:new value,usersCount:4"
+    )
+    expect(vr).toBe(
+        "Coffee:false,interested:Putin,Madonna,Tarzan,Rocky,unobservedProp:new value,usersCount:4"
+    )
+    expect(viewModel.title).toBe("Coffee")
+    expect(viewModel.prefixedTitle).toBe("StrongCoffee")
+    expect(viewModel.isDirty).toBe(true)
+    expect(viewModel.isPropertyDirty("title")).toBe(true)
+    expect(viewModel.isPropertyDirty("prefixedTitle")).toBe(false)
+
+    viewModel.submit()
+    expect(tr).toBe(
+        "Coffee:false,interested:Putin,Madonna,Tarzan,Rocky,unobservedProp:new value,usersCount:4"
+    )
+    expect(vr).toBe(
+        "Coffee:false,interested:Putin,Madonna,Tarzan,Rocky,unobservedProp:new value,usersCount:4"
+    )
+    expect(model.prefixedTitle).toBe("StrongCoffee")
+    expect(viewModel.isDirty).toBe(false)
+    expect(viewModel.isPropertyDirty("title")).toBe(false)
+    expect(viewModel.isPropertyDirty("prefixedTitle")).toBe(false)
 
     d1()
     d2()
