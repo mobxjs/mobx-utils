@@ -14,6 +14,7 @@ import {
     $mobx,
     makeObservable,
 } from "mobx"
+import { ComputedValue } from "mobx/dist/internal"
 import { invariant, getAllMethodsAndProperties } from "./utils"
 
 export interface IViewModel<T> {
@@ -56,8 +57,10 @@ export class ViewModel<T> implements IViewModel<T> {
                 `The propertyname ${key} is reserved and cannot be used with viewModels`
             )
             if (isComputedProp(model, key)) {
-                const derivation: () => any = _getAdministration(model, key).derivation // Fixme: there is no clear api to get the derivation
-                this.localComputedValues.set(key, computed(derivation.bind(this)) as any)
+                const computedBox = _getAdministration(model, key) as ComputedValue<T[keyof T]> // Fixme: there is no clear api to get the derivation
+                const get = computedBox.derivation.bind(this)
+                const set = computedBox.setter_?.bind(this)
+                this.localComputedValues.set(key, computed(get, { set }))
             }
 
             const descriptor = Object.getOwnPropertyDescriptor(model, key)
@@ -72,7 +75,9 @@ export class ViewModel<T> implements IViewModel<T> {
                     else return this.model[key as keyof T]
                 },
                 set: action((value: any) => {
-                    if (value !== this.model[key as keyof T]) {
+                    if (isComputedProp(model, key)) {
+                        this.localComputedValues.get(key)!.set(value)
+                    } else if (value !== this.model[key as keyof T]) {
                         this.localValues.set(key, value)
                     } else {
                         this.localValues.delete(key)
