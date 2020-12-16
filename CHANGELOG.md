@@ -1,3 +1,12 @@
+# 6.0.3
+
+* Fixed [#214](https://github.com/mobxjs/mobx-utils/issues/214) createViewModel doesn't work correctly with setters for computed values. ([#286](https://github.com/mobxjs/mobx-utils/pull/286))
+* Use computedFn name if explicitly set in options [#277](https://github.com/mobxjs/mobx-utils/pull/277).
+
+# 6.0.2
+
+* skipped
+
 # 6.0.1
 
 * Fixed build issue causing decorators in the final build version not to be picked up correctly. Fixes [#279](https://github.com/mobxjs/mobx-utils/issues/279)
