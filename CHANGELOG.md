@@ -1,3 +1,7 @@
+# 5.6.2
+
+* [#289](https://github.com/mobxjs/mobx-utils/pull/289) ObservableGroupMap.ts: remove console.log
+
 # 5.6.1
 
 * [#256](https://github.com/mobxjs/mobx-utils/pull/256) Fix [#255](https://github.com/mobxjs/mobx-utils/issues/255)
