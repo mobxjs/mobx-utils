@@ -178,7 +178,6 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
             reaction: reaction(
                 () => this._groupBy(item),
                 (newGroupByValue, _r) => {
-                    console.log("new group by value ", newGroupByValue)
                     const grouperItemInfo = item[this._ogmInfoKey]!
                     this._removeFromGroupArr(
                         grouperItemInfo.groupByValue,
