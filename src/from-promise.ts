@@ -8,7 +8,7 @@ export const FULFILLED = "fulfilled"
 export const REJECTED = "rejected"
 
 type CaseHandlers<U, T> = {
-    pending?: (t?: T) => U
+    pending?: (t?: unknown) => U
     fulfilled?: (t: T) => U
     rejected?: (e: any) => U
 }
@@ -20,7 +20,7 @@ export interface IBasePromiseBasedObservable<T> extends PromiseLike<T> {
 
 export type IPendingPromise = {
     readonly state: "pending"
-    readonly value: any // can be error, T or nothing at this point
+    readonly value: unknown // can be error, T or nothing at this point
 }
 
 export type IFulfilledPromise<T> = {
@@ -30,7 +30,7 @@ export type IFulfilledPromise<T> = {
 
 export type IRejectedPromise = {
     readonly state: "rejected"
-    readonly value: any
+    readonly value: unknown
 }
 
 export type IPromiseBasedObservable<T> = IBasePromiseBasedObservable<T> &
