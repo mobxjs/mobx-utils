@@ -1,3 +1,8 @@
+# 6.0.4
+
+* [ObservableGroupMap.ts: remove console.log #289](https://github.com/mobxjs/mobx-utils/pull/289)
+* [Make observable promise's values safer type wise #295](https://github.com/mobxjs/mobx-utils/pull/295) Closes [Typing IRejectedPromise and IPendingPromise to hold an unknown value](https://github.com/mobxjs/mobx-utils/issues/291) Users of fromPromise may get new compile errors for invalid code. See PR for details.
+
 # 6.0.3
 
 * Fixed [#214](https://github.com/mobxjs/mobx-utils/issues/214) createViewModel doesn't work correctly with setters for computed values. ([#286](https://github.com/mobxjs/mobx-utils/pull/286))
