@@ -17,12 +17,6 @@ export type ITransformerParams<A, B> = {
 
 let memoizationId = 0
 
-/**
- * Creates a function that maps an object to a view.
- * The mapping is memoized.
- *
- * See: https://mobx.js.org/refguide/create-transformer.html
- */
 export function createTransformer<A, B>(
     transformer: ITransformer<A, B>,
     onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void
@@ -31,6 +25,15 @@ export function createTransformer<A, B>(
     transformer: ITransformer<A, B>,
     arg2?: ITransformerParams<A, B>
 ): ITransformer<A, B>
+/**
+ * Creates a function that maps an object to a view.
+ * The mapping is memoized.
+ *
+ * See the [transformer](#createtransformer-in-detail) section for more details.
+ *
+ * @param transformer
+ * @param onCleanup
+ */
 export function createTransformer<A, B>(
     transformer: ITransformer<A, B>,
     arg2?: any
