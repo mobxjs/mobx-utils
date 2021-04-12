@@ -50,7 +50,6 @@
     "ts-jest": "^26.0.0",
     "typescript": "^4.0.3"
   },
-  "dependencies": {},
   "peerDependencies": {
     "mobx": "^6.0.0"
   },
