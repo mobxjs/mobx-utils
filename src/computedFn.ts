@@ -8,6 +8,10 @@ import {
     isAction,
 } from "mobx"
 
+export type IComputedFnOptions<F extends (...args: any[]) => any> = {
+    onCleanup?: (result: ReturnType<F> | undefined, ...args: Parameters<F>) => void
+} & IComputedValueOptions<ReturnType<F>>
+
 /**
  * computedFn takes a function with an arbitrary amount of arguments,
  * and memoizes the output of the function based on the arguments passed in.
@@ -44,7 +48,7 @@ import {
  */
 export function computedFn<T extends (...args: any[]) => any>(
     fn: T,
-    keepAliveOrOptions: IComputedValueOptions<ReturnType<T>> | boolean = false
+    keepAliveOrOptions: IComputedFnOptions<T> | boolean = false
 ): T {
     if (isAction(fn)) throw new Error("computedFn shouldn't be used on actions")
 
@@ -56,7 +60,7 @@ export function computedFn<T extends (...args: any[]) => any>(
             : keepAliveOrOptions
     const d = new DeepMap<IComputedValue<any>>()
 
-    return function (this: any, ...args: any[]): any {
+    return function (this: any, ...args: Parameters<T>): ReturnType<T> {
         const entry = d.entry(args)
         // cache hit, return
         if (entry.exists()) return entry.get().get()
@@ -71,9 +75,10 @@ export function computedFn<T extends (...args: any[]) => any>(
             return fn.apply(this, args)
         }
         // create new entry
+        let latestValue: ReturnType<T> | undefined
         const c = computed(
             () => {
-                return fn.apply(this, args)
+                return (latestValue = fn.apply(this, args))
             },
             {
                 ...opts,
@@ -85,6 +90,8 @@ export function computedFn<T extends (...args: any[]) => any>(
         if (!opts.keepAlive)
             onBecomeUnobserved(c, () => {
                 d.entry(args).delete()
+                if (opts.onCleanup) opts.onCleanup(latestValue, ...args)
+                latestValue = undefined
             })
         // return current val
         return c.get()

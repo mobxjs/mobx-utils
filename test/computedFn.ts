@@ -175,6 +175,22 @@ test("supports options", () => {
     expect(events).toEqual([])
 })
 
+test("supports onCleanup", () => {
+    const sep = observable.box(".")
+    const unloaded = []
+    const joinedStr = computedFn((sep) => [1, 2, 3].join(sep), {
+        onCleanup: (result, sep) => unloaded.push([result, sep]),
+    })
+    autorun(() => joinedStr(sep.get()))
+    sep.set(",")
+    expect(unloaded.length).toBe(1)
+    sep.set(" ")
+    expect(unloaded).toEqual([
+        ["1.2.3", "."],
+        ["1,2,3", ","],
+    ])
+})
+
 test("should not allow actions", () => {
     expect(() => computedFn(action(() => {}))).toThrow("action")
 })
