@@ -1,5 +1,6 @@
 import * as utils from "../src/mobx-utils"
 import * as mobx from "mobx"
+import { ViewModel } from "../src/create-view-model"
 
 mobx.configure({ enforceActions: "observed" })
 
@@ -21,6 +22,12 @@ class TodoClass {
     }
     constructor() {
         mobx.makeObservable(this)
+    }
+}
+
+class TodoViewModel extends ViewModel<TodoClass> {
+    get prefixedTitle() {
+        return "Overriden " + this.model.title
     }
 }
 
@@ -54,6 +61,16 @@ test("test Class/decorator createViewModel behaviour", () => {
     model.usersInterested = ["Vader", "Madonna"]
     model.unobservedProp = "testing"
     tests(model)
+})
+
+test("test view model overriden properties", () => {
+    const model = new TodoClass()
+    model.title = "coffee"
+    model.done = false
+    model.usersInterested = ["Vader", "Madonna"]
+    model.unobservedProp = "testing"
+    const viewModel = new TodoViewModel(model)
+    expect(viewModel.prefixedTitle).toBe("Overriden coffee")
 })
 
 function tests(model) {
