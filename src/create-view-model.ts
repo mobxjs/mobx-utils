@@ -46,9 +46,13 @@ export class ViewModel<T> implements IViewModel<T> {
     constructor(public model: T) {
         makeObservable(this)
         invariant(isObservableObject(model), "createViewModel expects an observable object")
+        const ownMethodsAndProperties = getAllMethodsAndProperties(this)
 
         // use this helper as Object.getOwnPropertyNames doesn't return getters
         getAllMethodsAndProperties(model).forEach((key: any) => {
+            if (ownMethodsAndProperties.includes(key)) {
+                return
+            }
             if (key === ($mobx as any) || key === "__mobxDidRunLazyInitializers") {
                 return
             }
