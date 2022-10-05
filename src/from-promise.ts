@@ -207,10 +207,10 @@ export namespace fromPromise {
         return p
     })
 
+    function resolveBase<T>(value: T): IFulfilledPromise<T> & IBasePromiseBasedObservable<T>
     function resolveBase<T>(
         value?: T
     ): IFulfilledPromise<T | undefined> & IBasePromiseBasedObservable<T>
-    function resolveBase<T>(value: T): IFulfilledPromise<T> & IBasePromiseBasedObservable<T>
     function resolveBase<T>(
         value: T | undefined = undefined
     ): IFulfilledPromise<T | undefined> & IBasePromiseBasedObservable<T | undefined> {
