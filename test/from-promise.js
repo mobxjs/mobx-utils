@@ -38,18 +38,20 @@ test("old state is undefined", (done) => {
     )
 })
 
-test("resolves old state", (done) => {
-    const oldP = utils.fromPromise(new Promise((resolve) => resolve(9)))
-    mobx.when(
-        () => oldP.state == "fulfilled",
-        () => {
-            const p = new Promise((resolve) => resolve(7))
-            const obs = utils.fromPromise(p, oldP)
-            expect(obs.value).toBe(9)
-            expect(obs.state).toBe("pending")
-            done()
-        }
-    )
+test("resolves old state", () => {
+    let obs = utils.fromPromise.resolve(9)
+    expect(obs.value).toBe(9)
+    expect(obs.state).toBe("fulfilled")
+
+    // Expect old state to be carried forward from fulfilled observable
+    obs = utils.fromPromise(Promise.resolve(7), obs)
+    expect(obs.value).toBe(9)
+    expect(obs.state).toBe("pending")
+
+    // Expect old state to be carried forward from *pending* observable
+    obs = utils.fromPromise(Promise.resolve(10), obs)
+    expect(obs.value).toBe(9)
+    expect(obs.state).toBe("pending")
 })
 
 test("resolves new state", (done) => {
