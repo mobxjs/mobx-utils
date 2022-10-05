@@ -76,14 +76,14 @@ test("add", () => {
 })
 
 test("delete", () => {
-    assertChanges({ x: 1 }, (x) => {
+    assertChanges<{ x?: number }>({ x: 1 }, (x) => {
         delete x.x
     })
 })
 
 test("cleanup", () => {
     const a = observable({ b: 1 })
-    const x = observable({ a })
+    const x = observable<{ a?: { b: number } }>({ a })
     const events: any[] = []
 
     const d = deepObserve(x, (change, path) => {

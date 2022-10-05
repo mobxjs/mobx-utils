@@ -10,6 +10,7 @@
         "rootDir": ".",
         "lib": ["dom", "es2015", "scripthost"],
         "useDefineForClassFields": true,
+        "strictNullChecks": true,
     },
     "include": ["**/*.ts"],
     "exclude": ["/node_modules"]

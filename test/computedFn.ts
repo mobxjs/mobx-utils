@@ -177,7 +177,7 @@ test("supports options", () => {
 
 test("supports onCleanup", () => {
     const sep = observable.box(".")
-    const unloaded = []
+    const unloaded: unknown[] = []
     const joinedStr = computedFn((sep) => [1, 2, 3].join(sep), {
         onCleanup: (result, sep) => unloaded.push([result, sep]),
     })

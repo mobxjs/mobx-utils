@@ -64,9 +64,7 @@
     "state management"
   ],
   "jest": {
-    "transform": {
-      "^.+\\.ts?$": "ts-jest"
-    },
+    "preset": "ts-jest",
     "testRegex": "test/.*\\.(t|j)sx?$",
     "moduleFileExtensions": [
       "ts",
