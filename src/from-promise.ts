@@ -181,10 +181,9 @@ export function fromPromise<T>(
 
     promise.isPromiseBasedObservable = true
     promise.case = caseImpl
+    const oldState = oldPromise ? (oldPromise as any).state : undefined
     const oldData =
-        oldPromise && (oldPromise as any).state === FULFILLED
-            ? (oldPromise as any).value
-            : undefined
+        oldState === FULFILLED || oldState === PENDING ? (oldPromise as any).value : undefined
     extendObservable(
         promise,
         {

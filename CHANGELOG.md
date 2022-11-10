@@ -1,3 +1,9 @@
+# 6.0.6
+
+* [fromPromise carries forward old value from pending observable](https://github.com/mobxjs/mobx-utils/pull/311)
+
+# 6.0.5
+
 # 6.0.4
 
 * [ObservableGroupMap.ts: remove console.log #289](https://github.com/mobxjs/mobx-utils/pull/289)
