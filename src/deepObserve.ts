@@ -8,10 +8,13 @@ import {
     IMapDidChange,
     values,
     entries,
+    isObservableSet,
+    IArraySplice,
+    _getAdministration
 } from "mobx"
 import { IDisposer } from "./utils"
 
-type IChange = IObjectDidChange | IArrayDidChange | IMapDidChange
+type IChange = IObjectDidChange | IArrayDidChange | IMapDidChange | IArraySplice
 
 type Entry = {
     dispose: IDisposer
@@ -30,7 +33,7 @@ function buildPath(entry: Entry | undefined): string {
 }
 
 function isRecursivelyObservable(thing: any) {
-    return isObservableObject(thing) || isObservableArray(thing) || isObservableMap(thing)
+    return isObservableObject(thing) || isObservableArray(thing) || isObservableMap(thing) || isObservableSet(thing)
 }
 
 /**
@@ -53,11 +56,17 @@ function isRecursivelyObservable(thing: any) {
  */
 export function deepObserve<T = any>(
     target: T,
-    listener: (change: IChange, path: string, root: T) => void
+    listener: (change: IChange, path: string, root: T) => void,
+    respectAnnotations = false
 ): IDisposer {
     const entrySet = new WeakMap<any, Entry>()
 
-    function genericListener(change: IChange) {
+    function shallowListener(change: IChange) {
+        const entry = entrySet.get(change.object)!
+        listener(change, buildPath(entry), target)
+    }
+
+    function deepListener(change: IChange) {
         const entry = entrySet.get(change.object)!
         processChange(change, entry)
         listener(change, buildPath(entry), target)
@@ -67,14 +76,15 @@ export function deepObserve<T = any>(
         switch (change.type) {
             // Object changes
             case "add": // also for map
-                observeRecursively(change.newValue, parent, change.name)
+                observeRecursively(change.newValue, parent, change.name, true)
                 break
             case "update": // also for array and map
                 unobserveRecursively(change.oldValue)
                 observeRecursively(
                     change.newValue,
                     parent,
-                    (change as any).name || "" + (change as any).index
+                    (change as any).name || "" + (change as any).index,
+                    true
                 )
                 break
             case "remove": // object
@@ -85,7 +95,7 @@ export function deepObserve<T = any>(
             case "splice":
                 change.removed.map(unobserveRecursively)
                 change.added.forEach((value, idx) =>
-                    observeRecursively(value, parent, "" + (change.index + idx))
+                    observeRecursively(value, parent, "" + (change.index + idx), true)
                 )
                 // update paths
                 for (let i = change.index + change.addedCount; i < change.object.length; i++) {
@@ -98,7 +108,10 @@ export function deepObserve<T = any>(
         }
     }
 
-    function observeRecursively(thing: any, parent: Entry | undefined, path: string) {
+    function observeRecursively(thing: any, parent: Entry | undefined, path: string, deep: boolean) {
+        // sets can't be observed deeply
+        deep = deep && !isObservableSet(thing)
+
         if (isRecursivelyObservable(thing)) {
             const entry = entrySet.get(thing)
             if (entry) {
@@ -115,10 +128,26 @@ export function deepObserve<T = any>(
                 const entry = {
                     parent,
                     path,
-                    dispose: observe(thing, genericListener),
+                    dispose: observe(thing, deep ? deepListener : shallowListener)
                 }
                 entrySet.set(thing, entry)
-                entries(thing).forEach(([key, value]) => observeRecursively(value, entry, key))
+
+                if (deep) {
+                    entries(thing).forEach(([key, value]) => {
+                        if (respectAnnotations) {
+                            const appliedAnnotationType =
+                                _getAdministration(thing)?.appliedAnnotations_?.[key]?.annotationType_
+
+                            if (appliedAnnotationType === "observable.shallow") {
+                                observeRecursively(value, entry, key, false)
+                            } else if (appliedAnnotationType !== "observable.ref") {
+                                observeRecursively(value, entry, key, true)
+                            }
+                        } else {
+                            observeRecursively(value, entry, key, true)
+                        }
+                    })
+                }
             }
         }
     }
@@ -133,7 +162,7 @@ export function deepObserve<T = any>(
         }
     }
 
-    observeRecursively(target, undefined, "")
+    observeRecursively(target, undefined, "", true)
 
     return () => {
         unobserveRecursively(target)
