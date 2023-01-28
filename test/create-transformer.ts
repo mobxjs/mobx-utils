@@ -14,7 +14,7 @@ test("transform1", () => {
     })
 
     let mapped
-    let unloaded = []
+    let unloaded: [{ title: string }, string][] = []
 
     let transformState = createTransformer(function (state: any) {
         stateCalc++
@@ -54,7 +54,7 @@ test("transform1", () => {
     expect(stateCalc).toBe(4)
     expect(todoCalc).toBe(3)
 
-    let tea = state.todos.shift()
+    let tea = state.todos.shift()!
     expect(mapped).toBe("johnBISCUIT")
     expect(stateCalc).toBe(5)
     expect(todoCalc).toBe(3)
@@ -112,6 +112,11 @@ test("createTransformer as off-instance computed", () => {
     // transformer creates a computed but reuses it for every time the same object is passed in
     let displayName = createTransformer(_computeDisplayName)
 
+    interface Person {
+        firstName: string
+        lastName: string
+    }
+
     let person1 = m.observable({
         firstName: "Mickey",
         lastName: "Mouse",
@@ -122,8 +127,8 @@ test("createTransformer as off-instance computed", () => {
         lastName: "Duck",
     })
 
-    let persons = m.observable([])
-    let displayNames = []
+    let persons = m.observable<Person>([])
+    let displayNames: string[] = []
 
     let disposer = m.autorun(() => {
         displayNames = persons.map((p) => displayName(p))
@@ -484,7 +489,7 @@ test("transform tree (modifying tree incrementally)", () => {
     ////////////////////////////////////
 
     // add partial tree as a batch
-    let children = []
+    let children: typeof TreeNode[] = []
     children.push(new TreeNode("root-1-child-1b"))
     children[0].addChild(new TreeNode("root-1-child-1b-child-1"))
     children.push(new TreeNode("root-1-child-2b"))
@@ -1155,8 +1160,8 @@ test("transform with primitive key", () => {
         })
     }
 
-    let observableBobs = m.observable([])
-    let bobs = []
+    let observableBobs = m.observable<string | number>([])
+    let bobs: { name: string }[] = []
 
     let bobFactory = createTransformer(function (key) {
         return new Bob()
@@ -1261,7 +1266,7 @@ function createTestSet(): any {
 
     TreeNode.prototype.path = function () {
         let node = this,
-            parts = []
+            parts: string[] = []
         while (node) {
             parts.push(node.name)
             node = node.parent
@@ -1328,7 +1333,7 @@ test("should respect onCleanup argument", () => {
         name: "michel",
     })
     let mapped
-    let unloaded = []
+    let unloaded: any[] = []
     let objectName
     let transformState = createTransformer(function (state: any) {
         return state.name + state.todos.map(transformTodo).join(",")
@@ -1374,14 +1379,14 @@ test("should respect debugNameGenerator argument", () => {
         mapped = transformTodo(state)
     })
     state.set("name", "BISCUIT")
-    objectName = m.getObserverTree(state, "title").observers[0].name
+    objectName = m.getObserverTree(state, "title").observers?.[0].name
     expect(objectName).toBe("COFFEE-DEBUG")
 })
 
 test("supports computed value options", () => {
     const events: number[][] = []
     const xs = m.observable([1, 2, 3])
-    const xsLessThan = createTransformer((n) => xs.filter((x) => x < n), {
+    const xsLessThan = createTransformer<number, number[]>((n) => xs.filter((x) => x < n), {
         equals: m.comparer.structural,
     })
 

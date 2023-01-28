@@ -22,7 +22,7 @@ test("expr", function () {
             )
         })
 
-        let b = []
+        let b: unknown[] = []
         let sub = mobx.observe(
             total,
             function (x) {
@@ -65,7 +65,7 @@ test("expr2", function () {
             )
         })
 
-        let b = []
+        let b: unknown[] = []
         let sub = mobx.observe(
             total,
             function (x) {
