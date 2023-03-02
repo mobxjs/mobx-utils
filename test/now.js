@@ -54,3 +54,36 @@ test("now should be up to date when ticker is reactivated, #271", (done) => {
         done()
     }, 200)
 })
+
+describe("given desynchronization is enabled", () => {
+    let actual
+
+    beforeEach(() => {
+        jest.useFakeTimers("modern")
+        jest.setSystemTime(new Date("2015-10-21T07:28:00Z"))
+
+        const someComputed = mobx.computed(() => {
+            const currentTimestamp = utils.now(1000)
+
+            return currentTimestamp > new Date("2015-10-21T07:28:00Z").getTime()
+        })
+
+        mobx.observe(
+            someComputed,
+            (changed) => {
+                actual = changed.newValue
+            },
+            true
+        )
+    })
+
+    it("given time passes, works", () => {
+        jest.advanceTimersByTime(1000)
+
+        expect(actual).toBe(true)
+    })
+
+    it("does not share the state from previous test", () => {
+        expect(actual).toBe(false)
+    })
+})
