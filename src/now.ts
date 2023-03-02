@@ -5,6 +5,15 @@ const tickers: {
     [interval: string]: IResource<number>
 } = {}
 
+let synchronized = true
+
+/**
+ * Turns of the synchronization of {@link now} for unit testing so that tests don't share state between them
+ */
+export function desynchronizeNowForTests() {
+    synchronized = false
+}
+
 /**
  * Returns the current date time as epoch number.
  * The date time is read from an observable which is updated automatically after the given interval.
@@ -36,11 +45,22 @@ export function now(interval: number | "frame" = 1000) {
         // See #40
         return Date.now()
     }
-    if (!tickers[interval]) {
-        if (typeof interval === "number") tickers[interval] = createIntervalTicker(interval)
-        else tickers[interval] = createAnimationFrameTicker()
+
+    if (!synchronized) {
+        if (typeof interval === "number") {
+            return createIntervalTicker(interval).current()
+        }
+
+        return createAnimationFrameTicker().current()
     }
-    return tickers[interval].current()
+
+    const timer = tickers[interval]
+        ? tickers[interval]
+        : typeof interval === "number"
+        ? createIntervalTicker(interval)
+        : createAnimationFrameTicker()
+
+    return timer.current()
 }
 
 function createIntervalTicker(interval: number): IResource<number> {

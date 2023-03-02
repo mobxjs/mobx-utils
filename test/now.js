@@ -62,6 +62,8 @@ describe("given desynchronization is enabled", () => {
         jest.useFakeTimers("modern")
         jest.setSystemTime(new Date("2015-10-21T07:28:00Z"))
 
+        utils.desynchronizeNowForTests()
+
         const someComputed = mobx.computed(() => {
             const currentTimestamp = utils.now(1000)
 
