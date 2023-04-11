@@ -1,3 +1,4 @@
+import { getGlobalState } from "mobx/dist/internal"
 import { DeepMap } from "./deepMap"
 import {
     IComputedValue,
@@ -52,7 +53,7 @@ export function computedFn<T extends (...args: any[]) => any>(
 ): T {
     if (isAction(fn)) throw new Error("computedFn shouldn't be used on actions")
 
-    let memoWarned = false
+    let memoWarned = getGlobalState().computedRequiresReaction
     let i = 0
     const opts =
         typeof keepAliveOrOptions === "boolean"
