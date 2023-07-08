@@ -6,6 +6,7 @@ import {
     onBecomeUnobserved,
     _isComputingDerivation,
     isAction,
+    _getGlobalState,
 } from "mobx"
 
 export type IComputedFnOptions<F extends (...args: any[]) => any> = {
@@ -66,7 +67,7 @@ export function computedFn<T extends (...args: any[]) => any>(
         if (entry.exists()) return entry.get().get()
         // if function is invoked, and its a cache miss without reactive, there is no point in caching...
         if (!opts.keepAlive && !_isComputingDerivation()) {
-            if (!memoWarned) {
+            if (!memoWarned && _getGlobalState().computedRequiresReaction) {
                 console.warn(
                     "invoking a computedFn from outside an reactive context won't be memoized, unless keepAlive is set"
                 )
