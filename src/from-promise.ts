@@ -58,7 +58,6 @@ function caseImpl<U, T>(
  *
  * And the following methods:
  * - `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
- * - `then((value: TValue) => TResult1 | PromiseLike<TResult1>, [(rejectReason: any) => any])`: chains additional handlers to the provided promise.
  *
  * The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`. You may also use it with `await` in `async` functions.
  *
@@ -144,9 +143,9 @@ function caseImpl<U, T>(
  *   (transformedResult) => console.log('transformed fetchResult: ' + transformedResult)
  * )
  *
- * @param {IThenable<T>} promise The promise which will be observed
- * @param {IThenable<T>} oldPromise? The previously observed promise
- * @returns {IPromiseBasedObservable<T>}
+ * @param origPromise The promise which will be observed
+ * @param oldPromise The previously observed promise
+ * @returns origPromise with added properties and methods described above.
  */
 export function fromPromise<T>(
     origPromise: PromiseLike<T>,
