@@ -5,13 +5,13 @@ const tickers: {
     [interval: string]: IResource<number>
 } = {}
 
-let synchronized = true
-
-/**
- * Turns of the synchronization of {@link now} for unit testing so that tests don't share state between them
- */
-export function desynchronizeNowForTests() {
-    synchronized = false
+export function clearTimers() {
+    for (const key in tickers) {
+        if (tickers.hasOwnProperty(key)) {
+            tickers[key].dispose()
+            delete tickers[key]
+        }
+    }
 }
 
 /**
@@ -46,21 +46,11 @@ export function now(interval: number | "frame" = 1000) {
         return Date.now()
     }
 
-    if (!synchronized) {
-        if (typeof interval === "number") {
-            return createIntervalTicker(interval).current()
-        }
-
-        return createAnimationFrameTicker().current()
+    if (!tickers[interval]) {
+        if (typeof interval === "number") tickers[interval] = createIntervalTicker(interval)
+        else tickers[interval] = createAnimationFrameTicker()
     }
-
-    const timer = tickers[interval]
-        ? tickers[interval]
-        : typeof interval === "number"
-        ? createIntervalTicker(interval)
-        : createAnimationFrameTicker()
-
-    return timer.current()
+    return tickers[interval].current()
 }
 
 function createIntervalTicker(interval: number): IResource<number> {
