@@ -59,20 +59,22 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 -   [chunkProcessor](#chunkprocessor)
     -   [Parameters](#parameters-10)
     -   [Examples](#examples-9)
+-   [resetNowInternalState](#resetnowinternalstate)
+    -   [Examples](#examples-10)
 -   [now](#now)
     -   [Parameters](#parameters-11)
-    -   [Examples](#examples-10)
+    -   [Examples](#examples-11)
 -   [expr](#expr)
     -   [Parameters](#parameters-12)
-    -   [Examples](#examples-11)
+    -   [Examples](#examples-12)
 -   [createTransformer](#createtransformer)
     -   [Parameters](#parameters-13)
 -   [deepObserve](#deepobserve)
     -   [Parameters](#parameters-14)
-    -   [Examples](#examples-12)
+    -   [Examples](#examples-13)
 -   [ObservableGroupMap](#observablegroupmap)
     -   [Parameters](#parameters-15)
-    -   [Examples](#examples-13)
+    -   [Examples](#examples-14)
 -   [ObservableMap](#observablemap)
 -   [defineProperty](#defineproperty)
 -   [defineProperty](#defineproperty-1)
@@ -81,7 +83,7 @@ CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
 -   [defineProperty](#defineproperty-4)
 -   [computedFn](#computedfn)
     -   [Parameters](#parameters-16)
-    -   [Examples](#examples-14)
+    -   [Examples](#examples-15)
 -   [DeepMapEntry](#deepmapentry)
 -   [DeepMap](#deepmap)
 
@@ -502,6 +504,21 @@ trackedActions.push("hoveredButton")
 ```
 
 Returns **IDisposer** stops the processor
+
+## resetNowInternalState
+
+Disposes of all the internal Observables created by invocations of `now()`.
+
+The use case for this is to ensure that unit tests can run independent of each other.
+You should not call this in regular application code.
+
+### Examples
+
+```javascript
+afterEach(() => {
+    utils.resetNowInternalState()
+})
+```
 
 ## now
 
