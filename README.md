@@ -96,7 +96,6 @@ the status of the promise and returns it. The returned object has the following 
 And the following methods:
 
 -   `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
--   `then((value: TValue) => TResult1 | PromiseLike<TResult1>, [(rejectReason: any) => any])`: chains additional handlers to the provided promise.
 
 The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`. You may also use it with `await` in `async` functions.
 
@@ -109,9 +108,8 @@ This is useful to replace one promise based observable with another, without goi
 
 ### Parameters
 
--   `origPromise`  
--   `oldPromise` **IThenable&lt;T>** ? The previously observed promise
--   `promise` **IThenable&lt;T>** The promise which will be observed
+-   `origPromise`  The promise which will be observed
+-   `oldPromise`  The previously observed promise
 
 ### Examples
 
@@ -192,7 +190,7 @@ fetchResult.then(
 )
 ```
 
-Returns **IPromiseBasedObservable&lt;T>** 
+Returns **any** origPromise with added properties and methods described above.
 
 ## isPromiseBasedObservable
 

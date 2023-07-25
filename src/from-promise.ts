@@ -8,7 +8,7 @@ export const FULFILLED = "fulfilled"
 export const REJECTED = "rejected"
 
 type CaseHandlers<U, T> = {
-    pending?: (t?: unknown) => U
+    pending?: (t?: T) => U
     fulfilled?: (t: T) => U
     rejected?: (e: any) => U
 }
@@ -18,9 +18,9 @@ export interface IBasePromiseBasedObservable<T> extends PromiseLike<T> {
     case<U>(handlers: CaseHandlers<U, T>, defaultFulfilled?: boolean): U
 }
 
-export type IPendingPromise = {
+export type IPendingPromise<T> = {
     readonly state: "pending"
-    readonly value: unknown // can be error, T or nothing at this point
+    readonly value: T | undefined
 }
 
 export type IFulfilledPromise<T> = {
@@ -34,7 +34,7 @@ export type IRejectedPromise = {
 }
 
 export type IPromiseBasedObservable<T> = IBasePromiseBasedObservable<T> &
-    (IPendingPromise | IFulfilledPromise<T> | IRejectedPromise)
+    (IPendingPromise<T> | IFulfilledPromise<T> | IRejectedPromise)
 
 function caseImpl<U, T>(
     this: IPromiseBasedObservable<T>,
@@ -58,7 +58,6 @@ function caseImpl<U, T>(
  *
  * And the following methods:
  * - `case({fulfilled, rejected, pending})`: maps over the result using the provided handlers, or returns `undefined` if a handler isn't available for the current promise state.
- * - `then((value: TValue) => TResult1 | PromiseLike<TResult1>, [(rejectReason: any) => any])`: chains additional handlers to the provided promise.
  *
  * The returned object implements `PromiseLike<TValue>`, so you can chain additional `Promise` handlers using `then`. You may also use it with `await` in `async` functions.
  *
@@ -144,13 +143,13 @@ function caseImpl<U, T>(
  *   (transformedResult) => console.log('transformed fetchResult: ' + transformedResult)
  * )
  *
- * @param {IThenable<T>} promise The promise which will be observed
- * @param {IThenable<T>} oldPromise? The previously observed promise
- * @returns {IPromiseBasedObservable<T>}
+ * @param origPromise The promise which will be observed
+ * @param oldPromise The previously observed promise
+ * @returns origPromise with added properties and methods described above.
  */
 export function fromPromise<T>(
     origPromise: PromiseLike<T>,
-    oldPromise?: PromiseLike<T>
+    oldPromise?: IPromiseBasedObservable<T>
 ): IPromiseBasedObservable<T> {
     invariant(arguments.length <= 2, "fromPromise expects up to two arguments")
     invariant(
@@ -181,9 +180,10 @@ export function fromPromise<T>(
 
     promise.isPromiseBasedObservable = true
     promise.case = caseImpl
-    const oldState = oldPromise ? (oldPromise as any).state : undefined
     const oldData =
-        oldState === FULFILLED || oldState === PENDING ? (oldPromise as any).value : undefined
+        oldPromise && (oldPromise.state === FULFILLED || oldPromise.state === PENDING)
+            ? oldPromise.value
+            : undefined
     extendObservable(
         promise,
         {
