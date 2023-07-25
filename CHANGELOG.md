@@ -1,3 +1,7 @@
+# 6.0.7
+
+* [Fix now() sharing global state between tests #316](https://github.com/mobxjs/mobx-utils/pull/316), fixes [#306](https://github.com/mobxjs/mobx-utils/issues/306). 
+
 # 6.0.6
 
 * [fromPromise carries forward old value from pending observable](https://github.com/mobxjs/mobx-utils/pull/311)

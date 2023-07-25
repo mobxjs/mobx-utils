@@ -78,7 +78,7 @@ describe("given desynchronization is enabled", () => {
     })
 
     afterEach(() => {
-        utils.clearTimers()
+        utils.resetNowInternalState()
     })
 
     it("given time passes, works", () => {

@@ -5,12 +5,21 @@ const tickers: {
     [interval: string]: IResource<number>
 } = {}
 
-export function clearTimers() {
-    for (const key in tickers) {
-        if (tickers.hasOwnProperty(key)) {
-            tickers[key].dispose()
-            delete tickers[key]
-        }
+/**
+ * Disposes of all the internal Observables created by invocations of `now()`.
+ *
+ * The use case for this is to ensure that unit tests can run independent of each other.
+ * You should not call this in regular application code.
+ *
+ * @example
+ * afterEach(() => {
+ *     utils.resetNowInternalState()
+ * })
+ */
+export function resetNowInternalState() {
+    for (const key of Object.getOwnPropertyNames(tickers)) {
+        tickers[key].dispose()
+        delete tickers[key]
     }
 }
 
