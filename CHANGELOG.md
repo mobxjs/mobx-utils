@@ -1,6 +1,11 @@
+# 6.0.8
+
+* [Fix now() sharing global state between tests #316](https://github.com/mobxjs/mobx-utils/pull/316), fixes [#306](https://github.com/mobxjs/mobx-utils/issues/306).
+
 # 6.0.7
 
-* [Fix now() sharing global state between tests #316](https://github.com/mobxjs/mobx-utils/pull/316), fixes [#306](https://github.com/mobxjs/mobx-utils/issues/306). 
+* [fix fromPromise typing #315](https://github.com/mobxjs/mobx-utils/pull/315)
+* [Update computedFn warning to respect mobx global computedRequiresReaction #318](https://github.com/mobxjs/mobx-utils/pull/318), fixes [#268](https://github.com/mobxjs/mobx-utils/issues/268).
 
 # 6.0.6
 
