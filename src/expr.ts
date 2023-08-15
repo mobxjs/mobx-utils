@@ -15,9 +15,6 @@ import { computed, _isComputingDerivation } from "mobx"
  * Instead, the component will only re-render when the relevant todo is (de)selected, which happens much less frequently.
  *
  * @example
- * const Todo = observer((props) => {
- *     const todo = props.todo
- *     const isSelected = mobxUtils.expr(() => props.viewState.selection === todo)
  * const TodoView = observer(({ todo, editorState }) => {
  *     const isSelected = mobxUtils.expr(() => editorState.selection === todo)
  *     return <div className={isSelected ? "todo todo-selected" : "todo"}>{todo.title}</div>
