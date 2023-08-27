@@ -46,8 +46,11 @@ function isRecursivelyObservable(thing: any) {
  *
  * deepObserve cannot be used on computed values.
  *
+ * @param {Object} target The object to observe.
+ * @param {function} listener Invoked when a change is detected.
+ *
  * @example
- * const disposer = deepObserve(target, (change, path) => {
+ * const disposer = deepObserve(target, (change, path, root) => {
  *    console.dir(change)
  * })
  */
