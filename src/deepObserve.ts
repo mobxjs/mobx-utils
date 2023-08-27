@@ -11,7 +11,7 @@ import {
 } from "mobx"
 import { IDisposer } from "./utils"
 
-type IChange = IObjectDidChange | IArrayDidChange | IMapDidChange
+export type IDeepDidChange = IObjectDidChange | IArrayDidChange | IMapDidChange
 
 type Entry = {
     dispose: IDisposer
@@ -53,17 +53,17 @@ function isRecursivelyObservable(thing: any) {
  */
 export function deepObserve<T = any>(
     target: T,
-    listener: (change: IChange, path: string, root: T) => void
+    listener: (change: IDeepDidChange, path: string, root: T) => void
 ): IDisposer {
     const entrySet = new WeakMap<any, Entry>()
 
-    function genericListener(change: IChange) {
+    function genericListener(change: IDeepDidChange) {
         const entry = entrySet.get(change.object)!
         processChange(change, entry)
         listener(change, buildPath(entry), target)
     }
 
-    function processChange(change: IChange, parent: Entry) {
+    function processChange(change: IDeepDidChange, parent: Entry) {
         switch (change.type) {
             // Object changes
             case "add": // also for map
