@@ -708,18 +708,18 @@ Note that this might introduce memory leaks!
 
 ```javascript
 const store = observable({
-a: 1,
-b: 2,
-c: 3,
-m: computedFn(function(x) {
-return this.a * this.b * x
-})
-})
+    a: 1,
+    b: 2,
+    c: 3,
+    m: computedFn(function(x) {
+        return this.a * this.b * x
+    }),
+});
 
 const d = autorun(() => {
-// store.m(3) will be cached as long as this autorun is running
-console.log(store.m(3) * store.c)
-})
+    // store.m(3) will be cached as long as this autorun is running
+    console.log(store.m(3) * store.c)
+});
 ```
 
 ## DeepMapEntry
