@@ -736,7 +736,7 @@ The resulting data graph will never be stale, it will be kept in sync with the s
 This makes it very easy to achieve powerful patterns similar to sideways data loading, map-reduce, tracking state history using immutable data structures etc.
 
 `createTransformer` turns a function (that should transform value `A` into another value `B`) into a reactive and memoizing function.
-In other words, if the `transformation` function computes B given a specific A, the same B will be returned for all other future invocations of the transformation with the same A.
+In other words, if the `transformation` function computes `B` given a specific `A`, the same `B` will be returned for all other future invocations of the transformation with the same `A`.
 However, if `A` changes, or any derivation accessed in the transformer function body gets invalidated, the transformation will be re-applied so that `B` is updated accordingly.
 And last but not least, if nobody is using the transformation of a specific A anymore, its entry will be removed from the memoization table.
 
