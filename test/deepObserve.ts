@@ -1,8 +1,8 @@
-import { deepObserve } from "../src/mobx-utils"
-import { observable, $mobx, IObjectDidChange } from "mobx"
+import { deepObserve, IDeepDidChange } from "../src/mobx-utils"
+import { observable, $mobx } from "mobx"
 import * as cloneDeepWith from "lodash.clonedeepwith"
 
-function cleanChange(change, includeObject = true) {
+function cleanChange(change: IDeepDidChange, includeObject = true) {
     return cloneDeepWith(change, (value, key) => {
         if (key === $mobx) return null
         if (key === "object" && !includeObject) return null
