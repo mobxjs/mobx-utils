@@ -363,13 +363,13 @@ and wraps a viewmodel around it. The viewmodel proxies all enumerable properties
 
 The viewmodel exposes the following additional methods, besides all the enumerable properties of the model:
 
--   `submit()`: copies all the values of the viewmodel to the model and resets the state
--   `reset()`: resets the state of the viewmodel, abandoning all local modifications
--   `resetProperty(propName)`: resets the specified property of the viewmodel
--   `isDirty`: observable property indicating if the viewModel contains any modifications
--   `isPropertyDirty(propName)`: returns true if the specified property is dirty
--   `changedValues`: returns a key / value map with the properties that have been changed in the model so far
 -   `model`: The original model object for which this viewModel was created
+-   `submit()`: Copies all the values of the viewmodel to the model and resets the state
+-   `reset()`: Resets the state of the viewmodel, abandoning all local modifications
+-   `resetProperty(propName)`: Resets the specified property of the viewmodel, abandoning local modifications of this property
+-   `isDirty`: Observable property indicating if the viewModel contains any modifications
+-   `isPropertyDirty(propName)`: Returns true if the specified property is dirty
+-   `changedValues`: Returns a key / value map with the properties that have been changed in the model so far
 
 You may use observable arrays, maps and objects with `createViewModel` but keep in mind to assign fresh instances of those to the viewmodel's properties, otherwise you would end up modifying the properties of the original model.
 Note that if you read a non-dirty property, viewmodel only proxies the read to the model. You therefore need to assign a fresh instance not only the first time you make the assignment but also after calling `reset()` or `submit()`.
