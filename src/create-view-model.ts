@@ -17,14 +17,57 @@ import {
 import { ComputedValue } from "mobx/dist/internal"
 import { invariant, getAllMethodsAndProperties } from "./utils"
 
+/**
+ * An IViewModel proxies all enumerable properties of the original model with the following behavior:
+ *  - as long as no new value has been assigned to the viewmodel property, the original property will be returned.
+ *  - any future change in the model will be visible in the viewmodel as well unless the viewmodel property was dirty at the time of the attempted change.
+ *  - once a new value has been assigned to a property of the viewmodel, that value will be returned during a read of that property in the future. However, the original model remain untouched until `submit()` is called.
+ */
 export interface IViewModel<T> {
+    /**
+     * The original model object for which this viewModel was created
+     */
     model: T
-    reset(): void
+
+    /**
+     * Copies all the values of the viewmodel to the model and resets the state
+     *
+     * `@action.bound`
+     */
     submit(): void
-    isDirty: boolean
-    changedValues: Map<keyof T, T[keyof T]>
-    isPropertyDirty(key: keyof T): boolean
+
+    /**
+     * Resets the state of the viewmodel, abandoning all local modifications
+     *
+     * `@action.bound`
+     */
+    reset(): void
+
+    /**
+     * Resets the specified property of the viewmodel, abandoning local modifications of this property
+     *
+     * `@action.bound`
+     */
     resetProperty(key: keyof T): void
+
+    /**
+     * Indicating if the viewModel contains any modifications
+     *
+     * `@computed` property
+     */
+    isDirty: boolean
+
+    /**
+     * Returns true if the specified property is dirty
+     */
+    isPropertyDirty(key: keyof T): boolean
+
+    /**
+     * Returns a key / value map with the properties that have been changed in the model so far
+     *
+     * `@computed` property
+     */
+    changedValues: Map<keyof T, T[keyof T]>
 }
 
 const RESERVED_NAMES = ["model", "reset", "submit", "isDirty", "isPropertyDirty", "resetProperty"]
@@ -131,13 +174,13 @@ export class ViewModel<T> implements IViewModel<T> {
  *  - once a new value has been assigned to a property of the viewmodel, that value will be returned during a read of that property in the future. However, the original model remain untouched until `submit()` is called.
  *
  * The viewmodel exposes the following additional methods, besides all the enumerable properties of the model:
- * - `submit()`: copies all the values of the viewmodel to the model and resets the state
- * - `reset()`: resets the state of the viewmodel, abandoning all local modifications
- * - `resetProperty(propName)`: resets the specified property of the viewmodel
- * - `isDirty`: observable property indicating if the viewModel contains any modifications
- * - `isPropertyDirty(propName)`: returns true if the specified property is dirty
- * - `changedValues`: returns a key / value map with the properties that have been changed in the model so far
  * - `model`: The original model object for which this viewModel was created
+ * - `submit()`: Copies all the values of the viewmodel to the model and resets the state
+ * - `reset()`: Resets the state of the viewmodel, abandoning all local modifications
+ * - `resetProperty(propName)`: Resets the specified property of the viewmodel, abandoning local modifications of this property
+ * - `isDirty`: Observable property indicating if the viewModel contains any modifications
+ * - `isPropertyDirty(propName)`: Returns true if the specified property is dirty
+ * - `changedValues`: Returns a key / value map with the properties that have been changed in the model so far
  *
  * You may use observable arrays, maps and objects with `createViewModel` but keep in mind to assign fresh instances of those to the viewmodel's properties, otherwise you would end up modifying the properties of the original model.
  * Note that if you read a non-dirty property, viewmodel only proxies the read to the model. You therefore need to assign a fresh instance not only the first time you make the assignment but also after calling `reset()` or `submit()`.
