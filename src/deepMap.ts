@@ -1,65 +1,85 @@
-/**
- * @private
- */
-export class DeepMapEntry<T> {
-    private root: Map<any, any>
-    private closest: Map<any, any>
-    private closestIdx: number = 0
-    isDisposed = false
+// Registered Symbols are not supported as keys in a WeakMap.
+// Firefox also does not yet support any Symbol as a WeakMap key.
+function supportedInWeakMap(symbol: Symbol) {
+    try {
+        new WeakMap().set(symbol, undefined)
+        return true
+    } catch {
+        return false
+    }
+}
 
-    constructor(private base: Map<any, any>, private args: any[]) {
-        let current: undefined | Map<any, any> = (this.closest = this.root = base)
-        let i = 0
-        for (; i < this.args.length - 1; i++) {
-            current = current!.get(args[i])
-            if (current) this.closest = current
-            else break
+export class DeepMapEntry<T> {
+    isDisposed = false
+    private hash: string
+
+    constructor(
+        private readonly state: {
+            store: Map<string, T>
+            weakHashes: WeakMap<object | Function | Symbol, string>
+            strongHashes: Map<Symbol, string>
+            hashId: number
+        },
+        args: Array<Readonly<unknown>>
+    ) {
+        this.hash = args.map((arg) => this.prehash(arg)).join("")
+    }
+
+    private prehash(arg: Readonly<unknown>): string | number {
+        if (typeof arg === "string") {
+            return `s:${arg}`
         }
-        this.closestIdx = i
+        if (typeof arg === "number") {
+            return `n:${arg}`
+        }
+        if (arg === null) {
+            return "null"
+        }
+        if (typeof arg === "boolean") {
+            return arg ? "true" : "false"
+        }
+        if (typeof arg === "undefined") {
+            return "undefined"
+        }
+        if (typeof arg === "object" || typeof arg === "function" || typeof arg === "symbol") {
+            let hashes = this.state.weakHashes
+            if (typeof arg === "symbol" && !supportedInWeakMap(arg)) {
+                hashes = this.state.strongHashes
+            }
+
+            if (hashes.has(arg)) return hashes.get(arg)!
+
+            const hash = `o:${this.state.hashId++}`
+            hashes.set(arg, hash)
+            return hash
+        }
+        if (typeof arg === "bigint") {
+            return `N:${arg}`
+        }
+
+        throw new Error("Unknown type")
     }
 
     exists(): boolean {
         this.assertNotDisposed()
-        const l = this.args.length
-        return this.closestIdx >= l - 1 && this.closest.has(this.args[l - 1])
+        return this.state.store.has(this.hash)
     }
 
     get(): T {
         this.assertNotDisposed()
         if (!this.exists()) throw new Error("Entry doesn't exist")
-        return this.closest.get(this.args[this.args.length - 1])
+        return this.state.store.get(this.hash)!
     }
 
     set(value: T) {
         this.assertNotDisposed()
-        const l = this.args.length
-        let current: Map<any, any> = this.closest
-        // create remaining maps
-        for (let i = this.closestIdx; i < l - 1; i++) {
-            const m = new Map()
-            current.set(this.args[i], m)
-            current = m
-        }
-        this.closestIdx = l - 1
-        this.closest = current
-        current.set(this.args[l - 1], value)
+        this.state.store.set(this.hash, value)
     }
 
     delete() {
         this.assertNotDisposed()
         if (!this.exists()) throw new Error("Entry doesn't exist")
-        const l = this.args.length
-        this.closest.delete(this.args[l - 1])
-        // clean up remaining maps if needed (reconstruct stack first)
-        let c = this.root
-        const maps: Map<any, any>[] = [c]
-        for (let i = 0; i < l - 1; i++) {
-            c = c.get(this.args[i])!
-            maps.push(c)
-        }
-        for (let i = maps.length - 1; i > 0; i--) {
-            if (maps[i].size === 0) maps[i - 1].delete(this.args[i - 1])
-        }
+        this.state.store.delete(this.hash)
         this.isDisposed = true
     }
 
@@ -73,11 +93,16 @@ export class DeepMapEntry<T> {
  * @private
  */
 export class DeepMap<T> {
-    private store = new Map<any, any>()
+    private readonly state = {
+        store: new Map<string, T>(),
+        weakHashes: new WeakMap<object | Function | Symbol, string>(),
+        strongHashes: new Map<Symbol, string>(),
+        hashId: 0,
+    }
     private argsLength = -1
     private last: DeepMapEntry<T> | undefined
 
-    entry(args: any[]): DeepMapEntry<T> {
+    entry(args: Array<Readonly<unknown>>): DeepMapEntry<T> {
         if (this.argsLength === -1) this.argsLength = args.length
         else if (this.argsLength !== args.length)
             throw new Error(
@@ -85,6 +110,6 @@ export class DeepMap<T> {
             )
         if (this.last) this.last.isDisposed = true
 
-        return (this.last = new DeepMapEntry(this.store, args))
+        return (this.last = new DeepMapEntry(this.state, args))
     }
 }
