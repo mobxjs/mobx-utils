@@ -16,48 +16,58 @@ export class DeepMapEntry<T> {
     constructor(
         private readonly state: {
             store: Map<string, T>
-            weakHashes: WeakMap<object | Function | Symbol, string>
-            strongHashes: Map<Symbol, string>
+            weakHashes: WeakMap<object | Function | Symbol, string> | undefined
+            strongHashes: Map<Symbol, string> | undefined
             hashId: number
         },
-        args: Array<Readonly<unknown>>
+        args: Array<Readonly<unknown> | undefined | null>
     ) {
         this.hash = args.map((arg) => this.prehash(arg)).join("")
     }
 
-    private prehash(arg: Readonly<unknown>): string | number {
-        if (typeof arg === "string") {
-            return `s:${arg}`
-        }
-        if (typeof arg === "number") {
-            return `n:${arg}`
-        }
+    private prehash(arg: Readonly<unknown> | undefined | null): string | number {
         if (arg === null) {
             return "null"
         }
-        if (typeof arg === "boolean") {
-            return arg ? "true" : "false"
+
+        switch (typeof arg) {
+            case "string":
+                return `s:${arg}`
+            case "number":
+                return `n:${arg}`
+            case "boolean":
+                return arg ? "true" : "false"
+            case "undefined":
+                return "undefined"
+            case "object":
+            case "function":
+            case "symbol":
+                const strongHash = typeof arg === "symbol" && !supportedInWeakMap(arg)
+                const hashes = this.getHashes(strongHash)
+                if (hashes.has(arg)) return hashes.get(arg)!
+
+                const hash = `o:${this.state.hashId++}`
+                hashes.set(arg, hash)
+
+                return hash
+            case "bigint":
+                return `N:${arg}`
+            default:
+                throw new Error("Unknown type")
         }
-        if (typeof arg === "undefined") {
-            return "undefined"
-        }
-        if (typeof arg === "object" || typeof arg === "function" || typeof arg === "symbol") {
-            let hashes = this.state.weakHashes
-            if (typeof arg === "symbol" && !supportedInWeakMap(arg)) {
-                hashes = this.state.strongHashes
+    }
+
+    private getHashes(strongHash: boolean) {
+        if (strongHash) {
+            if (!this.state.strongHashes) {
+                this.state.strongHashes = new Map()
             }
-
-            if (hashes.has(arg)) return hashes.get(arg)!
-
-            const hash = `o:${this.state.hashId++}`
-            hashes.set(arg, hash)
-            return hash
+            return this.state.strongHashes
         }
-        if (typeof arg === "bigint") {
-            return `N:${arg}`
+        if (!this.state.weakHashes) {
+            this.state.weakHashes = new Map()
         }
-
-        throw new Error("Unknown type")
+        return this.state.weakHashes
     }
 
     exists(): boolean {
@@ -95,14 +105,14 @@ export class DeepMapEntry<T> {
 export class DeepMap<T> {
     private readonly state = {
         store: new Map<string, T>(),
-        weakHashes: new WeakMap<object | Function | Symbol, string>(),
-        strongHashes: new Map<Symbol, string>(),
+        weakHashes: undefined,
+        strongHashes: undefined,
         hashId: 0,
     }
     private argsLength = -1
     private last: DeepMapEntry<T> | undefined
 
-    entry(args: Array<Readonly<unknown>>): DeepMapEntry<T> {
+    entry(args: Array<Readonly<unknown> | undefined | null>): DeepMapEntry<T> {
         if (this.argsLength === -1) this.argsLength = args.length
         else if (this.argsLength !== args.length)
             throw new Error(

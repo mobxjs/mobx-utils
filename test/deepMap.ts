@@ -107,7 +107,7 @@ test("mixed keys", () => {
     const d = new DeepMap<string>()
 
     const o = { hello: "world" }
-    const e = d.entry([o, "a", 1, BigInt(2), true, undefined])
+    const e = d.entry([o, "a", 1, BigInt(2), true, undefined, null])
 
     expect(e.exists()).toBe(false)
 
@@ -117,13 +117,13 @@ test("mixed keys", () => {
     expect(e.exists()).toBe(true)
 
     // Argument matching is based on object identity
-    const e2 = d.entry([{ hello: "world" }, "a", 1, BigInt(2), true, undefined])
+    const e2 = d.entry([{ hello: "world" }, "a", 1, BigInt(2), true, undefined, null])
     expect(e2.exists()).toBe(false)
 
     e2.set("cocoa")
     expect(e2.get()).toBe("cocoa")
 
-    const e3 = d.entry([o, "a", 1, BigInt(2), true, undefined])
+    const e3 = d.entry([o, "a", 1, BigInt(2), true, undefined, null])
 
     expect(e3.get()).toBe("matcha")
     expect(e3.exists()).toBe(true)
