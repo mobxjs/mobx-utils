@@ -5,21 +5,21 @@ import {
     _isComputingDerivation,
     IComputedValueOptions,
 } from "mobx"
-import { invariant, addHiddenProp } from "./utils"
+import { invariant } from "./utils"
 
 export type ITransformer<A, B> = (object: A) => B
 
+export type ITransformerCleanup<A, B> = (resultObject: B | undefined, sourceObject?: A) => void
+
 export type ITransformerParams<A, B> = {
-    onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void
+    onCleanup?: ITransformerCleanup<A, B>
     debugNameGenerator?: (sourceObject?: A) => string
     keepAlive?: boolean
 } & Omit<IComputedValueOptions<B>, "name">
 
-let memoizationId = 0
-
 export function createTransformer<A, B>(
     transformer: ITransformer<A, B>,
-    onCleanup?: (resultObject: B | undefined, sourceObject?: A) => void
+    onCleanup?: ITransformerCleanup<A, B>
 ): ITransformer<A, B>
 export function createTransformer<A, B>(
     transformer: ITransformer<A, B>,
@@ -31,20 +31,22 @@ export function createTransformer<A, B>(
  *
  * See the [transformer](#createtransformer-in-detail) section for more details.
  *
- * @param transformer
- * @param onCleanup
+ * @param transformer A function which transforms instances of A into instances of B
+ * @param arg2 An optional cleanup function which is called when the transformation is no longer
+ * observed from a reactive context, or config options
+ * @returns The memoized transformer function
  */
 export function createTransformer<A, B>(
     transformer: ITransformer<A, B>,
-    arg2?: any
+    arg2?: ITransformerParams<A, B> | ITransformerCleanup<A, B>
 ): ITransformer<A, B> {
     invariant(
         typeof transformer === "function" && transformer.length < 2,
         "createTransformer expects a function that accepts one argument"
     )
 
-    // Memoizes: object id -> reactive view that applies transformer to the object
-    let views: { [id: number]: IComputedValue<B> } = {}
+    // Memoizes: object -> reactive view that applies transformer to the object
+    const views = new Map<A, IComputedValue<B>>()
     let onCleanup: Function | undefined = undefined
     let keepAlive: boolean = false
     let debugNameGenerator: Function | undefined = undefined
@@ -56,7 +58,7 @@ export function createTransformer<A, B>(
         onCleanup = arg2
     }
 
-    function createView(sourceIdentifier: number, sourceObject: A) {
+    function createView(sourceObject: A) {
         let latestValue: B
         let computedValueOptions = {}
         if (typeof arg2 === "object") {
@@ -69,9 +71,12 @@ export function createTransformer<A, B>(
             onCleanup = undefined
             debugNameGenerator = undefined
         }
+        const sourceType = typeof sourceObject
         const prettifiedName = debugNameGenerator
             ? debugNameGenerator(sourceObject)
-            : `Transformer-${(<any>transformer).name}-${sourceIdentifier}`
+            : `Transformer-${(<any>transformer).name}-${
+                  sourceType === "string" || sourceType === "number" ? sourceObject : "object"
+              }`
         const expr = computed(
             () => {
                 return (latestValue = transformer(sourceObject))
@@ -83,7 +88,7 @@ export function createTransformer<A, B>(
         )
         if (!keepAlive) {
             const disposer = onBecomeUnobserved(expr, () => {
-                delete views[sourceIdentifier]
+                views.delete(sourceObject)
                 disposer()
                 if (onCleanup) onCleanup(latestValue, sourceObject)
             })
@@ -93,8 +98,8 @@ export function createTransformer<A, B>(
 
     let memoWarned = false
     return (object: A) => {
-        const identifier = getMemoizationId(object)
-        let reactiveView = views[identifier]
+        checkTransformableObject(object)
+        let reactiveView = views.get(object)
         if (reactiveView) return reactiveView.get()
         if (!keepAlive && !_isComputingDerivation()) {
             if (!memoWarned) {
@@ -109,25 +114,24 @@ export function createTransformer<A, B>(
             return value
         }
         // Not in cache; create a reactive view
-        reactiveView = views[identifier] = createView(identifier, object)
+        reactiveView = createView(object)
+        views.set(object, reactiveView)
         return reactiveView.get()
     }
 }
 
-function getMemoizationId(object: any) {
+function checkTransformableObject(object: any) {
     const objectType = typeof object
-    if (objectType === "string") return `string:${object}`
-    if (objectType === "number") return `number:${object}`
-    if (object === null || (objectType !== "object" && objectType !== "function"))
+    if (
+        object === null ||
+        (objectType !== "object" &&
+            objectType !== "function" &&
+            objectType !== "string" &&
+            objectType !== "number")
+    )
         throw new Error(
             `[mobx-utils] transform expected an object, function, string or number, got: ${String(
                 object
             )}`
         )
-    let tid = object.$transformId
-    if (tid === undefined) {
-        tid = `memoizationId:${++memoizationId}`
-        addHiddenProp(object, "$transformId", tid)
-    }
-    return tid
 }

@@ -72,10 +72,10 @@ test("transform1", () => {
           "name": "ObservableObject@1.todos[..].title",
           "observers": Array [
             Object {
-              "name": "Transformer--memoizationId:3",
+              "name": "Transformer--object",
               "observers": Array [
                 Object {
-                  "name": "Transformer--memoizationId:1",
+                  "name": "Transformer--object",
                   "observers": Array [
                     Object {
                       "name": "Autorun@2",
