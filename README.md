@@ -570,9 +570,6 @@ Instead, the component will only re-render when the relevant todo is (de)selecte
 ### Examples
 
 ```javascript
-const Todo = observer((props) => {
-    const todo = props.todo
-    const isSelected = mobxUtils.expr(() => props.viewState.selection === todo)
 const TodoView = observer(({ todo, editorState }) => {
     const isSelected = mobxUtils.expr(() => editorState.selection === todo)
     return <div className={isSelected ? "todo todo-selected" : "todo"}>{todo.title}</div>
@@ -588,9 +585,11 @@ See the [transformer](#createtransformer-in-detail) section for more details.
 
 ### Parameters
 
--   `transformer`  
--   `arg2`  
--   `onCleanup`  
+-   `transformer`  A function which transforms instances of A into instances of B
+-   `arg2`  An optional cleanup function which is called when the transformation is no longer
+    observed from a reactive context, or config options
+
+Returns **any** The memoized transformer function
 
 ## deepObserve
 
