@@ -81,7 +81,7 @@ export class DeepMap<T> {
     private argsLength = -1
     private currentVersion = 0
 
-    private checkVersion(version: number) {
+    private checkVersion = (version: number) => {
         return this.currentVersion === version
     }
 
@@ -93,6 +93,6 @@ export class DeepMap<T> {
             )
 
         this.currentVersion++
-        return new DeepMapEntry(this.store, args, this.currentVersion, this.checkVersion.bind(this))
+        return new DeepMapEntry(this.store, args, this.currentVersion, this.checkVersion)
     }
 }
