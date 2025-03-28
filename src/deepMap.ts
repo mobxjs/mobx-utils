@@ -5,9 +5,13 @@ export class DeepMapEntry<T> {
     private root: Map<any, any>
     private closest: Map<any, any>
     private closestIdx: number = 0
-    isDisposed = false
 
-    constructor(private base: Map<any, any>, private args: any[]) {
+    constructor(
+        private base: Map<any, any>,
+        private args: any[],
+        private version: number,
+        private versionChecker: (version: number) => boolean
+    ) {
         let current: undefined | Map<any, any> = (this.closest = this.root = base)
         let i = 0
         for (; i < this.args.length - 1; i++) {
@@ -19,19 +23,19 @@ export class DeepMapEntry<T> {
     }
 
     exists(): boolean {
-        this.assertNotDisposed()
+        this.assertCurrentVersion()
         const l = this.args.length
         return this.closestIdx >= l - 1 && this.closest.has(this.args[l - 1])
     }
 
     get(): T {
-        this.assertNotDisposed()
+        this.assertCurrentVersion()
         if (!this.exists()) throw new Error("Entry doesn't exist")
         return this.closest.get(this.args[this.args.length - 1])
     }
 
     set(value: T) {
-        this.assertNotDisposed()
+        this.assertCurrentVersion()
         const l = this.args.length
         let current: Map<any, any> = this.closest
         // create remaining maps
@@ -46,7 +50,7 @@ export class DeepMapEntry<T> {
     }
 
     delete() {
-        this.assertNotDisposed()
+        this.assertCurrentVersion()
         if (!this.exists()) throw new Error("Entry doesn't exist")
         const l = this.args.length
         this.closest.delete(this.args[l - 1])
@@ -60,12 +64,12 @@ export class DeepMapEntry<T> {
         for (let i = maps.length - 1; i > 0; i--) {
             if (maps[i].size === 0) maps[i - 1].delete(this.args[i - 1])
         }
-        this.isDisposed = true
     }
 
-    private assertNotDisposed() {
-        // TODO: once this becomes annoying, we should introduce a reset method to re-run the constructor logic
-        if (this.isDisposed) throw new Error("Concurrent modification exception")
+    private assertCurrentVersion() {
+        if (!this.versionChecker(this.version)) {
+            throw new Error("Concurrent modification exception")
+        }
     }
 }
 
@@ -75,7 +79,11 @@ export class DeepMapEntry<T> {
 export class DeepMap<T> {
     private store = new Map<any, any>()
     private argsLength = -1
-    private last: DeepMapEntry<T> | undefined
+    private currentVersion = 0
+
+    private checkVersion(version: number) {
+        return this.currentVersion === version
+    }
 
     entry(args: any[]): DeepMapEntry<T> {
         if (this.argsLength === -1) this.argsLength = args.length
@@ -83,8 +91,8 @@ export class DeepMap<T> {
             throw new Error(
                 `DeepMap should be used with functions with a consistent length, expected: ${this.argsLength}, got: ${args.length}`
             )
-        if (this.last) this.last.isDisposed = true
 
-        return (this.last = new DeepMapEntry(this.store, args))
+        this.currentVersion++
+        return new DeepMapEntry(this.store, args, this.currentVersion, this.checkVersion.bind(this))
     }
 }
