@@ -92,6 +92,11 @@ export class DeepMap<T> {
                 `DeepMap should be used with functions with a consistent length, expected: ${this.argsLength}, got: ${args.length}`
             )
 
+        if (this.currentVersion >= Number.MAX_SAFE_INTEGER) {
+            // Reset version counter when it reaches max safe integer
+            this.currentVersion = 0
+        }
+
         this.currentVersion++
         return new DeepMapEntry(this.store, args, this.currentVersion, this.checkVersion)
     }
