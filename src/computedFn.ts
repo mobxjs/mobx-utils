@@ -72,7 +72,7 @@ export function computedFn<T extends (...args: any[]) => any>(
                 (opts.requiresReaction ?? _getGlobalState().computedRequiresReaction)
             ) {
                 console.warn(
-                    "Invoking a computedFn from outside a reactive context won't be memoized unless keepAlive is set."
+                    "Invoking a computedFn from outside a reactive context won't be memoized unless keepAlive is set." 
                 )
                 memoWarned = true
             }
