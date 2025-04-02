@@ -73,7 +73,9 @@ export function computedFn<T extends (...args: any[]) => any>(
                 )
                 memoWarned = true
             }
-            return fn.apply(this, args)
+            const value = fn.apply(this, args)
+            if (opts.onCleanup) opts.onCleanup(value, ...args)
+            return value
         }
         // create new entry
         let latestValue: ReturnType<T> | undefined
