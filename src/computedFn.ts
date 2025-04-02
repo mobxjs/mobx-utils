@@ -67,13 +67,19 @@ export function computedFn<T extends (...args: any[]) => any>(
         if (entry.exists()) return entry.get().get()
         // if function is invoked, and its a cache miss without reactive, there is no point in caching...
         if (!opts.keepAlive && !_isComputingDerivation()) {
-            if (!memoWarned && _getGlobalState().computedRequiresReaction) {
+            if (
+                !memoWarned &&
+                (opts.requiresReaction ?? _getGlobalState().computedRequiresReaction)
+            ) {
                 console.warn(
-                    "Invoking a computedFn from outside a reactive context won't be memoized unless keepAlive is set." 
+                    "Invoking a computedFn from outside a reactive context won't be memoized " +
+                        "and is cleaned up immediately, unless keepAlive is set."
                 )
                 memoWarned = true
             }
-            return fn.apply(this, args)
+            const value = fn.apply(this, args)
+            if (opts.onCleanup) opts.onCleanup(value, ...args)
+            return value
         }
         // create new entry
         let latestValue: ReturnType<T> | undefined
