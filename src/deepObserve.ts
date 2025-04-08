@@ -118,7 +118,7 @@ export function deepObserve<T = any>(
                     dispose: observe(thing, genericListener),
                 }
                 entrySet.set(thing, entry)
-                entries(thing).forEach(([key, value]) => observeRecursively(value, entry, key))
+                entries(thing).forEach(([key, value]) => observeRecursively(value, entry, "" + key))
             }
         }
     }
