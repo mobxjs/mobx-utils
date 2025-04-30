@@ -69,11 +69,14 @@ export function computedFn<T extends (...args: any[]) => any>(
         if (!opts.keepAlive && !_isComputingDerivation()) {
             if (!memoWarned && _getGlobalState().computedRequiresReaction) {
                 console.warn(
-                    "Invoking a computedFn from outside a reactive context won't be memoized unless keepAlive is set." 
+                    "Invoking a computedFn from outside a reactive context won't be memoized " +
+                        "and is cleaned up immediately, unless keepAlive is set."
                 )
                 memoWarned = true
             }
-            return fn.apply(this, args)
+            const value = fn.apply(this, args)
+            if (opts.onCleanup) opts.onCleanup(value, ...args)
+            return value
         }
         // create new entry
         let latestValue: ReturnType<T> | undefined
