@@ -1,9 +1,10 @@
 import {
-    computed,
-    onBecomeUnobserved,
-    IComputedValue,
+    _getGlobalState,
     _isComputingDerivation,
+    computed,
+    IComputedValue,
     IComputedValueOptions,
+    onBecomeUnobserved,
 } from "mobx"
 import { invariant } from "./utils"
 
@@ -47,30 +48,11 @@ export function createTransformer<A, B>(
 
     // Memoizes: object -> reactive view that applies transformer to the object
     const views = new Map<A, IComputedValue<B>>()
-    let onCleanup: Function | undefined = undefined
-    let keepAlive: boolean = false
-    let debugNameGenerator: Function | undefined = undefined
-    if (typeof arg2 === "object") {
-        onCleanup = arg2.onCleanup
-        keepAlive = arg2.keepAlive !== undefined ? arg2.keepAlive : false
-        debugNameGenerator = arg2.debugNameGenerator
-    } else if (typeof arg2 === "function") {
-        onCleanup = arg2
-    }
+    const opts = getOpts(arg2)
+    const { debugNameGenerator, keepAlive, onCleanup } = opts
 
     function createView(sourceObject: A) {
         let latestValue: B
-        let computedValueOptions = {}
-        if (typeof arg2 === "object") {
-            onCleanup = arg2.onCleanup
-            debugNameGenerator = arg2.debugNameGenerator
-            computedValueOptions = arg2
-        } else if (typeof arg2 === "function") {
-            onCleanup = arg2
-        } else {
-            onCleanup = undefined
-            debugNameGenerator = undefined
-        }
         const sourceType = typeof sourceObject
         const prettifiedName = debugNameGenerator
             ? debugNameGenerator(sourceObject)
@@ -82,7 +64,7 @@ export function createTransformer<A, B>(
                 return (latestValue = transformer(sourceObject))
             },
             {
-                ...computedValueOptions,
+                ...opts,
                 name: prettifiedName,
             }
         )
@@ -102,10 +84,13 @@ export function createTransformer<A, B>(
         let reactiveView = views.get(object)
         if (reactiveView) return reactiveView.get()
         if (!keepAlive && !_isComputingDerivation()) {
-            if (!memoWarned) {
+            if (
+                !memoWarned &&
+                (opts.requiresReaction ?? _getGlobalState().computedRequiresReaction)
+            ) {
                 console.warn(
-                    "invoking a transformer from outside a reactive context won't memorized " +
-                        "and is cleaned up immediately, unless keepAlive is set"
+                    "Invoking a transformer from outside a reactive context won't be memoized " +
+                        "and is cleaned up immediately, unless keepAlive is set."
                 )
                 memoWarned = true
             }
@@ -117,6 +102,18 @@ export function createTransformer<A, B>(
         reactiveView = createView(object)
         views.set(object, reactiveView)
         return reactiveView.get()
+    }
+}
+
+function getOpts<A, B>(
+    opts?: ITransformerParams<A, B> | ITransformerCleanup<A, B>
+): ITransformerParams<A, B> {
+    if (typeof opts === "object") {
+        return opts
+    } else if (typeof opts === "function") {
+        return { onCleanup: opts }
+    } else {
+        return {}
     }
 }
 
