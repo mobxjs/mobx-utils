@@ -15,8 +15,6 @@ Feel free to open a PR with your own utilities. For large new features, please o
 
 NPM: `npm install mobx-utils --save`
 
-CDN: <https://unpkg.com/mobx-utils/mobx-utils.umd.js>
-
 `import {function_name} from 'mobx-utils'`
 
 # API

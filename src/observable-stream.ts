@@ -81,14 +81,19 @@ export function toStream<T>(
 }
 
 class StreamListener<T> implements IStreamObserver<T> {
-    @observable.ref current!: T
+    current!: T
     subscription!: ISubscription
 
-    constructor(observable: IObservableStream<T>, initialValue: T) {
-        makeObservable(this)
+    constructor(stream: IObservableStream<T>, initialValue: T) {
+        makeObservable(this, {
+            current: observable.ref,
+            next: action.bound,
+            complete: action.bound,
+            error: action.bound,
+        })
         runInAction(() => {
             this.current = initialValue
-            this.subscription = observable.subscribe(this)
+            this.subscription = stream.subscribe(this)
         })
     }
 
@@ -98,17 +103,14 @@ class StreamListener<T> implements IStreamObserver<T> {
         }
     }
 
-    @action.bound
     next(value: T) {
         this.current = value
     }
 
-    @action.bound
     complete() {
         this.dispose()
     }
 
-    @action.bound
     error(value: T) {
         this.current = value
         this.dispose()

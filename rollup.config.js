@@ -2,12 +2,9 @@ export default {
     input: "lib/mobx-utils.js",
     output: [
         {
-            format: "umd",
-            file: "mobx-utils.umd.js",
-            name: "mobxUtils",
-            globals: {
-                mobx: "mobx",
-            },
+            format: "cjs",
+            file: "mobx-utils.cjs.js",
+            exports: "named",
         },
         {
             format: "es",

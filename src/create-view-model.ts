@@ -76,18 +76,22 @@ export class ViewModel<T> implements IViewModel<T> {
     localValues: ObservableMap<keyof T, T[keyof T]> = observable.map({})
     localComputedValues: ObservableMap<keyof T, IComputedValue<T[keyof T]>> = observable.map({})
 
-    @computed
     get isDirty() {
         return this.localValues.size > 0
     }
 
-    @computed
-    get changedValues() {
+    get changedValues(): Map<keyof T, T[keyof T]> {
         return new Map(this.localValues)
     }
 
     constructor(public model: T) {
-        makeObservable(this)
+        makeObservable(this, {
+            isDirty: computed,
+            changedValues: computed,
+            submit: action.bound,
+            reset: action.bound,
+            resetProperty: action.bound,
+        })
         invariant(isObservableObject(model), "createViewModel expects an observable object")
         const ownMethodsAndProperties = getAllMethodsAndProperties(this)
 
@@ -138,9 +142,8 @@ export class ViewModel<T> implements IViewModel<T> {
         return this.localValues.has(key)
     }
 
-    @action.bound
     submit() {
-        keys(this.localValues).forEach((key: keyof T) => {
+        keys<keyof T>(this.localValues).forEach((key) => {
             const source = this.localValues.get(key)!
             const destination = this.model[key]
             if (isObservableArray(destination)) {
@@ -155,12 +158,10 @@ export class ViewModel<T> implements IViewModel<T> {
         this.localValues.clear()
     }
 
-    @action.bound
     reset() {
         this.localValues.clear()
     }
 
-    @action.bound
     resetProperty(key: keyof T) {
         this.localValues.delete(key)
     }

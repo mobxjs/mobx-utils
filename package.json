@@ -2,11 +2,19 @@
   "name": "mobx-utils",
   "version": "6.1.1",
   "description": "Utility functions and common patterns for MobX",
-  "main": "mobx-utils.umd.js",
+  "main": "mobx-utils.cjs.js",
   "module": "mobx-utils.module.js",
   "jsnext:main": "mobx-utils.module.js",
   "react-native": "mobx-utils.module.js",
   "typings": "lib/mobx-utils.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/mobx-utils.d.ts",
+      "module": "./mobx-utils.module.js",
+      "default": "./mobx-utils.cjs.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "scripts": {
     "prettier": "prettier --write \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
@@ -28,11 +36,12 @@
   },
   "files": [
     "lib/",
-    "mobx-utils.umd.js",
+    "mobx-utils.cjs.js",
     "mobx-utils.module.js"
   ],
   "devDependencies": {
     "@types/jest": "^25.2.3",
+    "@types/node": "^22",
     "coveralls": "^3.1.0",
     "documentation": "^13.0.0",
     "faucet": "*",
@@ -42,17 +51,17 @@
     "lodash.clonedeep": "*",
     "lodash.clonedeepwith": "*",
     "lodash.intersection": "*",
-    "mobx": "^6.0.0",
+    "mobx": "^6.16.1",
     "prettier": "^2.0.5",
     "rollup": "^2.10.8",
     "rxjs": "^6.6.3",
     "shelljs": "^0.8.4",
     "ts-jest": "^26.0.0",
-    "typescript": "^4.0.3"
+    "typescript": "~6.0.3"
   },
   "dependencies": {},
   "peerDependencies": {
-    "mobx": "^6.0.0"
+    "mobx": "^6.16.1"
   },
   "keywords": [
     "mobx",
@@ -90,5 +99,8 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

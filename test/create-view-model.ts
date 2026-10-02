@@ -5,15 +5,13 @@ import { ViewModel } from "../src/create-view-model"
 mobx.configure({ enforceActions: "observed" })
 
 class TodoClass {
-    @mobx.observable title: string
-    @mobx.observable done: boolean
-    @mobx.observable usersInterested: string[]
+    title: string
+    done: boolean
+    usersInterested: string[]
     unobservedProp: string
-    @mobx.computed
     get usersCount(): number {
         return this.usersInterested.length
     }
-    @mobx.computed
     get prefixedTitle() {
         return "Strong" + this.title
     }
@@ -21,7 +19,13 @@ class TodoClass {
         this.title = value.substr(6)
     }
     constructor() {
-        mobx.makeObservable(this)
+        mobx.makeObservable(this, {
+            title: mobx.observable,
+            done: mobx.observable,
+            usersInterested: mobx.observable,
+            usersCount: mobx.computed,
+            prefixedTitle: mobx.computed,
+        })
     }
 }
 

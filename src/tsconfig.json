@@ -1,7 +1,7 @@
 {
     "version": "1.8.10",
     "compilerOptions": {
-        "target": "es5",
+        "target": "es2015",
         "sourceMap": false,
         "declaration": true,
         "module": "es6",
@@ -9,8 +9,7 @@
         "outDir": "../lib/",
         "noImplicitAny": true,
         "strict": true,
-        "moduleResolution": "node",
-        "experimentalDecorators": true,
+        "moduleResolution": "bundler",
         "useDefineForClassFields": true,
         "lib": [
             "dom",
@@ -18,7 +17,9 @@
             "scripthost",
             "es2015.promise",
             "es2015.generator",
-            "es2015.iterable"
+            "es2015.iterable",
+            "es2018.asyncgenerator",
+            "esnext.collection"
         ]
     },
     "exclude": ["node_modules"]

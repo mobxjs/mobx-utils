@@ -5,8 +5,8 @@ import {
     onBecomeUnobserved,
     action,
     getDependencyTree,
-    comparer,
     getObserverTree,
+    comparer,
 } from "mobx"
 
 const john = {

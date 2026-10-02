@@ -3,7 +3,7 @@ node_modules
 lib
 coverage
 mobx-utils.module.js
-mobx-utils.umd.js
+mobx-utils.cjs.js
 .idea
 /.test-ts/
 *.iml

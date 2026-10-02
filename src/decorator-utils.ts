@@ -1,4 +1,4 @@
-import { addHiddenProp } from "./utils"
+import { addHiddenProp, fail } from "./utils"
 
 type BabelDescriptor = PropertyDescriptor & { initializer?: () => any }
 

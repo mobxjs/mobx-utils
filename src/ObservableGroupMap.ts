@@ -92,10 +92,10 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
         this._keyToName = keyToName
         this._groupBy = groupBy
         this._ogmInfoKey = Symbol("ogmInfo" + name) as any
-        this._base = base
+        this._base = base as IObservableArray<T & GroupItem>
 
-        for (let i = 0; i < base.length; i++) {
-            this._addItem(base[i])
+        for (let i = 0; i < this._base.length; i++) {
+            this._addItem(this._base[i])
         }
 
         this._disposeBaseObserver = observe(this._base, (change) => {
@@ -156,7 +156,7 @@ export class ObservableGroupMap<G, T> extends ObservableMap<G, IObservableArray<
     }
 
     private _removeFromGroupArr(key: G, itemIndex: number) {
-        const arr: IObservableArray<T & GroupItem> = super.get(key)!
+        const arr = super.get(key)! as IObservableArray<T & GroupItem>
         if (1 === arr.length) {
             super.delete(key)
         } else if (itemIndex === arr.length - 1) {
