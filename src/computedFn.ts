@@ -1,8 +1,10 @@
 import { DeepMap } from "./deepMap"
 import {
+    IAtom,
     IComputedValue,
     IComputedValueOptions,
     computed,
+    createAtom,
     onBecomeUnobserved,
     _isComputingDerivation,
     isAction,
@@ -83,19 +85,28 @@ export function computedFn<T extends (...args: any[]) => any>(
         }
         // create new entry
         let latestValue: ReturnType<T> | undefined
-        const c = computed(
+        const name = `computedFn(${opts.name || fn.name}#${++i})`
+        // without a tracking context (e.g. a computed read inside an action) mobx never marks the entry
+        // as observed, so onBecomeUnobserved would never fire for it. Such an entry depends on an always
+        // observed sentinel instead, which gets unobserved once mobx suspends the entry. See #319
+        const sentinel =
+            !opts.keepAlive && !_getGlobalState().trackingContext
+                ? createAtom(`${name}.sentinel`)
+                : undefined
+        const c: IComputedValue<ReturnType<T>> = computed(
             () => {
+                if (sentinel) reportObservedAlways(sentinel, c)
                 return (latestValue = fn.apply(this, args))
             },
             {
                 ...opts,
-                name: `computedFn(${opts.name || fn.name}#${++i})`,
+                name,
             }
         )
         entry.set(c)
         // clean up if no longer observed
         if (!opts.keepAlive)
-            onBecomeUnobserved(c, () => {
+            onBecomeUnobserved(sentinel || c, () => {
                 d.entry(args).delete()
                 if (opts.onCleanup) opts.onCleanup(latestValue, ...args)
                 latestValue = undefined
@@ -103,4 +114,17 @@ export function computedFn<T extends (...args: any[]) => any>(
         // return current val
         return c.get()
     } as any
+}
+
+// mobx only marks an atom as observed when it is read inside a tracking context, so provide one,
+// like mobx does for keepAlive computeds
+function reportObservedAlways(atom: IAtom, context: IComputedValue<any>) {
+    const globalState = _getGlobalState()
+    const prevTrackingContext = globalState.trackingContext
+    globalState.trackingContext = prevTrackingContext || context
+    try {
+        atom.reportObserved()
+    } finally {
+        globalState.trackingContext = prevTrackingContext
+    }
 }
