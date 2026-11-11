@@ -7,6 +7,11 @@ import {
     getDependencyTree,
     comparer,
     getObserverTree,
+    computed,
+    runInAction,
+    untracked,
+    createAtom,
+    IAtom,
 } from "mobx"
 
 const john = {
@@ -193,4 +198,281 @@ test("supports onCleanup", () => {
 
 test("should not allow actions", () => {
     expect(() => computedFn(action(() => {}))).toThrow("action")
+})
+
+test("evicts entries that are only read inside an action once the batch ends", () => {
+    const events: string[] = []
+    const unloaded: unknown[] = []
+    const store = observable({ x: 1 })
+    const double = computedFn(
+        (n: number) => {
+            events.push("calc " + n)
+            return store.x * n
+        },
+        { onCleanup: (result, n) => unloaded.push([result, n]) }
+    )
+
+    // a computed read inside an action is a derivation that nothing observes: the entry is memoized
+    // for the batch, then evicted and cleaned up like any unobserved entry
+    runInAction(() => {
+        expect(computed(() => double(2) + double(2)).get()).toBe(4)
+        expect(unloaded).toEqual([])
+    })
+    expect(events).toEqual(["calc 2"])
+    expect(unloaded).toEqual([[2, 2]])
+
+    // an untracked read is not served by a pinned entry: computed and cleaned up right away
+    expect(double(2)).toBe(2)
+    expect(events).toEqual(["calc 2", "calc 2"])
+    expect(unloaded).toEqual([
+        [2, 2],
+        [2, 2],
+    ])
+})
+
+test("memoizes direct calls inside an action until the batch ends", () => {
+    const events: string[] = []
+    const unloaded: unknown[] = []
+    const store = observable({ x: 1 })
+    const double = computedFn(
+        (n: number) => {
+            events.push("calc " + n)
+            return store.x * n
+        },
+        { onCleanup: (result, n) => unloaded.push([result, n]) }
+    )
+
+    // like a computed read inside an action: one computation per batch, unless a dependency changes
+    runInAction(() => {
+        expect(double(2)).toBe(2)
+        expect(double(2)).toBe(2)
+        store.x = 5
+        expect(double(2)).toBe(10)
+        expect(double(2)).toBe(10)
+        expect(unloaded).toEqual([])
+    })
+    expect(events).toEqual(["calc 2", "calc 2"])
+    expect(unloaded).toEqual([[10, 2]])
+
+    // outside of a batch nothing is memoized
+    expect(double(2)).toBe(10)
+    expect(events).toEqual(["calc 2", "calc 2", "calc 2"])
+    expect(unloaded).toEqual([
+        [10, 2],
+        [10, 2],
+    ])
+})
+
+test("evicts entries created inside an action or an untracked block that a reaction runs", () => {
+    let calls = 0
+    const unloaded: unknown[] = []
+    const double = computedFn(
+        (n: number) => {
+            calls++
+            return n * 2
+        },
+        { onCleanup: (result, n) => unloaded.push([result, n]) }
+    )
+
+    // the reaction provides a tracking context, but neither entry is tracked by it
+    const d1 = autorun(() => runInAction(() => double(1) + double(1)))
+    const d2 = autorun(() => untracked(() => double(2) + double(2)))
+    expect(calls).toBe(2)
+    expect(unloaded).toEqual([
+        [2, 1],
+        [4, 2],
+    ])
+    d1()
+    d2()
+    expect(unloaded.length).toBe(2)
+})
+
+test("keeps a direct call cached while a reaction from the same batch observes it", () => {
+    const events: string[] = []
+    const unloaded: unknown[] = []
+    const store = observable({ x: 1 })
+    const double = computedFn(
+        (n: number) => {
+            events.push("calc " + n)
+            return store.x * n
+        },
+        { onCleanup: (result, n) => unloaded.push([result, n]) }
+    )
+
+    const d = runInAction(() => {
+        double(2)
+        return autorun(() => events.push("autorun " + double(2)))
+    })
+    runInAction(() => {
+        store.x = 3
+    })
+    expect(unloaded).toEqual([])
+    d()
+
+    expect(events).toEqual(["calc 2", "autorun 2", "calc 2", "autorun 6"])
+    expect(unloaded).toEqual([[6, 2]])
+})
+
+test("caches and evicts normally after the same arguments were read inside an action", () => {
+    const events: string[] = []
+    const unloaded: unknown[] = []
+    const store = observable({ x: 1 })
+    const double = computedFn(
+        (n: number) => {
+            events.push("calc " + n)
+            return store.x * n
+        },
+        { onCleanup: (result, n) => unloaded.push([result, n]) }
+    )
+
+    runInAction(() => computed(() => double(2)).get())
+    const d = autorun(() => events.push("autorun " + double(2)))
+    // served from the entry created by the autorun
+    expect(double(2)).toBe(2)
+    runInAction(() => {
+        store.x = 2
+    })
+    d()
+
+    expect(events).toEqual(["calc 2", "calc 2", "autorun 2", "calc 2", "autorun 4"])
+    expect(unloaded).toEqual([
+        [2, 2],
+        [4, 2],
+    ])
+})
+
+test("cleans up a value computed by an observed computed inside an action exactly once", () => {
+    const events: string[] = []
+    const unloaded: unknown[] = []
+    const store = observable({ x: 1 })
+    const tenfold = computedFn(
+        (n: number) => {
+            events.push("calc " + n)
+            return n * 10
+        },
+        { onCleanup: (result, n) => unloaded.push([result, n]) }
+    )
+    const k = computed(() => tenfold(store.x))
+
+    const d = autorun(() => events.push("autorun " + k.get()))
+    // recomputed inside the action with a new argument: mobx 6 does not mark the new entry as
+    // observed (mobx 7 does since 7.0.4), either way it is cleaned up once, when it is evicted
+    runInAction(() => {
+        store.x = 2
+        expect(k.get()).toBe(20)
+    })
+    expect(unloaded).toEqual([[10, 1]])
+    d()
+
+    expect(events).toEqual(["calc 1", "autorun 10", "calc 2", "autorun 20"])
+    expect(unloaded).toEqual([
+        [10, 1],
+        [20, 2],
+    ])
+})
+
+test("keeps an entry read inside an action while a reaction from the same batch observes it", () => {
+    const cleanups: string[] = []
+    const storeFor = computedFn((key: string) => observable({ key, value: 0 }), {
+        onCleanup: (_, key) => cleanups.push(key),
+    })
+    const current = computed(() => storeFor("B"))
+    const seen: number[] = []
+
+    // read inside the action first, then observed while cached
+    const d = runInAction(() => {
+        current.get()
+        return autorun(() => seen.push(current.get().value))
+    })
+    runInAction(() => {
+        storeFor("B").value = 42
+    })
+    expect(cleanups).toEqual([])
+    d()
+
+    expect(seen).toEqual([0, 42])
+    expect(cleanups).toEqual(["B"])
+})
+
+test("evicts an entry read inside an action even if it throws", () => {
+    let calls = 0
+    const unloaded: unknown[] = []
+    const fail = computedFn(
+        (n: number) => {
+            calls++
+            throw new Error("fail " + n)
+        },
+        { onCleanup: (result, n) => unloaded.push([result, n]) }
+    )
+
+    expect(() => runInAction(() => computed(() => fail(1)).get())).toThrow("fail 1")
+    expect(unloaded).toEqual([[undefined, 1]])
+    expect(() => fail(1)).toThrow("fail 1")
+    expect(calls).toBe(2)
+})
+
+test("observes the dependencies of an entry like a plain computed", () => {
+    // hooks of a dependency read inside an action, then by a reaction created in the same batch
+    function dependencyHooks(createRead: (dep: IAtom) => () => unknown) {
+        const hooks: string[] = []
+        const dep = createAtom(
+            "dep",
+            () => hooks.push("observed"),
+            () => hooks.push("unobserved")
+        )
+        const read = createRead(dep)
+        runInAction(() => read())
+        hooks.push("read inside an action")
+        runInAction(() => computed(read).get())
+        hooks.push("read by a computed inside an action")
+        const k = computed(read)
+        const d = runInAction(() => {
+            k.get()
+            return autorun(() => k.get())
+        })
+        hooks.push("observed by a reaction")
+        d()
+        const d2 = autorun(() => runInAction(() => read()))
+        hooks.push("read inside an action that a reaction runs")
+        d2()
+        return hooks
+    }
+
+    const throughComputedFn = dependencyHooks((dep) => {
+        const f = computedFn((n: number) => {
+            dep.reportObserved()
+            return n
+        })
+        return () => f(1)
+    })
+    const throughComputed = dependencyHooks((dep) => {
+        const c = computed(() => {
+            dep.reportObserved()
+            return 1
+        })
+        return () => c.get()
+    })
+    // on mobx 7 an entry that is marked as observed too early or too late changes this sequence
+    expect(throughComputedFn).toEqual(throughComputed)
+})
+
+test("caches nested computedFn calls while observed", () => {
+    const events: string[] = []
+    const store = observable({ x: 1, y: 1 })
+    const inner = computedFn((n: number) => {
+        events.push("inner " + n)
+        return store.x * n
+    })
+    const outer = computedFn((n: number) => {
+        events.push("outer " + n)
+        return inner(n) + store.y
+    })
+
+    const d = autorun(() => events.push("autorun " + outer(2)))
+    runInAction(() => {
+        store.y = 2
+    })
+    d()
+
+    expect(events).toEqual(["outer 2", "inner 2", "autorun 3", "outer 2", "autorun 4"])
 })
