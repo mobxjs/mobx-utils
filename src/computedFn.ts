@@ -23,7 +23,8 @@ export type IComputedFnOptions<F extends (...args: any[]) => any> = {
  * that is accepted. However, the amount of arguments must be constant and default arguments are not supported.
  *
  * By default the output of a function call will only be memoized as long as the
- * output is being observed.
+ * output is being observed. Like a `computed`, a call made inside an action (or any other batch)
+ * is memoized until that batch ends.
  *
  * The function passes into `computedFn` should be pure, not be an action and only be relying on
  * observables.
@@ -67,12 +68,11 @@ export function computedFn<T extends (...args: any[]) => any>(
         const entry = d.entry(args)
         // cache hit, return
         if (entry.exists()) return entry.get().get()
-        // if function is invoked, and its a cache miss without reactive, there is no point in caching...
-        if (!opts.keepAlive && !_isComputingDerivation()) {
-            if (
-                !memoWarned &&
-                (opts.requiresReaction ?? _getGlobalState().computedRequiresReaction)
-            ) {
+        const globalState = _getGlobalState()
+        // if function is invoked, and its a cache miss outside of a batch, there is no point in caching...
+        // (like a computed: a derivation, an action and a transaction all run inside a batch)
+        if (!opts.keepAlive && globalState.inBatch === 0) {
+            if (!memoWarned && (opts.requiresReaction ?? globalState.computedRequiresReaction)) {
                 console.warn(
                     "Invoking a computedFn from outside a reactive context won't be memoized " +
                         "and is cleaned up immediately, unless keepAlive is set."
@@ -86,11 +86,13 @@ export function computedFn<T extends (...args: any[]) => any>(
         // create new entry
         let latestValue: ReturnType<T> | undefined
         const name = `computedFn(${opts.name || fn.name}#${++i})`
-        // without a tracking context (e.g. a computed read inside an action) mobx never marks the entry
-        // as observed, so onBecomeUnobserved would never fire for it. Such an entry depends on an always
-        // observed sentinel instead, which gets unobserved once mobx suspends the entry. See #319
+        // mobx only marks the entry as observed when a derivation reads it inside a tracking context,
+        // that is on behalf of a reaction. Otherwise (e.g. a call inside an action, directly or through
+        // a computed) onBecomeUnobserved would never fire for it. Such an entry depends on an always
+        // observed sentinel instead, which gets unobserved once mobx suspends the entry, at the end of
+        // the batch unless a reaction started observing it. See #319
         const sentinel =
-            !opts.keepAlive && !_getGlobalState().trackingContext
+            !opts.keepAlive && !(_isComputingDerivation() && globalState.trackingContext)
                 ? createAtom(`${name}.sentinel`)
                 : undefined
         const c: IComputedValue<ReturnType<T>> = computed(

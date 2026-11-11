@@ -9,6 +9,7 @@ import {
     getObserverTree,
     computed,
     runInAction,
+    untracked,
     createAtom,
     IAtom,
 } from "mobx"
@@ -229,6 +230,89 @@ test("evicts entries that are only read inside an action once the batch ends", (
     ])
 })
 
+test("memoizes direct calls inside an action until the batch ends", () => {
+    const events: string[] = []
+    const unloaded: unknown[] = []
+    const store = observable({ x: 1 })
+    const double = computedFn(
+        (n: number) => {
+            events.push("calc " + n)
+            return store.x * n
+        },
+        { onCleanup: (result, n) => unloaded.push([result, n]) }
+    )
+
+    // like a computed read inside an action: one computation per batch, unless a dependency changes
+    runInAction(() => {
+        expect(double(2)).toBe(2)
+        expect(double(2)).toBe(2)
+        store.x = 5
+        expect(double(2)).toBe(10)
+        expect(double(2)).toBe(10)
+        expect(unloaded).toEqual([])
+    })
+    expect(events).toEqual(["calc 2", "calc 2"])
+    expect(unloaded).toEqual([[10, 2]])
+
+    // outside of a batch nothing is memoized
+    expect(double(2)).toBe(10)
+    expect(events).toEqual(["calc 2", "calc 2", "calc 2"])
+    expect(unloaded).toEqual([
+        [10, 2],
+        [10, 2],
+    ])
+})
+
+test("evicts entries created inside an action or an untracked block that a reaction runs", () => {
+    let calls = 0
+    const unloaded: unknown[] = []
+    const double = computedFn(
+        (n: number) => {
+            calls++
+            return n * 2
+        },
+        { onCleanup: (result, n) => unloaded.push([result, n]) }
+    )
+
+    // the reaction provides a tracking context, but neither entry is tracked by it
+    const d1 = autorun(() => runInAction(() => double(1) + double(1)))
+    const d2 = autorun(() => untracked(() => double(2) + double(2)))
+    expect(calls).toBe(2)
+    expect(unloaded).toEqual([
+        [2, 1],
+        [4, 2],
+    ])
+    d1()
+    d2()
+    expect(unloaded.length).toBe(2)
+})
+
+test("keeps a direct call cached while a reaction from the same batch observes it", () => {
+    const events: string[] = []
+    const unloaded: unknown[] = []
+    const store = observable({ x: 1 })
+    const double = computedFn(
+        (n: number) => {
+            events.push("calc " + n)
+            return store.x * n
+        },
+        { onCleanup: (result, n) => unloaded.push([result, n]) }
+    )
+
+    const d = runInAction(() => {
+        double(2)
+        return autorun(() => events.push("autorun " + double(2)))
+    })
+    runInAction(() => {
+        store.x = 3
+    })
+    expect(unloaded).toEqual([])
+    d()
+
+    expect(events).toEqual(["calc 2", "autorun 2", "calc 2", "autorun 6"])
+    expect(unloaded).toEqual([[6, 2]])
+})
+
 test("caches and evicts normally after the same arguments were read inside an action", () => {
     const events: string[] = []
     const unloaded: unknown[] = []
@@ -337,8 +421,10 @@ test("observes the dependencies of an entry like a plain computed", () => {
             () => hooks.push("unobserved")
         )
         const read = createRead(dep)
-        runInAction(() => computed(read).get())
+        runInAction(() => read())
         hooks.push("read inside an action")
+        runInAction(() => computed(read).get())
+        hooks.push("read by a computed inside an action")
         const k = computed(read)
         const d = runInAction(() => {
             k.get()
@@ -346,6 +432,9 @@ test("observes the dependencies of an entry like a plain computed", () => {
         })
         hooks.push("observed by a reaction")
         d()
+        const d2 = autorun(() => runInAction(() => read()))
+        hooks.push("read inside an action that a reaction runs")
+        d2()
         return hooks
     }
 
